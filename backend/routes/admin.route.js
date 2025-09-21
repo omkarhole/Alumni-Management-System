@@ -7,7 +7,7 @@ const forumRouter=require('./carrier.route.js');
 const galleryRouter=require('./carrier.route.js');
 const settingsRouter=require('./carrier.route.js');
 const userRouter=require('./carrier.route.js');
-const dashboardRouter=require('./carrier.route.js');
+const dashboardRouter=require('./dashboard.route.js');
 
 const router=express.Router();
 
