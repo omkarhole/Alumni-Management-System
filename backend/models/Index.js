@@ -1,14 +1,14 @@
-import sequelize from '../utils/db.js';
-import AlumnusBio from './AlumnusBio.js';
-import Career from './Career.js';
-import Course from './Course.js';
-import Event from './Event.js';
-import EventCommit from './EventCommit.js';
-import ForumComment from './ForumComment.js';
-import ForumTopic from './ForumTopic.js';
-import Gallery from './Gallery.js';
-import SystemSetting from './SystemSetting.js';
-import User from './User.js';
+const sequelize = require('../utils/db.js');
+const AlumnusBio = require('./AlumnusBio.js');
+const Career = require('./Career.js');
+const Course = require('./Course.js');
+const Event = require('./Event.js');
+const EventCommit = require('./EventCommit.js');
+const ForumComment = require('./ForumComment.js');
+const ForumTopic = require('./ForumTopic.js');
+const Gallery = require('./Gallery.js');
+const SystemSetting = require('./SystemSetting.js');
+const User = require('./User.js');
 
 // Initialize all models
 const models = {
@@ -31,7 +31,7 @@ Object.values(models).forEach(model => {
   }
 });
 
-export {
+module.exports = {
   sequelize,
   AlumnusBio,
   Career,

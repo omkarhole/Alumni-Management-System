@@ -1,20 +1,10 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../utils/db.js';
+const { DataTypes } = require('sequelize');
+const sequelize = require('../utils/db.js');
 
 const EventCommit = sequelize.define('EventCommit', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  event_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  user_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  }
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  event_id: { type: DataTypes.INTEGER, allowNull: false },
+  user_id: { type: DataTypes.INTEGER, allowNull: false }
 }, {
   tableName: 'event_commits',
   timestamps: false
@@ -22,15 +12,8 @@ const EventCommit = sequelize.define('EventCommit', {
 
 // Associations
 EventCommit.associate = (models) => {
-  EventCommit.belongsTo(models.Event, {
-    foreignKey: 'event_id',
-    as: 'event'
-  });
-  
-  EventCommit.belongsTo(models.User, {
-    foreignKey: 'user_id',
-    as: 'user'
-  });
+  EventCommit.belongsTo(models.Event, { foreignKey: 'event_id', as: 'event' });
+  EventCommit.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
 };
 
-export default EventCommit;
+module.exports = EventCommit;

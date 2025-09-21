@@ -1,21 +1,26 @@
 // Run it with:
 // => node test.js
 
-// It will:=> Connect to DB, =>
-//  Sync models, 
-// => Insert sample data, 
+// It will:
+// => Connect to DB
+// => Sync models
+// => Insert sample data
 // => Fetch with associations (include) to check relations
 
-//  test,js: => It’s basically a test runner to check if,
-//  =>Your database connection works.,
-//  => Your tables (models) are created in the database.,
-//  => Your relations (associations) between tables (like User → Career, Alumnus → Course, etc.) are correct.,
-//  =>You can insert and read sample data.
-
-
-
 // test.js
-import { sequelize, User, AlumnusBio, Course, Career, Event, EventCommit, ForumTopic, ForumComment, Gallery, SystemSetting } from "../models/index.js";
+const {
+  sequelize,
+  User,
+  AlumnusBio,
+  Course,
+  Career,
+  Event,
+  EventCommit,
+  ForumTopic,
+  ForumComment,
+  Gallery,
+  SystemSetting,
+} = require("../backend/models/Index"); // auto-loads index.js inside models/
 
 async function runTests() {
   try {
