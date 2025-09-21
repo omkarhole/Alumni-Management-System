@@ -2,6 +2,10 @@ const express=require('express');
 const cors=require('cors');
 const dotenv=require('dotenv');
 const path=require('path');
+const authRouter=require('./routes/auth.routes');
+const adminRouter=require('./routes/admin.route'); 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 const errorHandler = require('./middlewares/error.middleware');
 dotenv.config();
 const app=express();
@@ -15,9 +19,9 @@ app.use(express.json());
 //static assets
 app.use('/api/admin/public',express.static(path.join(process.cwd(),'Public')));
 
-//api routes - temporarily commented until routes are created
+//api routes - admin and auth
 // app.use('/auth',authRouter);
-// app.use('/api/admin',adminRouter);
+app.use('/api/admin',adminRouter);
 
 //routes
 app.get('/',(req,res)=>{

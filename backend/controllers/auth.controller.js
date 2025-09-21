@@ -1,7 +1,7 @@
 const bycrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { where } = require('sequelize');
-// const { User }=require('../models/user.model');
+const { User }=require('../models/User');
 
 
 //login controller
