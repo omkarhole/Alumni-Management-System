@@ -10,6 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 
+//static assets
+app.use('/api/admin/public',express.static(path.join(process.cwd(),'public')));
 
 //routes
 app.get('/',(req,res)=>{
