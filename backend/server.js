@@ -3,7 +3,7 @@ const cors=require('cors');
 const dotenv=require('dotenv');
 const path=require('path');
 const authRouter=require('./routes/auth.routes');
-const adminRouter=require('./routes/admin.route'); 
+const adminRouter=require('./routes/admin.routes'); 
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 const errorHandler = require('./middlewares/error.middleware');
@@ -20,7 +20,7 @@ app.use(express.json());
 app.use('/api/admin/public',express.static(path.join(process.cwd(),'Public')));
 
 //api routes - admin and auth
-// app.use('/auth',authRouter);
+app.use('/auth',authRouter);
 app.use('/api/admin',adminRouter);
 
 //routes

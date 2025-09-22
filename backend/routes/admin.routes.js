@@ -1,13 +1,14 @@
 const express=require('express');
 
-const careerRouter=require('./carrier.route.js');
-const courseRouter=require('./carrier.route.js');
-const eventRouter=require('./carrier.route.js');
-const forumRouter=require('./carrier.route.js');
-const galleryRouter=require('./carrier.route.js');
-const settingsRouter=require('./carrier.route.js');
-const userRouter=require('./carrier.route.js');
-const dashboardRouter=require('./dashboard.route.js');
+const careerRouter=require('./career.routes.js');
+const courseRouter=require('./course.routes.js');
+const eventRouter=require('./event.routes.js');
+const forumRouter=require('./forum.routes.js');
+const galleryRouter=require('./gallery.routes.js');
+const settingsRouter=require('./settings.routes.js');
+const userRouter=require('./user.routes.js');
+const dashboardRouter=require('./dashboard.routes.js');
+const alumniRouter=require('./alumni.routes.js');
 
 const router=express.Router();
 
