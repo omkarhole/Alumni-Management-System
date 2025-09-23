@@ -8,13 +8,28 @@ const cookieParser = require('cookie-parser');
 const errorHandler = require('./middlewares/error.middleware');
 dotenv.config();
 const app=express();
-app.use(cookieParser());
+
+
+// cors setup 
+const CLIENT_ORIGINS=[
+    'http://localhost:5173'
+    // add vercel api here
+];
+
+app.use(cors({ origin: CLIENT_ORIGINS, methods: ['GET','POST','PUT','PATCH','DELETE'], credentials: true }));
+app.options('*', cors({ origin: CLIENT_ORIGINS, credentials: true }));
+
+
+
+
+
+
 
 const PORT=process.env.PORT || 5000;
 
-app.use(cors());
+// middlewares build-in
 app.use(express.json());
-
+app.use(cookieParser());
 
 //static assets
 app.use('/api/admin/public',express.static(path.join(process.cwd(),'Public')));
