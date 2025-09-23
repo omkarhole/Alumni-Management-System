@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { AlumnusBio, User } = require('../models/index');
-
+const path = require('path');
 
 
 // print alumnilist
