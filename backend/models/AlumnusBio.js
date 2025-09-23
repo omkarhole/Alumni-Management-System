@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../utils/db.js');
+const { sequelize } = require('../utils/db.js');
 
 const AlumnusBio = sequelize.define('AlumnusBio', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -19,8 +19,13 @@ const AlumnusBio = sequelize.define('AlumnusBio', {
 
 // Associations
 AlumnusBio.associate = (models) => {
-  AlumnusBio.hasOne(models.User, { foreignKey: 'alumnus_id', as: 'user', constraints: false });
-  AlumnusBio.belongsTo(models.Course, { foreignKey: 'course_id', as: 'course' });
+
+  AlumnusBio.hasOne(models.User, {
+    foreignKey: 'alumnus_id', as: 'user', constraints: false
+  });
+  AlumnusBio.belongsTo(models.Course,
+    { foreignKey: 'course_id', as: 'course' }
+  );
 };
 
 module.exports = AlumnusBio;
