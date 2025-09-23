@@ -10,7 +10,7 @@ import Gallery from "./components/Gallery";
 import Careers from "./components/Careers";
 import Forum from "./components/Forum";
 import About from "./components/About";
-import Login from "./components/Login";
+import Login from "./components/Login";;
 import Signup from "./components/Signup";
 import MyAccount from "./components/MyAccount";
 import Dashboard from "./admin/Dashboard";
@@ -57,6 +57,14 @@ function AppRouter() {
   const location = useLocation();
   const isDashboardRoute = location.pathname.startsWith("/dashboard");
 
+  // useEffect(() => {
+  //   const user = localStorage.getItem('user_type');
+  //   // This effect is now handled in AuthProvider
+  // }, []);
+
+  // setTimeout(() => {
+    
+  // }, 1000);
 
   return (
     <>
@@ -97,6 +105,7 @@ function AppRouter() {
         {isLoggedIn && <Route path="account" element={<MyAccount />} />}
         <Route path="forum/view" element={<View_Forum />} />
         <Route path="jobs/add" element={<ManageJobs />} />
+        {/* <Route path="jobs/add" element={<Manage_Career />} /> */}
 
       </Routes>
       {!isDashboardRoute && <Footer />}

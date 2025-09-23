@@ -34,6 +34,18 @@ const Header = () => {
         setName(user_name);
     }, [location.state]);
 
+    // useEffect(() => {
+    //     const handleClickOutside = (event) => {
+    //         if (navRef.current && !navRef.current.contains(event.target)) {
+    //             setIsMenuOpen(false);
+    //         }
+    //     };
+
+    //     document.addEventListener("mousedown", handleClickOutside);
+    //     return () => {
+    //         document.removeEventListener("mousedown", handleClickOutside);
+    //     };
+    // }, [navRef]);
 
     const handleLogout = () => {
         axios.post(`${authUrl}/logout`)
@@ -55,7 +67,11 @@ const Header = () => {
                     </button>
                     <div ref={navRef} className={`collapse navbar-collapse ${isMenuOpen ? 'show' : ''}`} id="navbarResponsive">
                         <ul className="navbar-nav ml-auto my-2 my-lg-0">
-                            
+                            {/* <li className="nav-item">
+                                <button onClick={toggleTheme} className="btn btn-sm btn-primary">
+                                    {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                                </button>
+                            </li> */}
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/")}`} to="/">Home</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/alumni")}`} to="/alumni">Alumni</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/gallery")}`} to="/gallery">Gallery</Link></li>
