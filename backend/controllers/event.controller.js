@@ -1,5 +1,5 @@
 const {Op,literal}=require('sequelize');
-const {Event,EventCommit}=require('../models/Index')
+const {Event,EventCommit}=require('../models/index')
 
 //all events details
 

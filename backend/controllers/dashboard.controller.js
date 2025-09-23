@@ -1,4 +1,4 @@
-const {ForumTopic,Career,Event,AlumnusBio} =require('../models/Index');
+const {ForumTopic,Career,Event,AlumnusBio} =require('../models/index');
 const {Op}=require('sequelize');
 
 

@@ -1,4 +1,4 @@
-const sequelize = require('../utils/db.js');
+const {sequelize} = require('../utils/db.js');
 const AlumnusBio = require('./AlumnusBio.js');
 const Career = require('./Career.js');
 const Course = require('./Course.js');

@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { AlumnusBio, User } = require('../models/Index');
+const { AlumnusBio, User } = require('../models/index');
 
 
 

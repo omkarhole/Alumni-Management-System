@@ -9,7 +9,6 @@
 
 // test.js
 const {
-  sequelize,
   User,
   AlumnusBio,
   Course,
@@ -22,6 +21,7 @@ const {
   SystemSetting,
 } = require("../backend/models/Index"); // auto-loads index.js inside models/
 
+const {sequelize} = require('./utils/db');
 async function runTests() {
   try {
     console.log("🔄 Connecting to database...");

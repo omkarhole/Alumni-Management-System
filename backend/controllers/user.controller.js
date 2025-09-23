@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const { User, AlumnusBio } = require('../models/Index');
+const { User, AlumnusBio } = require('../models/index');
 
 // List all users
 async function listUsers(req, res, next) {

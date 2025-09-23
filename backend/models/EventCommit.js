@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../utils/db.js');
+const {sequelize} = require('../utils/db.js');
 
 const EventCommit = sequelize.define('EventCommit', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },

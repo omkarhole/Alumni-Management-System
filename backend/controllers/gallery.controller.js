@@ -1,4 +1,4 @@
-const {Gallery} =require('../models/Index');
+const {Gallery} =require('../models/index');
 
 const fs=require('fs');
 

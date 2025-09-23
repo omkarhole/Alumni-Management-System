@@ -5,10 +5,10 @@ const path=require('path');
 const authRouter=require('./routes/auth.routes');
 const adminRouter=require('./routes/admin.routes'); 
 const cookieParser = require('cookie-parser');
-app.use(cookieParser());
 const errorHandler = require('./middlewares/error.middleware');
 dotenv.config();
 const app=express();
+app.use(cookieParser());
 
 const PORT=process.env.PORT || 5000;
 

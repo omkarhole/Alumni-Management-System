@@ -1,4 +1,4 @@
-const {ForumTopic,ForumComment,User}=require('../models/Index');
+const {ForumTopic,ForumComment,User}=require('../models/index');
 
 // list all forum topics with user names
 async function listForums(req, res, next) {
@@ -51,7 +51,7 @@ async function listComments(req, res, next) {
 async function addComment(req, res, next) {
   try {
     const payload = {
-      comment:  req.body.c,
+      comment:  req.body.comment,
       user_id:  req.body.user_id,
       topic_id: +req.params.topicId
     };

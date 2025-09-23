@@ -1,14 +1,16 @@
 const bycrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { where } = require('sequelize');
-const { User }=require('../models/User');
 
+const { User,AlumnusBio }=require('../models/index');
+
+console.log('user model:',User);
+console.log('AlumnusBio model:', AlumnusBio);
 
 //login controller
 async function login(req, res, next) {
     try {
         const { email, password } = req.body;
-        const user = await user.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email } });
         if (!user) {
             return res.json({ loginStatus: false, Error: 'Invalid Credentials' });
         }
