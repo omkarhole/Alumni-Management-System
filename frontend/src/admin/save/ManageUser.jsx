@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import { baseUrl } from '../../utils/globalurl';
+// import { baseUrl } from '../../utils/globalurl';
 
 
 const ManageUser = () => {
@@ -28,7 +28,7 @@ const ManageUser = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.put(`${baseUrl}/user/${users.id}`, users)
+        axios.put(`http://localhost:5000/api/admin/users/${users.id}`, users)
             .then((res) => toast.success(res.data.message))
             .catch((err) => console.log(err))
         setUsers({
