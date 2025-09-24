@@ -22,8 +22,10 @@ const MyAccount = () => {
         const fetchData = async () => {
             try {
                 const [alumnusDetailsRes, coursesRes] = await Promise.all([
+
                     axios.get(`http://localhost:5000/api/admin/alumni/${alumnus_id}`),
                     axios.get(`http://localhost:5000/api/admin/courses`)
+
                 ]);
 
                 if (alumnusDetailsRes.data) setAcc(alumnusDetailsRes.data);
@@ -66,7 +68,6 @@ const MyAccount = () => {
 
             const response = await axios.put(`http://localhost:5000/api/admin/alumni/account`, formData);
             toast.success(response.data.message);
-
             setFile(null);
         } catch (error) {
             toast.error('An error occurred while updating account');

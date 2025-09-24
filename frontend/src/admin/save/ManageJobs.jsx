@@ -6,7 +6,8 @@ import { Bounce, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-// import { baseUrl } from '../../utils/globalurl';
+
+// import { baseUrl } from '../../utils/globalurl
 import { useAuth } from '../../AuthContext';
 
 const ManageJobs = ({ setHandleAdd }) => {
@@ -98,6 +99,7 @@ const ManageJobs = ({ setHandleAdd }) => {
 
       // Navigate back to dashboard jobs
     
+
 
     } catch (error) {
       console.error("Error submitting job:", error);

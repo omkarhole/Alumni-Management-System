@@ -38,6 +38,7 @@ import { ThemeProvider } from "./ThemeContext";
 import PrivateRoute from "./components/PrivateRoute";
 import NotFound from "./components/NotFound";
 
+
 function App() {
   return (
     <BrowserRouter>
@@ -114,3 +115,12 @@ function AppRouter() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
