@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
-import { baseUrl } from '../utils/globalurl';
+// import { baseUrl } from '../utils/globalurl';
 
 const MyAccount = () => {
     const [acc, setAcc] = useState({
@@ -22,8 +22,10 @@ const MyAccount = () => {
         const fetchData = async () => {
             try {
                 const [alumnusDetailsRes, coursesRes] = await Promise.all([
-                    axios.get(`${baseUrl}/alumni/${alumnus_id}`),
-                    axios.get(`${baseUrl}/courses`)
+
+                    axios.get(`http://localhost:5000/api/admin/alumni/${alumnus_id}`),
+                    axios.get(`http://localhost:5000/api/admin/courses`)
+
                 ]);
 
                 if (alumnusDetailsRes.data) setAcc(alumnusDetailsRes.data);
@@ -64,9 +66,8 @@ const MyAccount = () => {
             formData.append('alumnus_id', alumnus_id);
             formData.append('user_id', user_id);
 
-            const response = await axios.put(`${baseUrl}/alumni/account`, formData);
+            const response = await axios.put(`http://localhost:5000/api/admin/alumni/account`, formData);
             toast.success(response.data.message);
-
             setFile(null);
         } catch (error) {
             toast.error('An error occurred while updating account');
