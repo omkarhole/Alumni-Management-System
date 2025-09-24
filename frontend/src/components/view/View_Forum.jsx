@@ -76,7 +76,7 @@ const ViewTopic = () => {
         const username = localStorage.getItem("user_name");
         try {
             const response = await axios.post(`${baseUrl}/forums/${topic.id}/comments`, {
-                c: newComment,
+                comment: newComment,
                 user_id: userid,
                 topic_id: topic.id
             });
