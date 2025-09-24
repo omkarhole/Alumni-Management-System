@@ -17,15 +17,8 @@ const CLIENT_ORIGINS=[
 ];
 
 app.use(cors({ origin: CLIENT_ORIGINS, methods: ['GET','POST','PUT','PATCH','DELETE'], credentials: true }));
-app.options('*', cors({ origin: CLIENT_ORIGINS, credentials: true }));
+// app.options('/*', cors({ origin: CLIENT_ORIGINS, credentials: true }));
 
-
-
-
-
-
-
-const PORT=process.env.PORT || 5000;
 
 // middlewares build-in
 app.use(express.json());
@@ -51,6 +44,7 @@ app.use((req,res)=>{
 //central error handler
 app.use(errorHandler);
 
+const PORT=process.env.PORT || 5000;
 app.listen(PORT,()=>{
     console.log(`server is running on port :${PORT}`);
 })
