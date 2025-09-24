@@ -46,10 +46,10 @@ async function signup(req, res, next) {
         let user;
         if (userType === 'alumnus') {
             const bio = await AlumnusBio.create({ name, email, course_id });
-            user = await User.create({ name, email, password: hashed, userType, alumnus_id: bio.id });
+            user = await User.create({ name, email, password: hashed, type: userType, alumnus_id: bio.id });
         }
         else {
-            user = await User.create({ name, email, password: hashed, userType });
+            user = await User.create({ name, email, password: hashed, type: userType });
 
         }
         res.json({ message: "Signup Scuccessful", userId: user.id, signupStatus: true });

@@ -32,7 +32,7 @@ const AdminCourses = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`${baseUrl}/courses/${id}`);
+      const response = await axios.delete(`http://localhost:5000/api/admin/courses/${id}`);
       toast.warning(response.data.message);
       setCourses(courses.filter(c => c.id !== id));
     } catch (error) {

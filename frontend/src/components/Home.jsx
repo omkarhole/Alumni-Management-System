@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from "axios";
@@ -37,7 +39,7 @@ const Home = () => {
     }, [location.state]);
 
     useEffect(() => {
-        axios.get(`${baseUrl}/events/upcoming-events`)
+        axios.get(`http://localhost:5000/api/admin/events/upcoming`)
             .then((res) => {
                 console.log("HELLO",res.data);
                 setEvents(res.data);
