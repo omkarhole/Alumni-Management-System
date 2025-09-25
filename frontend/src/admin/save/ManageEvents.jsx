@@ -5,11 +5,11 @@ import { FaTimes } from "react-icons/fa";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
-import { baseUrl } from '../../utils/globalurl';
+// import { baseUrl } from '../../utils/globalurl';
 
 const ManageEvents = () => {
     const [eventData, setEventData] = useState({
-        id: '',
+        id:null,
         title: "",
         schedule: "",
         content: "",
@@ -39,33 +39,81 @@ const ManageEvents = () => {
     };
 
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log(eventData);
-        try {
-            if (eventData.id != "") {
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     console.log(eventData);
+    //     try {
+    //         if (eventData.id !== "") {
 
-                // if (location.state && location.state.action === 'edit') {
-                // Perform update operation
-                await axios.put(`${baseUrl}/events/${eventData.id}`, eventData)
-                    .then((res) => toast.success(res.data.message))
-                // }
-            } else {
-                // Perform insert operation
-                await axios.post(`${baseUrl}/events`, eventData)
-                    .then((res) => toast.success(res.data.message))
-            }
-            setEventData({
-                id: '',
-                title: "",
-                schedule: "",
-                content: "",
-            })
-        } catch (error) {
-            console.error('Error:', error);
-            toast.error('An error occurred');
-        }
+    //             // if (location.state && location.state.action === 'edit') {
+    //             // Perform update operation
+    //             await axios.put(`http://localhost:5000/api/admin/events/${eventData.id}`, eventData)
+    //                 .then((res) => toast.success(res.data.message))
+    //             // }
+    //         } else {
+    //             // Perform insert operation
+    //             await axios.post(`http://localhost:5000/api/admin/events`, eventData)
+    //                 .then((res) => toast.success(res.data.message))
+    //         }
+    //         setEventData({
+    //             id: '',
+    //             title: "",
+    //             schedule: "",
+    //             content: "",
+    //         })
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //         toast.error('An error occurred');
+    //     }
+    // }
+    const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validate form data
+    if (!eventData.title.trim() || !eventData.schedule || !eventData.content.trim()) {
+        toast.error('Please fill all required fields');
+        return;
     }
+
+    try {
+        let response;
+        if (location.state?.status === 'edit' && eventData.id) {
+            // Update existing event
+            response = await axios.put(
+                `http://localhost:5000/api/admin/events/${eventData.id}`, 
+                {
+                    title: eventData.title,
+                    schedule: eventData.schedule,
+                    content: eventData.content
+                }
+            );
+        } else {
+            // Create new event
+            const { id, ...submitData } = eventData;  // Remove id for new events
+            response = await axios.post(
+                'http://localhost:5000/api/admin/events', 
+                submitData
+            );
+        }
+
+        toast.success(response.data.message);
+        
+        // Reset form
+        setEventData({
+            id: null,
+            title: "",
+            schedule: "",
+            content: "",
+        });
+
+        // Navigate back after success
+        setTimeout(handleBack, 1500);
+
+    } catch (error) {
+        console.error('Error:', error);
+        toast.error(error.response?.data?.message || 'An error occurred');
+    }
+};
 
 
     const handleBack = () => {
@@ -82,7 +130,7 @@ const ManageEvents = () => {
                 <div className="col-lg-12">
                     <div className="card">
                         <div className="card-body">
-                            <form action="" id="manage-event">
+                            <form onSubmit={handleSubmit} id="manage-event">
                                 <input type="hidden" name="id" value="id" />
                                 <div className="form-group row">
                                     <div className="col-md-5">

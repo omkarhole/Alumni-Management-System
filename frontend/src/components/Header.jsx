@@ -48,7 +48,7 @@ const Header = () => {
     // }, [navRef]);
 
     const handleLogout = () => {
-        axios.post(`${authUrl}/logout`)
+        axios.post(`http://localhost:5000/auth/logout`)
             .then((res) => {
                 navigate("/", { state: { action: "homelogout" } })
                 localStorage.clear();
