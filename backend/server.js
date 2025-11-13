@@ -2,6 +2,7 @@ const express=require('express');
 const cors=require('cors');
 const dotenv=require('dotenv');
 const path=require('path');
+const { connectDB } = require('./utils/db');
 const authRouter=require('./routes/auth.routes');
 const adminRouter=require('./routes/admin.routes'); 
 const cookieParser = require('cookie-parser');
@@ -9,6 +10,8 @@ const errorHandler = require('./middlewares/error.middleware');
 dotenv.config();
 const app=express();
 
+// Connect to MongoDB
+connectDB();
 
 // cors setup 
 const CLIENT_ORIGINS=[
@@ -25,7 +28,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 //static assets
-app.use('/api/admin/public',express.static(path.join(process.cwd(),'Public')));
+app.use('/public',express.static(path.join(process.cwd(),'public')));
 
 //api routes - admin and auth
 app.use('/auth',authRouter);

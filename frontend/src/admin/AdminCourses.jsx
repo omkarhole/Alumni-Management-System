@@ -32,9 +32,9 @@ const AdminCourses = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:5000/api/admin/courses/${id}`);
+      const response = await axios.delete(`${baseUrl}/courses/${id}`);
       toast.warning(response.data.message);
-      setCourses(courses.filter(c => c.id !== id));
+      setCourses(courses.filter(c => (c._id || c.id) !== id));
     } catch (error) {
       console.error('Error:', error);
       toast.error("An error occurred");
@@ -60,12 +60,12 @@ const AdminCourses = () => {
     try {
       if (name.id) {
         // If id exists, it's an update operation
-        const res =  await axios.put(`${baseUrl}/courses/${id}`, name);
+        const res = await axios.put(`${baseUrl}/courses/${name.id}`, { course: name.course });
         toast.success("Course updated successfully");
         setCourses(prevCourses => {
           const updatedCourses = prevCourses.map(course => {
-            if (course.id === name.id) {
-              return { id: name.id, course: name.course };
+            if ((course._id || course.id) === name.id) {
+              return { ...course, course: name.course };
             }
             return course;
           });
@@ -153,14 +153,14 @@ const AdminCourses = () => {
                           <button
                             className="btn btn-sm btn-primary mr-2 edit_gallery"
                             type="button"
-                            onClick={() => handleInput(c.course, c.id)}
+                            onClick={() => handleInput(c.course, c._id || c.id)}
                           >
                             Edit
                           </button>
                           <button
                             className="btn btn-sm btn-danger delete_gallery"
                             type="button"
-                            onClick={() => handleDelete(c.id)}
+                            onClick={() => handleDelete(c._id || c.id)}
                           >
                             Delete
                           </button>

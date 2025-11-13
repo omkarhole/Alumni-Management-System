@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
-// import { baseUrl } from '../utils/globalurl';
+import { baseUrl } from '../utils/globalurl';
 
 const MyAccount = () => {
     const [acc, setAcc] = useState({
@@ -22,13 +22,23 @@ const MyAccount = () => {
         const fetchData = async () => {
             try {
                 const [alumnusDetailsRes, coursesRes] = await Promise.all([
-
-                    axios.get(`http://localhost:5000/api/admin/alumni/${alumnus_id}`),
-                    axios.get(`http://localhost:5000/api/admin/courses`)
-
+                    axios.get(`${baseUrl}/alumni/${alumnus_id}`, { withCredentials: true }),
+                    axios.get(`${baseUrl}/courses`)
                 ]);
 
-                if (alumnusDetailsRes.data) setAcc(alumnusDetailsRes.data);
+                if (alumnusDetailsRes.data) {
+                    const data = alumnusDetailsRes.data;
+                    // Map nested structure to flat form state
+                    setAcc({
+                        name: data.name || '',
+                        email: data.email || '',
+                        gender: data.alumnus_bio?.gender || '',
+                        batch: data.alumnus_bio?.batch || '',
+                        course_id: data.alumnus_bio?.course?._id || data.alumnus_bio?.course || '',
+                        connected_to: data.alumnus_bio?.connected_to || '',
+                        password: ''
+                    });
+                }
                 if (coursesRes.data) setCourses(coursesRes.data);
 
             } catch (error) {
@@ -66,7 +76,7 @@ const MyAccount = () => {
             formData.append('alumnus_id', alumnus_id);
             formData.append('user_id', user_id);
 
-            const response = await axios.put(`http://localhost:5000/api/admin/alumni/account`, formData);
+            const response = await axios.put(`${baseUrl}/alumni/account`, formData, { withCredentials: true });
             toast.success(response.data.message);
             setFile(null);
         } catch (error) {
@@ -125,20 +135,18 @@ const MyAccount = () => {
                                         </select>
                                     </div>
 
-                                    <label className="col-sm-2 col-form-label">Batch</label>
-                                    <div className="col-sm-4">
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="batch"
-                                            required
-                                            value={acc?.batch || ''}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="form-group row">
+                    <label className="col-sm-2 col-form-label">Batch</label>
+                    <div className="col-sm-4">
+                        <input
+                            type="number"
+                            className="form-control"
+                            name="batch"
+                            required
+                            value={acc?.batch || ''}
+                            onChange={handleChange}
+                        />
+                    </div>
+                </div>                                <div className="form-group row">
                                     <label className="col-sm-2 col-form-label">Course Graduated</label>
                                     <div className="col-sm-10">
                                         <select
@@ -150,7 +158,7 @@ const MyAccount = () => {
                                         >
                                             <option disabled value="">Select course</option>
                                             {courses.map(c => (
-                                                <option key={c.id} value={c.id}>{c.course}</option>
+                                                <option key={c._id || c.id} value={c._id || c.id}>{c.course}</option>
                                             ))}
                                         </select>
                                     </div>

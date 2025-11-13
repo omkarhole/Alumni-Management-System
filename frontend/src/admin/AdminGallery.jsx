@@ -51,7 +51,7 @@ const AdminGallery = () => {
   const handleDelete = async (id) => {
     try {
       const response = await axios.delete(`${baseUrl}/gallery/${id}`);
-      setGallery(gallery.filter(item => item.id !== id));
+      setGallery(gallery.filter(item => (item._id || item.id) !== id));
       toast.success(response.data.message)
     } catch (error) {
       console.error('Error:', error);
@@ -133,7 +133,7 @@ const AdminGallery = () => {
                         <td style={{ verticalAlign: "middle" }} className="text-center ">
                           <div className='d-flex  '>
                             {/* <button onClick={() => handleEdit(g.image_path, g.about, g.id)} className="btn btn-sm btn-primary mr-2 edit_gallery" type="button">Edit</button> */}
-                            <button onClick={() => handleDelete(g.id)} className="btn btn-sm btn-danger delete_gallery" type="button">Delete</button>
+                            <button onClick={() => handleDelete(g._id || g.id)} className="btn btn-sm btn-danger delete_gallery" type="button">Delete</button>
                           </div></td>
                       </tr>
                     ))}

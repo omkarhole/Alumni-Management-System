@@ -21,14 +21,14 @@ const ViewEvent = () => {
 
   useEffect(() => {
     if (location.state && location.state.data) {
-      const eventId = location.state.data.id;
+      const eventId = location.state.data._id || location.state.data.id;
       const userId = localStorage.getItem("user_id");
       const requestData = {
         event_id: eventId,
         user_id: userId
       };
 
-      axios.post(`${baseUrl}/events/participation-check`, requestData)
+      axios.post(`${baseUrl}/events/participation-check`, requestData, { withCredentials: true })
         .then((res) => {
           setParticipated(res.data.participated)
         })
@@ -37,14 +37,14 @@ const ViewEvent = () => {
   }, [location.state]);
 
   const handleParticipation = () => {
-    const eventId = location.state.data.id;
+    const eventId = location.state.data._id || location.state.data.id;
     const userId = localStorage.getItem("user_id");
     const requestData = {
       event_id: eventId,
       user_id: userId
     };
 
-    axios.post(`${baseUrl}/events/participate`, requestData)
+    axios.post(`${baseUrl}/events/participate`, requestData, { withCredentials: true })
       .then((res) => {
         setParticipated(true);
       })

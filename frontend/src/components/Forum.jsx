@@ -129,10 +129,10 @@ const Forum = () => {
                                                 <div className='forumbtn d-flex justify-content-between align-items-center'>
                                                     <div className=''>
                                                         <span className="badge badge-info me-1   px-3 ">
-                                                            <b><i>Created by: <span className="filter-txt">{e.user.name}</span></i></b>
+                                                            <b><i>Created by: <span className="filter-txt">{e.user?.name || 'Unknown'}</span></i></b>
                                                         </span>
                                                         <span className="badge badge-secondary px-3">
-                                                            <b><FaComments /> <i> {e.comments_count}</i></b>
+                                                            <b><FaComments /> <i> {e.comments?.length || 0}</i></b>
                                                         </span>
                                                     </div>
 

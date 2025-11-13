@@ -9,25 +9,23 @@ import { baseUrl } from '../../utils/globalurl';
 
 const ManageEvents = () => {
     const [eventData, setEventData] = useState({
-        id: '',
         title: "",
         schedule: "",
         content: "",
-
     });
+    const [eventId, setEventId] = useState(null);
     const location = useLocation();
     const navigate = useNavigate();
     useEffect(() => {
         if (location.state && location.state.status === "edit") {
-            const { id, title, schedule, content } = location.state.data;
+            const { _id, id, title, schedule, content } = location.state.data;
             const formattedSchedule = schedule.replace('Z', '');
-            setEventData(prevState => ({
-                ...prevState,
-                id,
+            setEventId(_id || id);
+            setEventData({
                 title,
                 schedule: formattedSchedule,
                 content
-            }));
+            });
         }
     }, [location.state]);
 
@@ -43,20 +41,17 @@ const ManageEvents = () => {
         e.preventDefault();
         console.log(eventData);
         try {
-            if (eventData.id != "") {
-
-                // if (location.state && location.state.action === 'edit') {
+            if (eventId) {
                 // Perform update operation
-                await axios.put(`${baseUrl}/events/${eventData.id}`, eventData)
+                await axios.put(`${baseUrl}/events/${eventId}`, eventData)
                     .then((res) => toast.success(res.data.message))
-                // }
             } else {
                 // Perform insert operation
                 await axios.post(`${baseUrl}/events`, eventData)
                     .then((res) => toast.success(res.data.message))
             }
+            setEventId(null);
             setEventData({
-                id: '',
                 title: "",
                 schedule: "",
                 content: "",

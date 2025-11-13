@@ -42,7 +42,7 @@ const AdminJobs = () => {
         try {
             const response = await axios.delete(`${baseUrl}/jobs/${id}`);
             toast.warning(response.data.message);
-            setJobs(jobs.filter(job => job.id !== id));
+            setJobs(jobs.filter(job => (job._id || job.id) !== id));
         } catch (error) {
             console.error('Error:', error);
             toast.error("An error occurred");
@@ -91,7 +91,7 @@ const AdminJobs = () => {
                                                             <td className="text-center justify-content-center border-0 d-flex gap-1">
                                                                 <button className="btn btn-sm btn-outline-primary view_career" type="button" onClick={() => openModal(job)}>View</button>
                                                                 <Link to="/dashboard/jobs/manage" state={{ action: "edit", data: job }} className="btn btn-sm btn-outline-primary edit_career" >Edit</Link>
-                                                                <button className="btn btn-sm btn-outline-danger delete_career" type="button" onClick={() => handleDelete(job.id)}>Delete</button>
+                                                                <button className="btn btn-sm btn-outline-danger delete_career" type="button" onClick={() => handleDelete(job._id || job.id)}>Delete</button>
                                                             </td>
                                                         </tr>
                                                     ))}</> : <>

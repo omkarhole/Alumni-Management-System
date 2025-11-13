@@ -24,6 +24,7 @@ const ManageJobs = ({ setHandleAdd }) => {
     user_id: uid,
   });
   
+  const [jobId, setJobId] = useState(null); // Store job ID separately
   const [loading, setLoading] = useState(false);
   const toastId = useRef(null);
 
@@ -34,9 +35,17 @@ const ManageJobs = ({ setHandleAdd }) => {
     }
 
     if (location.state?.action === 'edit') {
-      setFormData(location.state.data);
+      const data = location.state.data;
+      setJobId(data._id || data.id); // Store the ID separately
+      setFormData({
+        company: data.company || '',
+        job_title: data.job_title || '',
+        location: data.location || '',
+        description: data.description || '',
+        user_id: data.user_id || data.user || uid,
+      });
     }
-  }, [location.state, isLoggedIn, navigate]);
+  }, [location.state, isLoggedIn, navigate, uid]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,8 +88,8 @@ const ManageJobs = ({ setHandleAdd }) => {
       };
 
       let response;
-      if (location.state?.action === 'edit') {
-        response = await axios.put(`http://localhost:5000/api/admin/jobs/${formData.id}`, formData, config);
+      if (location.state?.action === 'edit' && jobId) {
+        response = await axios.put(`http://localhost:5000/api/admin/jobs/${jobId}`, formData, config);
       } else {
         response = await axios.post(`http://localhost:5000/api/admin/jobs/`, formData, config);
       }
@@ -88,8 +97,8 @@ const ManageJobs = ({ setHandleAdd }) => {
       toast.success(response.data.message || "Job saved successfully");
 
       // Reset form
+      setJobId(null);
       setFormData({
-        id: '',
         company: '',
         job_title: '',
         location: '',
@@ -122,7 +131,6 @@ const ManageJobs = ({ setHandleAdd }) => {
       <ToastContainer position="top-center" />
       <div className="container-fluid">
         <form onSubmit={handleSubmit}>
-          <input type="hidden" name="id" value={formData.id} />
           <div className="row form-group">
             <div className="col-md-8">
               <label>Company</label>
