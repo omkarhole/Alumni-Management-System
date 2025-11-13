@@ -20,7 +20,7 @@ const AdminEvents = () => {
       .then((res) => {
         console.log(res.data.message)
         toast.success(res.data.message);
-        setEvents(events.filter((e) => e.id !== id))
+        setEvents(events.filter((e) => (e._id || e.id) !== id))
       })
       .catch((err) => console.log(err))
   }
@@ -87,7 +87,7 @@ const AdminEvents = () => {
                             <td className="text-center justify-content-center border-0 d-flex gap-1">
                               <button onClick={() => handleView(event)} className="btn btn-sm btn-outline-primary edit_career" >View</button>
                               <Link to="/dashboard/events/manage" state={{ status: "edit", data: event }} className="btn btn-sm btn-outline-primary" type="button">Edit</Link>
-                              <button onClick={() => delEvent(event.id)} className="btn btn-sm btn-outline-danger" type="button">Delete</button>
+                              <button onClick={() => delEvent(event._id || event.id)} className="btn btn-sm btn-outline-danger" type="button">Delete</button>
                             </td>
                           </tr>
                         ))}</> : <>

@@ -10,13 +10,19 @@ const ManageForum = ({ setHandleAdd }) => {
   const navigate = useNavigate()
   const isEdit = location.state?.status === 'edit'
 
-  const [formData, setFormData] = useState({ id: '', title: '', description: '' })
+  const [formData, setFormData] = useState({ title: '', description: '' })
+  const [forumId, setForumId] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
   // populate when editing
   useEffect(() => {
     if (isEdit) {
-      setFormData(location.state.data)
+      const data = location.state.data;
+      setForumId(data._id || data.id);
+      setFormData({
+        title: data.title || '',
+        description: data.description || ''
+      });
     }
   }, [isEdit, location.state])
 
@@ -47,15 +53,16 @@ const ManageForum = ({ setHandleAdd }) => {
         user_id,
       }
 
-      if (isEdit) {
-        await callApi(`/forums/${formData.id}`, 'put', payload)
+      if (isEdit && forumId) {
+        await callApi(`/forums/${forumId}`, 'put', payload)
         toast.success('Forum updated')
       } else {
         await callApi('/forums', 'post', payload)
         toast.success('Forum created')
       }
 
-      setFormData({ id: '', title: '', description: '' })
+      setForumId(null);
+      setFormData({ title: '', description: '' })
       handleBack()
     } catch (err) {
       console.error(err)
@@ -69,13 +76,6 @@ const ManageForum = ({ setHandleAdd }) => {
     <div className="container-fluid">
       <ToastContainer position="top-center" />
       <form onSubmit={handleSubmit}>
-        {isEdit && (
-          <input
-            type="hidden"
-            value={formData.id}
-          />
-        )}
-
         <div className="form-group row">
           <label className="col-md-2 col-form-label">Title</label>
           <div className="col-md-8">

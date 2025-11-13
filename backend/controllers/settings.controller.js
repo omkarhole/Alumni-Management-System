@@ -2,7 +2,7 @@ const {SystemSetting}=require('../models/index');
 
 // get all settings
 async function getSettings(req, res, next) {
-  try { res.json(await SystemSetting.findAll()); } catch (err) { next(err); }
+  try { res.json(await SystemSetting.find()); } catch (err) { next(err); }
 }
 
 

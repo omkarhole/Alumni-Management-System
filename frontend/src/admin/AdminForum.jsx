@@ -28,7 +28,7 @@ const AdminForum = () => {
       .then((res) => {
         // console.log(res.data.message)
         toast.info(res.data.message);
-        setForum(forum.filter((e) => e.id !== id))
+        setForum(forum.filter((e) => (e._id || e.id) !== id))
       })
       .catch((err) => console.log(err))
   }
@@ -111,7 +111,7 @@ const AdminForum = () => {
                               <td className="text-center justify-content-center border-0 d-flex gap-1">
                                 <button onClick={() => handleView(e)} className="btn btn-sm btn-outline-primary edit_career" >View</button>
                                 <Link to="/dashboard/forum/manage" state={{ status: "edit", data: e }} className="btn btn-sm btn-outline-primary" type="button">Edit</Link>
-                                <button onClick={() => delForum(e.id)} className="btn btn-sm btn-outline-danger " type="button">Delete</button>
+                                <button onClick={() => delForum(e._id || e.id)} className="btn btn-sm btn-outline-danger " type="button">Delete</button>
                               </td>
                             </tr>))}</> : <>
                           <tr>

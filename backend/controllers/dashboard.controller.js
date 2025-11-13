@@ -1,18 +1,14 @@
-const {ForumTopic,Career,Event,AlumnusBio} =require('../models/index');
-const {Op}=require('sequelize');
-
-
+const {ForumTopic,Career,Event,User} =require('../models/index');
 
 //get counts function 
-
-  async function getCounts(req, res, next) {
+async function getCounts(req, res, next) {
   try {
     const [ forumCount, jobCount, eventCount, upEventCount, alumniCount ] = await Promise.all([
-      ForumTopic.count(),
-      Career.count(),
-      Event.count(),
-      Event.count({ where: { schedule: { [Op.gte]: new Date() } } }),
-      AlumnusBio.count()
+      ForumTopic.countDocuments(),
+      Career.countDocuments(),
+      Event.countDocuments(),
+      Event.countDocuments({ schedule: { $gte: new Date() } }),
+      User.countDocuments({ type: 'alumnus' })
     ]);
     res.json({
       forums: forumCount,

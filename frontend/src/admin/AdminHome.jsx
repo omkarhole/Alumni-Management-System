@@ -34,14 +34,17 @@ const AdminHome = () => {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/admin/dashboard/counts`)
+    axios.get(`http://localhost:5000/api/admin/dashboard/counts`, { withCredentials: true })
       .then((res) => {
         console.log("Counts data:", res.data);
         setCounts(res.data);
       })
       .catch((err) => {
-        console.error(err);
-        alert('Failed to fetch counts');
+        console.error("Error fetching counts:", err);
+        // Don't show alert for 401 errors (just not authenticated)
+        if (err.response?.status !== 401) {
+          console.error('Failed to fetch counts');
+        }
       });
   }, []);
 

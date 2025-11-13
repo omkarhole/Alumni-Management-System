@@ -29,9 +29,8 @@ const AlumniList = () => {
         if (alumniList.length > 0) {
             const filteredlist = alumniList.filter(list =>
                 list.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                list.course.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                list.batch.toString().includes(searchQuery)
-                // list.batch.toString() === searchQuery
+                list.alumnus_bio?.course?.course?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                list.alumnus_bio?.batch?.toString().includes(searchQuery)
             );
             setFilteredAlumnni(filteredlist);
         }
@@ -87,9 +86,9 @@ const AlumniList = () => {
                             <div className="col-md-4 mb-4" key={index}>
                                 <div className="card h-100 shadow-sm">
                                     <center>
-                                        {a.avatar ?
+                                        {a.alumnus_bio?.avatar ?
                                             <img
-                                                src={`${baseUrl}/${a.avatar}`}
+                                                src={`${baseUrl}/${a.alumnus_bio.avatar}`}
                                                 className="card-img-top img-fluid alimg "
                                                 alt="avatar"
                                             /> : <>
@@ -102,10 +101,10 @@ const AlumniList = () => {
                                     </center>
                                     <div className="card-body">
                                         <h5 className="card-title text-center pad-zero ">{a.name} <small>
-                                            <i className={`badge badge-primary ${a.status === 1 ? '' : 'd-none'}`}>
+                                            <i className={`badge badge-primary ${a.alumnus_bio?.status === 1 ? '' : 'd-none'}`}>
                                                 Verified
                                             </i>
-                                            <i className={`badge badge-warning ${a.status === 0 ? '' : 'd-none'}`}>
+                                            <i className={`badge badge-warning ${a.alumnus_bio?.status === 0 ? '' : 'd-none'}`}>
                                                 Unverified
                                             </i>
                                         </small></h5>
@@ -113,14 +112,14 @@ const AlumniList = () => {
                                         <p className="card-text">
                                             <strong>Email:</strong> {a.email}
                                         </p>
-                                        {a.course && <p className="card-text">
-                                            <strong>Course:</strong> {a.course}
+                                        {a.alumnus_bio?.course?.course && <p className="card-text">
+                                            <strong>Course:</strong> {a.alumnus_bio.course.course}
                                         </p>}
-                                        {a.batch != "0000" && <p className="card-text">
-                                            <strong>Batch:</strong> {a.batch}
+                                        {a.alumnus_bio?.batch && a.alumnus_bio.batch != "0000" && <p className="card-text">
+                                            <strong>Batch:</strong> {a.alumnus_bio.batch}
                                         </p>}
-                                        {a.connected_to && <p className="card-text">
-                                            <strong>Currently working in/as:</strong> {a.connected_to}
+                                        {a.alumnus_bio?.connected_to && <p className="card-text">
+                                            <strong>Currently working in/as:</strong> {a.alumnus_bio.connected_to}
                                         </p>}
                                     </div>
                                 </div>

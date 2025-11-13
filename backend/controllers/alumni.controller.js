@@ -1,13 +1,15 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { AlumnusBio, User } = require('../models/index');
+const { User } = require('../models/index');
 const path = require('path');
 
 
 // print alumnilist
 async function alumniList(req, res, next) {
     try {
-        const list = await AlumnusBio.findAll({ order: [['name', 'ASC']] });
+        const list = await User.find({ type: 'alumnus' })
+            .populate('alumnus_bio.course')
+            .sort({ name: 1 });
         res.json(list);
     } catch (err) {
         next(err);
@@ -17,7 +19,7 @@ async function alumniList(req, res, next) {
 // print alumnus by id
 async function alumnus(req, res, next) {
     try {
-        const record = await AlumnusBio.findOne({ where: { id: req.params.id } });
+        const record = await User.findById(req.params.id).populate('alumnus_bio.course');
         res.json(record);
     } catch (err) {
         next(err);
@@ -27,9 +29,9 @@ async function alumnus(req, res, next) {
 // update alumnus status
 async function updateAlumnusStatus(req, res, next) {
     try {
-        await AlumnusBio.update(
-            { status: req.body.status },
-            { where: { id: req.body.id } }
+        await User.findByIdAndUpdate(
+            req.body.id,
+            { 'alumnus_bio.status': req.body.status }
         );
         res.json({ message: 'Status updated' });
     } catch (err) {
@@ -40,7 +42,7 @@ async function updateAlumnusStatus(req, res, next) {
 // delete alumnus
 async function deleteAlumnus(req, res, next) {
     try {
-        await AlumnusBio.destroy({ where: { id: req.params.id } });
+        await User.findByIdAndDelete(req.params.id);
         res.json({ message: 'Deleted' });
     } catch (err) {
         next(err);
@@ -53,37 +55,31 @@ async function updateAccount(req, res, next) {
     console.log("update acccccccccc");
     try {
         console.log("SERVER");
-        // parse integers
-        const alumnusId = parseInt(req.body.alumnus_id, 10);
-        const userId = parseInt(req.body.user_id, 10);
+        const userId = req.body.user_id;
 
-        // Build bio update payload
-        const bioData = {
+        // Build user update payload
+        const userData = {
             name: req.body.name,
             email: req.body.email,
-            gender: req.body.gender,
-            batch: req.body.batch,
-            course_id: parseInt(req.body.course_id, 10),
-            connected_to: req.body.connected_to,
+            'alumnus_bio.gender': req.body.gender,
+            'alumnus_bio.batch': req.body.batch,
+            'alumnus_bio.course': req.body.course_id,
+            'alumnus_bio.connected_to': req.body.connected_to,
         };
+        
         if (req.file) {
             const fullPath = req.file.path;
             const relPath = path.relative(process.cwd(), fullPath);
-            bioData.avatar = relPath.replace(/\\/g, '/');
+            userData['alumnus_bio.avatar'] = relPath.replace(/\\/g, '/');
         }
 
-        // Update alumnus_bio row
-        await AlumnusBio.update(bioData, { where: { id: alumnusId } });
-
-        // Build user update payload
-        const userData = { name: req.body.name, email: req.body.email };
         if (req.body.password) {
             const hashed = await bcrypt.hash(req.body.password, 10);
             userData.password = hashed;
         }
 
-        // Update users row
-        await User.update(userData, { where: { id: userId } });
+        // Update user
+        await User.findByIdAndUpdate(userId, userData);
 
         res.json({ message: 'Account updated successfully' });
     } catch (err) {

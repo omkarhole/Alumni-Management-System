@@ -92,7 +92,7 @@ const Signup = () => {
                                                 <select onChange={(e) => setValues({ ...values, course_id: e.target.value })} className="form-control select2" name="course_id" required value={values.course_id}>
                                                     <option disabled value="">Select course</option>
                                                     {courses.map(c => (
-                                                        <option key={c.id} value={c.id}>{c.course}</option>
+                                                        <option key={c._id || c.id} value={c._id || c.id}>{c.course}</option>
                                                     ))}
                                                 </select>
                                             </div>

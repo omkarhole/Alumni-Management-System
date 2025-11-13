@@ -1,54 +1,26 @@
-const { Sequelize } = require('sequelize');
-const config = require('../config/config.js');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+dotenv.config();
 
-const env = process.env.NODE_ENV || "development";
-const cfg = config[env];
-
-// Railway MySQL connection
-const sequelize = new Sequelize(cfg.database, cfg.username, cfg.password, {
-  host: cfg.host,
-  port: cfg.port,
-  dialect: cfg.dialect,
-  dialectOptions: cfg.dialectOptions,
-  logging: false,
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 30000,
-    idle: 10000
-  },
-  retry: {
-    match: [
-      /ETIMEDOUT/,
-      /EHOSTUNREACH/,
-      /ECONNRESET/,
-      /ECONNREFUSED/,
-      /ETIMEDOUT/,
-      /ESOCKETTIMEDOUT/,
-      /EHOSTUNREACH/,
-      /EPIPE/,
-      /EAI_AGAIN/,
-      /SequelizeConnectionError/,
-      /SequelizeConnectionRefusedError/,
-      /SequelizeHostNotFoundError/,
-      /SequelizeHostNotReachableError/,
-      /SequelizeInvalidConnectionError/,
-      /SequelizeConnectionTimedOutError/
-    ],
-    max: 3
-  }
-});
-
-// Test connection function
-const testConnection = async () => {
+const connectDB = async () => {
   try {
-    await sequelize.authenticate();
-    console.log("✅ Railway MySQL Database connected successfully");
-    return true;
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('✅ MongoDB connected successfully');
   } catch (error) {
-    console.error("❌ Unable to connect to Railway database:", error.message);
-    return false;
+    console.error('❌ MongoDB connection error:', error.message);
+    process.exit(1);
   }
 };
 
-module.exports = { sequelize, testConnection };
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB error:', err);
+});
+
+module.exports = { connectDB, mongoose };

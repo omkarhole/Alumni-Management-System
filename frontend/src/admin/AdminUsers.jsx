@@ -9,7 +9,7 @@ const AdminUsers = () => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    axios.get(`${baseUrl}/users`)
+    axios.get(`${baseUrl}/users`, { withCredentials: true })
       .then((res) => {
         setUsers(res.data);
         console.log(users);
@@ -18,10 +18,10 @@ const AdminUsers = () => {
   }, []);
 
   const delUser = (id) => {
-    axios.delete(`${baseUrl}/users/${id}`)
+    axios.delete(`${baseUrl}/users/${id}`, { withCredentials: true })
       .then((res) => {
         toast.info(res.data.message);
-        setUsers(users.filter((e) => e.id !== id))
+        setUsers(users.filter((e) => (e._id || e.id) !== id))
       })
       .catch((err) => console.log(err))
   }
@@ -64,7 +64,7 @@ const AdminUsers = () => {
                           <Link to="/dashboard/users/manage" state={{ status: "edit", data: user }} className="btn btn-primary btn-sm mr-2">
                             <FaEdit /> Edit
                           </Link>
-                          <button onClick={() => delUser(user.id)} className="btn btn-danger btn-sm">
+                          <button onClick={() => delUser(user._id || user.id)} className="btn btn-danger btn-sm">
                             <FaTrash /> Delete
                           </button>
                         </td>
