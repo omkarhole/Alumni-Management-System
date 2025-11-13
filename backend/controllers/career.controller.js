@@ -70,6 +70,108 @@ async function deleteCareer(req,res,next){
     }
 }
 
+// apply to job (for students)
+async function applyToJob(req, res, next) {
+    try {
+        const career = await Career.findById(req.params.id);
+        if (!career) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+        
+        // Check if user already applied
+        const alreadyApplied = career.applicants.some(
+            applicant => applicant.user.toString() === req.body.user_id
+        );
+        
+        if (alreadyApplied) {
+            return res.status(400).json({ message: 'You have already applied for this job' });
+        }
+        
+        career.applicants.push({
+            user: req.body.user_id,
+            status: 'pending'
+        });
+        
+        await career.save();
+        res.status(201).json({ message: 'Application submitted successfully' });
+    } catch (err) {
+        next(err);
+    }
+}
+
+// get job applications (for admin/alumni who posted the job)
+async function getJobApplications(req, res, next) {
+    try {
+        const career = await Career.findById(req.params.id)
+            .populate('applicants.user', 'name email student_bio');
+        
+        if (!career) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+        
+        res.json(career.applicants);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// update application status (for admin/alumni who posted the job)
+async function updateApplicationStatus(req, res, next) {
+    try {
+        const { status } = req.body;
+        const career = await Career.findById(req.params.jobId);
+        
+        if (!career) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+        
+        const applicant = career.applicants.find(
+            app => app.user.toString() === req.params.userId
+        );
+        
+        if (!applicant) {
+            return res.status(404).json({ message: 'Application not found' });
+        }
+        
+        applicant.status = status;
+        await career.save();
+        
+        res.json({ message: 'Application status updated successfully' });
+    } catch (err) {
+        next(err);
+    }
+}
+
+// get student's own applications
+async function getMyApplications(req, res, next) {
+    try {
+        const careers = await Career.find({
+            'applicants.user': req.user.id
+        })
+        .populate('user', 'name')
+        .select('company job_title location applicants');
+        
+        // Filter to show only this user's application status
+        const applications = careers.map(career => {
+            const myApplication = career.applicants.find(
+                app => app.user.toString() === req.user.id
+            );
+            return {
+                _id: career._id,
+                company: career.company,
+                job_title: career.job_title,
+                location: career.location,
+                status: myApplication.status,
+                appliedAt: myApplication.appliedAt
+            };
+        });
+        
+        res.json(applications);
+    } catch (err) {
+        next(err);
+    }
+}
 
 
-module.exports={listCarrers,addCareer,updateCareer,deleteCareer};
+
+module.exports={listCarrers,addCareer,updateCareer,deleteCareer,applyToJob,getJobApplications,updateApplicationStatus,getMyApplications};

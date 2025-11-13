@@ -5,6 +5,7 @@ const path=require('path');
 const { connectDB } = require('./utils/db');
 const authRouter=require('./routes/auth.routes');
 const adminRouter=require('./routes/admin.routes'); 
+const studentRouter=require('./routes/student.routes');
 const cookieParser = require('cookie-parser');
 const errorHandler = require('./middlewares/error.middleware');
 dotenv.config();
@@ -33,6 +34,7 @@ app.use('/public',express.static(path.join(process.cwd(),'public')));
 //api routes - admin and auth
 app.use('/auth',authRouter);
 app.use('/api/admin',adminRouter);
+app.use('/api/student', studentRouter);
 
 //routes
 app.get('/',(req,res)=>{

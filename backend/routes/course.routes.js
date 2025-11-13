@@ -5,11 +5,12 @@ const {
   updateCourse,
   deleteCourse
 }=require('../controllers/course.controller');
+const { authenticate, isAdmin } = require('../middlewares/auth.middleware');
 const router=express.Router();
 
-router.get('/',listCourses);
-router.post('/',addCourse);
-router.put('/:id',updateCourse);
-router.delete('/:id',deleteCourse);
+router.get('/', listCourses);
+router.post('/', authenticate, isAdmin, addCourse);
+router.put('/:id', authenticate, isAdmin, updateCourse);
+router.delete('/:id', authenticate, isAdmin, deleteCourse);
 
 module.exports=router;
