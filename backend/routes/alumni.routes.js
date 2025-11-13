@@ -2,6 +2,7 @@ const express=require('express');
 const multer=require('multer');
 
 const {avatarUpload}=require('../utils/file-upload');
+const { authenticate, isAdmin } = require('../middlewares/auth.middleware');
 
 const router=express.Router();
 
@@ -17,11 +18,11 @@ const {
 // alumni routes
 router.get('/', alumniList);
 router.get('/:id', alumnus);
-router.put('/status', updateAlumnusStatus);
-router.delete('/:id', deleteAlumnus);
+router.put('/status', authenticate, isAdmin, updateAlumnusStatus);
+router.delete('/:id', authenticate, isAdmin, deleteAlumnus);
 
 // route for updating account with avatar upload
-router.put('/account', avatarUpload.single('avatar'), updateAccount);
+router.put('/account', authenticate, avatarUpload.single('avatar'), updateAccount);
 
 
 

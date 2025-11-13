@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+
+// Career Schema definition
 const careerSchema = new mongoose.Schema({
   company: {
     type: String,
@@ -21,7 +23,24 @@ const careerSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  }
+  },
+  // Applicants sub-schema to track students who applied for the career opportunity
+  applicants: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'accepted', 'rejected'],
+      default: 'pending'
+    },
+    appliedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 }, {
   timestamps: true
 });

@@ -17,14 +17,35 @@ async function login(req, res, next) {
         }
         const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1d' });
         res.cookie('token', token, { httpOnly: true });
-
-        res.json({
+        
+        // response object for admin
+        const response = {
             loginStatus: true,
             userId: user._id,
             userType: user.type,
             userName: user.name,
             alumnus_id: user._id
-        });
+        };
+        // Add type-specific data to the response object if student or alumnus
+        if (user.type === 'student' && user.student_bio) {
+            response.student_bio = {
+                gender: user.student_bio.gender,
+                enrollment_year: user.student_bio.enrollment_year,
+                current_year: user.student_bio.current_year,
+                course: user.student_bio.course,
+                roll_number: user.student_bio.roll_number,
+                avatar: user.student_bio.avatar
+            };
+        } else if (user.type === 'alumnus' && user.alumnus_bio) {
+            response.alumnus_bio = {
+                gender: user.alumnus_bio.gender,
+                batch: user.alumnus_bio.batch,
+                course: user.alumnus_bio.course,
+                status: user.alumnus_bio.status,
+                avatar: user.alumnus_bio.avatar
+            };
+        }
+        res.json(response);
     } catch (err) {
         next(err);
     }
@@ -41,11 +62,12 @@ async function signup(req, res, next) {
         }
         const hashed = await bycrypt.hash(password, 10);
         let user;
+        // added alumnus signup
         if (userType === 'alumnus') {
-            user = await User.create({ 
-                name, 
-                email, 
-                password: hashed, 
+            user = await User.create({
+                name,
+                email,
+                password: hashed,
                 type: userType,
                 alumnus_bio: {
                     gender: req.body.gender || 'male',
@@ -54,6 +76,35 @@ async function signup(req, res, next) {
                     connected_to: '',
                     avatar: '',
                     status: 0
+                }
+            });
+        }
+        // added student signup
+        else if (userType === 'student') {
+
+            // VALIDATION CHECKS
+            if (!req.body.enrollment_year || req.body.enrollment_year < 1900 || req.body.enrollment_year > new Date().getFullYear()) {
+                return res.status(400).json({ error: 'Invalid enrollment year' });
+            }
+
+            if (!req.body.current_year || req.body.current_year < 1 || req.body.current_year > 6) {
+                return res.status(400).json({ error: 'Current year must be between 1 and 6' });
+            }
+
+            if (!course_id) {
+                return res.status(400).json({ error: 'Course is required for students' });
+            }
+            user = await User.create({
+                name,
+                email,
+                password: hashed,
+                type: userType,
+                student_bio: {
+                    gender: req.body.gender || 'male',
+                    enrollment_year: req.body.enrollment_year || new Date().getFullYear(),
+                    course: course_id,
+                    roll_number: req.body.roll_number || null,
+                    avatar: ''
                 }
             });
         }

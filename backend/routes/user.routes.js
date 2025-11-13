@@ -4,18 +4,18 @@ const {
   updateUser,
   deleteUser
 }=require('../controllers/user.controller');
-const authenticate=require('../middlewares/auth.middleware');
+const { authenticate, isAdmin } = require('../middlewares/auth.middleware');
 const router=express.Router();
 
-// list of all users
+// list of all users (admin only)
 
-router.get('/',authenticate,listUsers);
+router.get('/', authenticate, isAdmin, listUsers);
 
-// update a user (name, email, type, password)
-router.put('/:id', authenticate, updateUser);
+// update a user (admin only)
+router.put('/:id', authenticate, isAdmin, updateUser);
 
-// delete a user
-router.delete('/:id', authenticate, deleteUser);
+// delete a user (admin only)
+router.delete('/:id', authenticate, isAdmin, deleteUser);
 
 
 module.exports=router;
