@@ -44,6 +44,11 @@ const studentBioSchema=new mongoose.Schema({
     type:Number,
     required:true
   },
+  current_year:{
+    type:Number,
+    min: 1,
+    max: 6
+  },
   course:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Course',

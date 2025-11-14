@@ -10,6 +10,7 @@ import { baseUrl } from '../utils/globalurl';
 
 const Forum = () => {
     const { isLoggedIn, isAdmin } = useAuth();
+    const [loading, setLoading] = useState(true);
     const [forum, setForum] = useState([]);
     const [filteredForum, setFilteredForum] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -17,10 +18,11 @@ const Forum = () => {
     const [handleAdd, setHandleAdd] = useState(false);
 
     useEffect(() => {
-        axios.get(`${baseUrl}/forums`)
+        axios.get(`${baseUrl}/forums`, { withCredentials: true })
             .then((res) => {
-                console.log(res.data)
+                // console.log(res.data)
                 setForum(res.data);
+                setLoading(false);
             })
             .catch((err) => console.log(err));
     }, []);
@@ -45,7 +47,9 @@ const Forum = () => {
         );
         setFilteredForum(filteredTopics);
     }, [searchQuery, forum]);
-
+    if (loading) {
+        return <div className="text-center mt-5">Loading forums...</div>;
+    }
 
     return (
         <>

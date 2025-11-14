@@ -14,7 +14,7 @@ const AdminAlumni = () => {
     axios.get(`${baseUrl}/alumni`, { withCredentials: true })
       .then((res) => {
         setAlumni(res.data);
-        console.log(res.data);
+        // console.log(res.data);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -97,11 +97,11 @@ const AdminAlumni = () => {
                                 <p> <b>{a.name}</b></p>
                               </td>
                               <td className="">
-                                <p> <b>{a.course}</b></p>
+                                <p> <b>{a.alumnus_bio?.course?.course || a.alumnus_bio?.course?.name || 'N/A'}</b></p>
                               </td>
                               <td className="text-center">
-                                {a.status === 1 && <span className="badge badge-primary">Verified</span>}
-                                {a.status === 0 && <span className="badge badge-secondary">Not Verified</span>}
+                                {a.alumnus_bio?.status === 1 && <span className="badge badge-primary">Verified</span>}
+                                {a.alumnus_bio?.status === 0 && <span className="badge badge-secondary">Not Verified</span>}
                               </td>
                               <td className="text-center">
                                 <div className="d-flex justify-content-center">
