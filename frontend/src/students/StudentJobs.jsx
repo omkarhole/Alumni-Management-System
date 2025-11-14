@@ -93,7 +93,7 @@ const StudentJobs = () => {
                     </thead>
                     <tbody>
                       {jobs.map((job, index) => {
-                        const hasApplied = appliedJobs.has(job._id || job.id);
+                        const hasApplied = appliedJobs.has(job._id || job.id); 
                         return (
                           <tr key={job._id || job.id}>
                             <td className="text-center">{index + 1}</td>

@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import { baseUrl } from '../utils/globalurl';
-
+import { useAuth } from '../AuthContext';
 const MyAccount = () => {
+    const { isAlumnus } = useAuth();
     const [acc, setAcc] = useState({
         name: '',
         connected_to: "",
@@ -178,7 +179,7 @@ const MyAccount = () => {
                                     </div>
                                 </div>
 
-                                <div className="form-group row">
+                                { isAlumnus && <div className="form-group row">
                                     <label htmlFor="avatar" className="col-sm-2 col-form-label">Image</label>
                                     <div className="col-sm-10">
                                         <input
@@ -188,7 +189,7 @@ const MyAccount = () => {
                                             onChange={handleFileChange}
                                         />
                                     </div>
-                                </div>
+                                </div>}
 
                                 <div className="form-group row">
                                     <label className="col-sm-2 col-form-label">Email</label>

@@ -9,7 +9,7 @@ import { baseUrl } from '../utils/globalurl';
 
 
 const Careers = () => {
-    const { isLoggedIn, isAdmin } = useAuth();
+    const { isLoggedIn, isAdmin, isStudent } = useAuth();
     const [filteredJob, setFilteredJob] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [jobs, setJobs] = useState([]);
@@ -64,9 +64,9 @@ const Careers = () => {
                             <h3 className="text-white">Job List</h3>
                             <hr className="divider my-4" />
                             <div className="row col-md-12 mb-2 justify-content-center">
-                                {isLoggedIn ?
+                                {isLoggedIn && !isStudent  ?
                                     <> {handleAdd ? <></> : (<button onClick={() => setHandleAdd(true)} className="btn btn-primary btn-block col-sm-4" type="button" id="new_career"><FaPlus /> Post a Job Opportunity</button>)}
-                                    </> : <p className='text-white'>Please Login to post jobs.</p>}
+                                    </> : <p className='text-white'></p>}
                                 {/* <button onClick={()=>navigate("/jobs/add")} className="btn btn-primary btn-block col-sm-4" type="button" id="new_career"><FaPlus /> Post a Job Opportunity</button> */}
                             </div>
                         </div>
