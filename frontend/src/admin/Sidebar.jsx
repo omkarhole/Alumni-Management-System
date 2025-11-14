@@ -49,6 +49,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     </Link>
                 </li>
                 <li onClick={toggleSidebar} className="nav-item">
+                    <Link  className={`nav-link ${isActive("/dashboard/job-applications")}`} to={"/dashboard/job-applications"}>
+                        <FaBriefcase />
+                        <span className='ms-1'>Job Applications</span>
+                    </Link>
+                </li>
+                <li onClick={toggleSidebar} className="nav-item">
                     <Link  className={`nav-link ${isActive("/dashboard/events")}`} to={"/dashboard/events"}>
                         <IoCalendar />
                         <span className='ms-1'>Events</span>

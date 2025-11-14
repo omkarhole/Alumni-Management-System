@@ -23,6 +23,7 @@ import AdminEvents from "./admin/AdminEvents";
 import AdminForum from "./admin/AdminForum";
 import AdminAlumni from "./admin/AdminAlumni";
 import AdminJobs from "./admin/AdminJobs";
+import AdminJobApplications from "./admin/AdminJobApplications";
 import ManageJobs from "./admin/save/ManageJobs";
 import View_Event from "./components/view/View_Event";
 import StudentDashboard from "./students/StudentDashboard";
@@ -103,6 +104,7 @@ function AppRouter() {
             <Route path="/dashboard/forum" element={<AdminForum />} />
             <Route path="/dashboard/alumnilist" element={<AdminAlumni />} />
             <Route path="/dashboard/jobs" element={<AdminJobs />} />
+            <Route path="/dashboard/job-applications" element={<AdminJobApplications />} />
             <Route path="/dashboard/jobs/manage" element={<ManageJobs />} />
             <Route path="/dashboard/events/manage" element={<ManageEvents />} />
             <Route path="/dashboard/forum/manage" element={<ManageForum />} />

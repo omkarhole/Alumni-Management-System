@@ -6,6 +6,14 @@ async function listCarrers(req,res,next){
     try{
         const careers=await Career.find()
             .populate('user', 'name')
+            .populate({
+                path: 'applicants.user',
+                select: 'name email student_bio',
+                populate: {
+                    path: 'student_bio.course',
+                    select: 'name course'
+                }
+            })
             .sort({ createdAt: -1 });
         res.json(careers);
 
