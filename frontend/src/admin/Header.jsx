@@ -16,7 +16,7 @@ const Header = ({ toggleSidebar }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        axios.post(`${authUrl}/logout`)
+        axios.post(`${authUrl}/logout`, {}, { withCredentials: true })
             .then((res) => {
                 navigate("/", { state: { action: "homelogout" } })
                 localStorage.clear();

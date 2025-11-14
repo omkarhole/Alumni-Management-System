@@ -11,7 +11,7 @@ const AdminCourses = () => {
   });
 
   useEffect(() => {
-    axios.get(`${baseUrl}/courses`)
+    axios.get(`${baseUrl}/courses`, { withCredentials: true })
       .then((res) => {
         setCourses(res.data);
       })
@@ -32,7 +32,7 @@ const AdminCourses = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`${baseUrl}/courses/${id}`);
+      const response = await axios.delete(`${baseUrl}/courses/${id}`, { withCredentials: true });
       toast.warning(response.data.message);
       setCourses(courses.filter(c => (c._id || c.id) !== id));
     } catch (error) {
@@ -60,7 +60,7 @@ const AdminCourses = () => {
     try {
       if (name.id) {
         // If id exists, it's an update operation
-        const res = await axios.put(`${baseUrl}/courses/${name.id}`, { course: name.course });
+        const res = await axios.put(`${baseUrl}/courses/${name.id}`, { course: name.course }, { withCredentials: true });
         toast.success("Course updated successfully");
         setCourses(prevCourses => {
           const updatedCourses = prevCourses.map(course => {
@@ -72,15 +72,12 @@ const AdminCourses = () => {
           return updatedCourses;
         });
       } else {
-
-        const res = await axios.post(`${baseUrl}/courses`, { course: name.course });
+        const res = await axios.post(`${baseUrl}/courses`, { course: name.course }, { withCredentials: true });
         toast.success("Course saved successfully");
-        const newCourse = { id: res.data, course: name.course };
-        setCourses([...courses, newCourse]);
+        // Backend returns the full course object with _id
+        setCourses([...courses, res.data]);
       }
-      setName({ ...name, course: '', id: '' }); // Reset the input fields
-      // const newCourse = { id: res.data, course: name.course };
-      // setCourses([...courses, newCourse]);
+      setName({ course: '', id: '' }); // Reset the input fields
     } catch (error) {
       console.error('Error:', error);
       toast.error('An error occurred');

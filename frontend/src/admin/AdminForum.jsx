@@ -15,7 +15,7 @@ const AdminForum = () => {
 
 
   useEffect(() => {
-    axios.get(`${baseUrl}/forums`)
+    axios.get(`${baseUrl}/forums`, { withCredentials: true })
       .then((res) => {
         console.log(res.data)
         setForum(res.data);
@@ -24,7 +24,7 @@ const AdminForum = () => {
   }, []);
 
   const delForum = (id) => {
-    axios.delete(`${baseUrl}/forums/${id}`)
+    axios.delete(`${baseUrl}/forums/${id}`, { withCredentials: true })
       .then((res) => {
         // console.log(res.data.message)
         toast.info(res.data.message);

@@ -9,7 +9,7 @@ const AdminGallery = () => {
   const [about, setAbout] = useState('');
 
   useEffect(() => {
-    axios.get(`${baseUrl}/gallery`)
+    axios.get(`${baseUrl}/gallery`, { withCredentials: true })
       .then((res) => {
         setGallery(res.data);
       })
@@ -50,7 +50,7 @@ const AdminGallery = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`${baseUrl}/gallery/${id}`);
+      const response = await axios.delete(`${baseUrl}/gallery/${id}`, { withCredentials: true });
       setGallery(gallery.filter(item => (item._id || item.id) !== id));
       toast.success(response.data.message)
     } catch (error) {

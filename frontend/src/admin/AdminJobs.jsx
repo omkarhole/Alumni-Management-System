@@ -24,7 +24,7 @@ const AdminJobs = () => {
     // const location = useLocation();
 
     useEffect(() => {
-        axios.get(`${baseUrl}/jobs`)
+        axios.get(`${baseUrl}/jobs`, { withCredentials: true })
             .then((res) => {
                 console.log(res.data);
                 setJobs(res.data);
@@ -40,7 +40,7 @@ const AdminJobs = () => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await axios.delete(`${baseUrl}/jobs/${id}`);
+            const response = await axios.delete(`${baseUrl}/jobs/${id}`, { withCredentials: true });
             toast.warning(response.data.message);
             setJobs(jobs.filter(job => (job._id || job.id) !== id));
         } catch (error) {

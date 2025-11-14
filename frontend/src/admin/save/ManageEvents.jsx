@@ -43,11 +43,11 @@ const ManageEvents = () => {
         try {
             if (eventId) {
                 // Perform update operation
-                await axios.put(`${baseUrl}/events/${eventId}`, eventData)
+                await axios.put(`${baseUrl}/events/${eventId}`, eventData, { withCredentials: true })
                     .then((res) => toast.success(res.data.message))
             } else {
                 // Perform insert operation
-                await axios.post(`${baseUrl}/events`, eventData)
+                await axios.post(`${baseUrl}/events`, eventData, { withCredentials: true })
                     .then((res) => toast.success(res.data.message))
             }
             setEventId(null);

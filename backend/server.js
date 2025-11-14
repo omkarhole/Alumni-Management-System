@@ -31,8 +31,9 @@ app.use(cookieParser());
 //static assets
 app.use('/public',express.static(path.join(process.cwd(),'public')));
 
-//api routes - admin and auth
+//api routes - admin and auth (student,alumni,admin)
 app.use('/auth',authRouter);
+// admin routes 
 app.use('/api/admin',adminRouter);
 app.use('/api/student', studentRouter);
 

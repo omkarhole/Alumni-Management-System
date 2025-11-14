@@ -84,7 +84,8 @@ const ManageJobs = ({ setHandleAdd }) => {
         headers: {
           'Content-Type': 'application/json',
           ...(token && { Authorization: `Bearer ${token}` })
-        }
+        },
+        withCredentials: true
       };
 
       let response;

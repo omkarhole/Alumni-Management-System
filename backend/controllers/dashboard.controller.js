@@ -3,7 +3,7 @@ const {ForumTopic,Career,Event,User} =require('../models/index');
 //get counts function 
 async function getCounts(req, res, next) {
   try {
-    const [ forumCount, jobCount, eventCount, upEventCount, alumniCount ] = await Promise.all([
+    const [ forumCount, jobCount, eventCount, upEventCount, alumniCount,studentCount ] = await Promise.all([
       // total forum topics count
       ForumTopic.countDocuments(),
       // total jobs count
