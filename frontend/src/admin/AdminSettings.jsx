@@ -6,7 +6,7 @@ const AdminSettings = () => {
   const [system, setSystem] = useState({});
 
   useEffect(() => {
-    axios.get(`${baseUrl}/settings`)
+    axios.get(`${baseUrl}/settings`, { withCredentials: true })
       .then((res) => {
         setSystem(res.data);
       })

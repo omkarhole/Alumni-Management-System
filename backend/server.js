@@ -8,6 +8,7 @@ const adminRouter=require('./routes/admin.routes');
 const studentRouter=require('./routes/student.routes');
 const cookieParser = require('cookie-parser');
 const errorHandler = require('./middlewares/error.middleware');
+const { authenticate } = require('./middlewares/auth.middleware');
 dotenv.config();
 const app=express();
 
@@ -31,10 +32,12 @@ app.use(cookieParser());
 //static assets
 app.use('/public',express.static(path.join(process.cwd(),'public')));
 
-//api routes - admin and auth
+//api routes - admin and auth (student,alumni,admin)
 app.use('/auth',authRouter);
+// admin routes 
 app.use('/api/admin',adminRouter);
-app.use('/api/student', studentRouter);
+// student routes (with authentication)
+app.use('/api/student', authenticate, studentRouter);
 
 //routes
 app.get('/',(req,res)=>{

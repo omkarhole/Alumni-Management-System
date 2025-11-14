@@ -6,6 +6,8 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAlumnus, setIsAlumnus] = useState(false);
+  const [isStudent, setIsStudent] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const login = () => setIsLoggedIn(true);
@@ -16,19 +18,25 @@ export const AuthProvider = ({ children }) => {
     if (user === 'admin') {
       setIsAdmin(true);
       setIsLoggedIn(true);
+      setIsAlumnus(false);
+      setIsStudent(false);
     } else if (user === 'alumnus') {
       setIsAdmin(false);
       setIsLoggedIn(true);
-    } else {
+      setIsAlumnus(true);
+      setIsStudent(false);
+    } else if (user === 'student') {
       setIsAdmin(false);
-      setIsLoggedIn(false);
-    }
+      setIsLoggedIn(true);
+      setIsAlumnus(false);
+      setIsStudent(true);
+    } 
   }, [login]);
 
 
 
   return (
-    <AuthContext.Provider value={{ isAdmin, isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isAdmin, isAlumnus, isStudent, isLoggedIn, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

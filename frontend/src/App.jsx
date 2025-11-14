@@ -25,6 +25,13 @@ import AdminAlumni from "./admin/AdminAlumni";
 import AdminJobs from "./admin/AdminJobs";
 import ManageJobs from "./admin/save/ManageJobs";
 import View_Event from "./components/view/View_Event";
+import StudentDashboard from "./students/StudentDashboard";
+import StudentHome from "./students/StudentHome";
+import StudentJobs from "./students/StudentJobs";
+import StudentEvents from "./students/StudentEvents";
+import StudentForum from "./students/StudentForum";
+import StudentProfile from "./students/StudentProfile";
+import StudentsApplications from "./students/StudentsApplications";
 import ManageEvents from "./admin/save/ManageEvents";
 import View_Forum from "./components/view/View_Forum";
 import ManageForum from "./admin/save/ManageForum";
@@ -54,9 +61,10 @@ function App() {
 
 
 function AppRouter() {
-  const { isLoggedIn, isAdmin } = useAuth();
+  const { isLoggedIn, isAdmin, isStudent } = useAuth();
   const location = useLocation();
   const isDashboardRoute = location.pathname.startsWith("/dashboard");
+  const isStudentDashboardRoute = location.pathname.startsWith("/student-dashboard");
 
   // useEffect(() => {
   //   const user = localStorage.getItem('user_type');
@@ -69,7 +77,7 @@ function AppRouter() {
 
   return (
     <>
-      {!isDashboardRoute && <Header />}
+      {!isDashboardRoute && !isStudentDashboardRoute && <Header />}
       <Routes>
         <Route path="*" element={<NotFound />} />
         <Route path="/" element={<Home />} />
@@ -107,9 +115,20 @@ function AppRouter() {
         <Route path="forum/view" element={<View_Forum />} />
         <Route path="jobs/add" element={<ManageJobs />} />
         {/* <Route path="jobs/add" element={<Manage_Career />} /> */}
+        
+        {isLoggedIn && isStudent && (
+          <Route path="/student-dashboard" element={<StudentDashboard />}>
+            <Route path="" element={<StudentHome />} />
+            <Route path="/student-dashboard/jobs" element={<StudentJobs />} />
+            <Route path="/student-dashboard/applications" element={<StudentsApplications />} />
+            <Route path="/student-dashboard/events" element={<StudentEvents />} />
+            <Route path="/student-dashboard/forum" element={<StudentForum />} />
+            <Route path="/student-dashboard/profile" element={<StudentProfile />} />
+          </Route>
+        )}
 
       </Routes>
-      {!isDashboardRoute && <Footer />}
+      {!isDashboardRoute && !isStudentDashboardRoute && <Footer />}
     </>
   );
 }

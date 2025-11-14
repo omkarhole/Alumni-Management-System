@@ -30,7 +30,8 @@ const AdminHome = () => {
     forums: 0,
     jobs: 0,
     upevents: 0,
-    events: 0
+    events: 0,
+    students:0
   });
 
   useEffect(() => {
@@ -57,7 +58,8 @@ const AdminHome = () => {
               <InfoCard title={`Alumni <span>| Total</span>`} count={counts.alumni} Icon={FaUsers} className="customers-card" />
               <InfoCard title="Forum Topics <span>| Total</span>" count={counts.forums} Icon={MdForum} className="sales-card" />
               <InfoCard title="Posted Jobs <span>| Now</span>" count={counts.jobs} Icon={FaBriefcase} className="revenue-card" />
-              <InfoCard title="Upcoming Events <span>| Total</span>" count={counts.upevents} Icon={IoCalendar} className="purple-card" />
+                <InfoCard title="Upcoming Events <span>| Total</span>" count={counts.upevents} Icon={IoCalendar} className="purple-card" />
+                <InfoCard title="Students <span>| Total</span>" count={counts.students} Icon={RiSuitcaseFill} className="students-card" />
             </div>
           </div>
         </div>

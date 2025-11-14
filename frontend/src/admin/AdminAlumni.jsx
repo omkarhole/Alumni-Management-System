@@ -11,7 +11,7 @@ const AdminAlumni = () => {
   const [alumni, setAlumni] = useState([]);
 
   useEffect(() => {
-    axios.get(`${baseUrl}/alumni`)
+    axios.get(`${baseUrl}/alumni`, { withCredentials: true })
       .then((res) => {
         setAlumni(res.data);
         console.log(res.data);
@@ -22,7 +22,7 @@ const AdminAlumni = () => {
   const navigate = useNavigate();
 
   const delAlumni = (id) => {
-    axios.delete(`${baseUrl}/alumni/${id}`)
+    axios.delete(`${baseUrl}/alumni/${id}`, { withCredentials: true })
       .then((res) => {
         toast.success(res.data.message);
         setAlumni(alumni.filter((e) => e.id !== id))

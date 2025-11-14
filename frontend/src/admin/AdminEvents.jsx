@@ -10,13 +10,13 @@ const AdminEvents = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${baseUrl}/events`)
+    axios.get(`${baseUrl}/events`, { withCredentials: true })
       .then((res) => setEvents(res.data))
       .catch((err) => console.log(err));
   }, []);
 
   const delEvent = (id) => {
-    axios.delete(`${baseUrl}/events/${id}`)
+    axios.delete(`${baseUrl}/events/${id}`, { withCredentials: true })
       .then((res) => {
         console.log(res.data.message)
         toast.success(res.data.message);

@@ -5,14 +5,14 @@ const { authenticate, canPostJobs, isStudent } = require('../middlewares/auth.mi
 
 const router=express.Router();
 
-// all careers routes 
+// all careers routes  for admin and authenticated users
 
 router.get('/', authenticate, listCarrers);
 router.post('/', authenticate, canPostJobs, addCareer);
 router.put('/:id', authenticate, canPostJobs, updateCareer);
 router.delete('/:id', authenticate, canPostJobs, deleteCareer);
 
-// job application routes
+// job application routes for students
 router.post('/:id/apply', authenticate, isStudent, applyToJob);
 router.get('/:id/applicants', authenticate, canPostJobs, getJobApplications);
 router.patch('/:jobId/applicants/:userId', authenticate, canPostJobs, updateApplicationStatus);
