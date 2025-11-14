@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { authUrl,baseUrl } from '../utils/globalurl';
+import { authUrl, baseUrl } from '../utils/globalurl';
 
 const Signup = () => {
     const [values, setValues] = useState({
@@ -11,6 +11,11 @@ const Signup = () => {
         password: "",
         userType: "",
         course_id: "",
+        enrollment_year: new Date().getFullYear(),
+        current_year: 1,
+        roll_number: "",
+        gender: "male",
+        batch: ""
     });
     const [courses, setCourses] = useState([]);
 
@@ -88,14 +93,68 @@ const Signup = () => {
                                             </select>
                                         </div>
                                         {values.userType === "alumnus" &&
-                                            <div className="form-group">
-                                                <label htmlFor="course_id" className="control-label">Course</label>
-                                                <select onChange={(e) => setValues({ ...values, course_id: e.target.value })} className="form-control select2" name="course_id" required value={values.course_id}>
-                                                    <option disabled value="">Select course</option>
-                                                    {courses.map(c => (
-                                                        <option key={c._id || c.id} value={c._id || c.id}>{c.course}</option>
-                                                    ))}
-                                                </select>
+                                            <div>
+                                                <div className="form-group">
+                                                    <label htmlFor="course_id" className="control-label">Course</label>
+                                                    <select onChange={(e) => setValues({ ...values, course_id: e.target.value })} className="form-control select2" name="course_id" required value={values.course_id}>
+                                                        <option disabled value="">Select course</option>
+                                                        {courses.map(c => (
+                                                            <option key={c._id || c.id} value={c._id || c.id}>{c.course}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="gender" className="control-label">Gender</label>
+                                                    <select onChange={(e) => setValues({ ...values, gender: e.target.value })} className="form-control" name="gender" required value={values.gender}>
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="batch" className="control-label">Batch Year</label>
+                                                    <input type="number" className="form-control" name="batch" value={values.batch} onChange={(e) => setValues({ ...values, batch: e.target.value })} required />
+                                                </div>
+                                            </div>
+                                        }
+                                        {values.userType === "student" &&
+                                            <div>
+                                                <div className="form-group">
+                                                    <label htmlFor="course_id" className="control-label">Course</label>
+                                                    <select onChange={(e) => setValues({ ...values, course_id: e.target.value })} className="form-control select2" name="course_id" required value={values.course_id}>
+                                                        <option disabled value="">Select course</option>
+                                                        {courses.map(c => (
+                                                            <option key={c._id || c.id} value={c._id || c.id}>{c.course}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="gender" className="control-label">Gender</label>
+                                                    <select onChange={(e) => setValues({ ...values, gender: e.target.value })} className="form-control" name="gender" required value={values.gender}>
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+                                                <div className='flex items-center gap-4 w-full'> 
+                                                    <div className="flex flex-col">
+                                                        <label htmlFor="enrollment_year" className="control-label">Enrollment Year</label>
+                                                        <input type="number" className="form-control" name="enrollment_year" value={values.enrollment_year} onChange={(e) => setValues({ ...values, enrollment_year: parseInt(e.target.value) })} required />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <label htmlFor="current_year" className="control-label">Current Year</label>
+                                                        <select className="form-control" name="current_year" value={values.current_year} onChange={(e) => setValues({ ...values, current_year: parseInt(e.target.value) })} required>
+                                                            <option value={1}>1st Year</option>
+                                                            <option value={2}>2nd Year</option>
+                                                            <option value={3}>3rd Year</option>
+                                                            <option value={4}>4th Year</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="roll_number" className="control-label">Roll Number (Optional)</label>
+                                                    <input type="text" className="form-control" name="roll_number" value={values.roll_number} onChange={(e) => setValues({ ...values, roll_number: e.target.value })} />
+                                                </div>
                                             </div>
                                         }
                                         <hr className="divider" />

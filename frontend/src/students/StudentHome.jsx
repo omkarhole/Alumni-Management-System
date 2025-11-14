@@ -4,7 +4,6 @@ import { IoCalendar } from "react-icons/io5";
 import { RiSuitcaseFill } from "react-icons/ri";
 import { MdForum } from "react-icons/md";
 import axios from "axios";
-// import { baseUrl } from '../utils/globalurl';
 
 const InfoCard = ({ title, count, Icon, className }) => (
   <div className="col-xxl-4 col-xl-6">
@@ -24,18 +23,15 @@ const InfoCard = ({ title, count, Icon, className }) => (
   </div>
 );
 
-const AdminHome = () => {
-  const [counts, setCounts] = useState({
-    alumni: 0,
-    forums: 0,
-    jobs: 0,
-    upevents: 0,
-    events: 0,
-    students:0
-  });
-
-  useEffect(() => {
-    axios.get(`http://localhost:5000/api/admin/dashboard/counts`, { withCredentials: true })
+const StudentHome = () => {
+   const [counts, setCounts] = useState({
+      forums: 0,
+      jobs: 0,
+      upevents: 0,
+      applications:0
+    });
+     useEffect(() => {
+    axios.get(`http://localhost:5000/api/student/dashboard/counts`, { withCredentials: true })
       .then((res) => {
         console.log("Counts data:", res.data);
         setCounts(res.data);
@@ -50,22 +46,21 @@ const AdminHome = () => {
   }, []);
 
   return (
-    <>
-      <section className="section dashboard cutommargin p-3  ">
-        <div className="row">
-          <div className="col-lg-10 m-2">
+      <>
+        <section className="section dashboard cutommargin p-3  ">
             <div className="row">
-              <InfoCard title={`Alumni <span>| Total</span>`} count={counts.alumni} Icon={FaUsers} className="customers-card" />
-              <InfoCard title="Forum Topics <span>| Total</span>" count={counts.forums} Icon={MdForum} className="sales-card" />
-              <InfoCard title="Posted Jobs <span>| Now</span>" count={counts.jobs} Icon={FaBriefcase} className="revenue-card" />
-                <InfoCard title="Upcoming Events <span>| Total</span>" count={counts.upevents} Icon={IoCalendar} className="purple-card" />
-                <InfoCard title="Students <span>| Total</span>" count={counts.students} Icon={RiSuitcaseFill} className="students-card" />
+              <div className="col-lg-10 m-2">
+                <div className="row">
+                  <InfoCard title={`Available Jobs <span>| Total</span>`} count={counts.jobs} Icon={FaUsers} className="customers-card" />
+                  <InfoCard title="My Applications <span>| Total</span>" count={counts.applications} Icon={MdForum} className="sales-card" />
+                  <InfoCard title="Forum Topic <span>| Now</span>" count={counts.forums} Icon={FaBriefcase} className="revenue-card" />
+                  <InfoCard title="Upcoming Events <span>| Total</span>" count={counts.upevents} Icon={IoCalendar} className="purple-card" />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
-    </>
-  );
-};
+          </section>
+        </>
+  )
+}
 
-export default AdminHome;
+export default StudentHome

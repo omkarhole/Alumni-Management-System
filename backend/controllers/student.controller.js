@@ -1,4 +1,5 @@
-const { User } = require("../models");
+const { User, Career, Event, ForumTopic } = require("../models");
+const bcrypt = require('bcrypt');
 
 async function getMyApplications(req,res,next){
     try{
@@ -40,5 +41,32 @@ async function updateStudentProfile(req,res,next){
     }
 
 }
+async function getCounts(req, res, next) {
+    try {
+        const userId = req.user.id;
 
-module.exports={getMyApplications,getStudentProfile,updateStudentProfile};
+        const [forumCount, jobCount, upEventCount, myApplicationsCount] = await Promise.all([
+            // total forum topics count
+            ForumTopic.countDocuments(),
+            // total jobs count
+            Career.countDocuments(),
+            // upcoming events count
+            Event.countDocuments({ schedule: { $gte: new Date() } }),
+            // my applications count
+            Career.countDocuments({ 'applicants.user': userId })
+        ]);
+
+        // return counts as json
+        res.json({
+            forums: forumCount,
+            jobs: jobCount,
+            upevents: upEventCount,
+            applications: myApplicationsCount
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+}
+
+module.exports={getMyApplications,getStudentProfile,updateStudentProfile,getCounts};
