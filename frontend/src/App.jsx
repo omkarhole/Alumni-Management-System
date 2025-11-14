@@ -111,7 +111,7 @@ function AppRouter() {
           </Route>
         )}
         <Route path="events/view" element={<View_Event />} />
-        {isLoggedIn && <Route path="account" element={<MyAccount />} />}
+        {isLoggedIn  && <Route path="account" element={<MyAccount />} />}
         <Route path="forum/view" element={<View_Forum />} />
         <Route path="jobs/add" element={<ManageJobs />} />
         {/* <Route path="jobs/add" element={<Manage_Career />} /> */}

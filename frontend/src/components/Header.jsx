@@ -14,7 +14,7 @@ const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
-    const { logout, isLoggedIn, isAdmin } = useAuth();
+    const { logout, isLoggedIn, isAdmin, isStudent } = useAuth();
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [name, setName] = useState();
@@ -84,6 +84,7 @@ const Header = () => {
                                     {name}<FaAngleDown />
                                 </Link>
                                 <ul className="dropdown-menu ">
+                                    {isStudent && <li><Link onClick={toggleMenu} className="dropdown-item " to="student-dashboard" ><MdDashboard /> Dashboard</Link></li>}
                                     {isAdmin && <li><Link onClick={toggleMenu} className="dropdown-item " to="dashboard" ><MdDashboard /> Dashboard</Link></li>}
                                     {!isAdmin && <li><Link onClick={toggleMenu} className="dropdown-item" to="account" ><FaCog /> Manage Account</Link></li>}
                                     <li><hr className="dropdown-divider" /></li>

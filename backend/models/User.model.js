@@ -53,10 +53,10 @@ const studentBioSchema=new mongoose.Schema({
     type:String,
     unique:true
   },
-   avatar: {
-    type: String,
-    default: ''
-  }
+  //  avatar: {
+  //   type: String,
+  //   default: ''
+  // }
 
 })
 
