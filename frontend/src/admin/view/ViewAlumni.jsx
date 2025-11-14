@@ -15,9 +15,7 @@ const ViewAlumni = () => {
     useEffect(() => {
         if (location.state && location.state.status === 'view') {
             setAlumni(location.state.data);
-            setAccStatus(location.state.data.status);
-
-            // console.log(location.state.data.status);
+            setAccStatus(location.state.data.alumnus_bio?.status);
         }
     }, [location.state]);
 
@@ -26,7 +24,7 @@ const ViewAlumni = () => {
 
     const handleStatus = (num) => {
         console.log(num);
-        axios.put(`${baseUrl}/alumni/status`, { status: num, id: alumni.id })
+        axios.put(`${baseUrl}/alumni/status`, { status: num, id: alumni._id }, { withCredentials: true })
             .then((res) => {
                 setAccStatus(num);
                 if (num == 1) {
@@ -46,7 +44,7 @@ const ViewAlumni = () => {
                     <div>
                         <center>
                             <div className="avatar">
-                                <img src={`${baseUrl}/${alumni.avatar}`} className="vaimg" alt="avatar" />
+                                <img src={`${baseUrl}/${alumni.alumnus_bio?.avatar}`} className="vaimg" alt="avatar" />
                             </div>
                         </center>
                     </div>
@@ -55,12 +53,12 @@ const ViewAlumni = () => {
                         <div className="col-md-6">
                             <p>Name: <b>{alumni.name}</b></p>
                             <p>Email: <b> {alumni.email} </b></p>
-                            <p>Batch: <b> {alumni.batch} </b></p>
-                            <p>Course: <b>{alumni.course} </b></p>
+                            <p>Batch: <b> {alumni.alumnus_bio?.batch} </b></p>
+                            <p>Course: <b>{alumni.alumnus_bio?.course?.course || alumni.alumnus_bio?.course?.name || 'N/A'} </b></p>
                         </div>
                         <div className="col-md-6">
-                            <p>Gender: <b> {alumni.gender} </b></p>
-                            <p>Connected To: <b> {alumni.connected_to} </b></p>
+                            <p>Gender: <b> {alumni.alumnus_bio?.gender} </b></p>
+                            <p>Connected To: <b> {alumni.alumnus_bio?.connected_to} </b></p>
                             <p>Account Status: <b> {accStatus == 1 ? <span className="badge badge-primary">Verified</span> : <span className="badge badge-secondary">Unverified</span>}</b></p>
                         </div>
                     </div>

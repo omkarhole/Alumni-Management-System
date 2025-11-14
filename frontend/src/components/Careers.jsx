@@ -16,6 +16,7 @@ const Careers = () => {
     const [selectedJob, setSelectedJob] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [handleAdd, setHandleAdd] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const openModal = (job) => {
         setSelectedJob(job);
@@ -28,10 +29,11 @@ const Careers = () => {
     };
 
     useEffect(() => {
-        axios.get(`${baseUrl}/jobs`)
+        axios.get(`${baseUrl}/jobs`, { withCredentials: true })
             .then((res) => {
                 console.log(res.data);
                 setJobs(res.data);
+                setLoading(false);
             })
             .catch((err) => console.log(err));
     }, []);
@@ -54,6 +56,9 @@ const Careers = () => {
         setFilteredJob(filteredCareer);
     }, [searchQuery, jobs]);
 
+    if (loading) {
+        return <div className="text-center mt-5">Loading jobs...</div>;
+    }
 
     return (
         <>
