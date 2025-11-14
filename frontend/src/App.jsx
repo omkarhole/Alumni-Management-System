@@ -128,7 +128,6 @@ function AppRouter() {
             <Route path="/student-dashboard/profile" element={<StudentProfile />} />
           </Route>
         )}
-
       </Routes>
       {!isDashboardRoute && !isStudentDashboardRoute && <Footer />}
     </>
@@ -136,12 +135,3 @@ function AppRouter() {
 }
 
 export default App;
-
-
-
-
-
-
-
-
-

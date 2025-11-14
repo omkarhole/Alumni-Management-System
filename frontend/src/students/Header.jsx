@@ -5,34 +5,36 @@ import { IoMdLogOut } from 'react-icons/io'
 import { Link, useNavigate } from 'react-router-dom'
 import logo from "../assets/uploads/logo.png";
 import { useAuth } from '../AuthContext'
-import { useState,useEffect } from 'react'
+import axios from 'axios'
+import { useState, useEffect } from 'react'
+import { authUrl } from '../utils/globalurl';
 
-const Header = ({toggleSidebar}) => {
+const Header = ({ toggleSidebar }) => {
 
-     const { logout, isLoggedIn, isAdmin } = useAuth();
-        const [name, setName] = useState();
-        const navigate = useNavigate();
-    
-        const handleLogout = () => {
-            axios.post(`${authUrl}/logout`, {}, { withCredentials: true })
-                .then((res) => {
-                    navigate("/", { state: { action: "homelogout" } })
-                    localStorage.clear();
-                    logout();
-                })
-                .catch((err) => console.log(err));
-        };
-    
-        useEffect(() => {
-            const user_name = localStorage.getItem("user_name");
-            setName(user_name);
-        }, []);
-  return (
-     <header id="header" className="header fixed-top d-flex align-items-center">
+    const { logout, isLoggedIn, isAdmin } = useAuth();
+    const [name, setName] = useState();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        axios.post(`${authUrl}/logout`, {}, { withCredentials: true })
+            .then((res) => {
+                navigate("/", { state: { action: "homelogout" } })
+                localStorage.clear();
+                logout();
+            })
+            .catch((err) => console.log(err));
+    };
+
+    useEffect(() => {
+        const user_name = localStorage.getItem("user_name");
+        setName(user_name);
+    }, []);
+    return (
+        <header id="header" className="header fixed-top d-flex align-items-center">
 
             <div className="d-flex align-items-center justify-content-between">
                 <FaBars className="bi bi-list toggle-sidebar-btn d-lg-none" onClick={toggleSidebar} />
-                    <img className='dlimg' src={logo} alt="" />
+                <img className='dlimg' src={logo} alt="" />
                 <div className="logo d-flex align-items-center">
                     <span className="d-none d-lg-block">Dashboard</span>
                 </div>
@@ -99,7 +101,7 @@ const Header = ({toggleSidebar}) => {
             </nav>
 
         </header>
-  )
+    )
 }
 
 export default Header

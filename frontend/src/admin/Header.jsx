@@ -94,10 +94,8 @@ const Header = ({ toggleSidebar }) => {
                                     <span className=' ms-1' onClick={handleLogout} >Sign Out</span>
                                 </button>
                             </li>
-
                         </ul>
                     </li>
-
                 </ul>
             </nav>
 
