@@ -487,6 +487,15 @@ mark,
   height: auto;
 }
 
+
+.dlimg {
+  width: 60px;         /* or any size you want */
+  height: 60px;        /* must match width for a perfect circle */
+  border-radius: 50%;   /* makes it circular */
+  object-fit: cover;    /* keeps the image from stretching */
+}
+
+
 .figure {
   display: inline-block;
 }
@@ -4316,7 +4325,7 @@ input[type=button].btn-block {
   color: rgba(255, 255, 255, 0.75);
 }
 .navbar-dark .navbar-nav .nav-link.disabled {
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.197);
 }
 .navbar-dark .navbar-nav .show > .nav-link,
 .navbar-dark .navbar-nav .active > .nav-link,
@@ -4445,6 +4454,7 @@ input[type=button].btn-block {
 .card-img-bottom {
   flex-shrink: 0;
   width: 100%;
+  margin-top: 20px;
 }
 
 .card-img,
@@ -9795,6 +9805,8 @@ button.bg-dark:focus {
 
 .text-white {
   color: #fff !important;
+  text-align: center;
+
 }
 
 .text-primary {
@@ -10097,6 +10109,8 @@ hr.light {
     color: #007bff;
   }
 }
+
+
 /* 
 @media (max-width: 425px) {
   
@@ -10233,8 +10247,9 @@ header.masthead h1 {
     top: 3.5rem;
 }
 nav#mainNav {
-    background: #00000099;
-    color: white !important;
+   background-color: rgba(4, 15, 35, 0.65);
+   backdrop-filter: blur(8px);
+    color: white!important;
 }
 .align-self-end.mb-4.page-title {
     border-radius: 15px;
