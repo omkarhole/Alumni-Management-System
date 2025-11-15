@@ -24,11 +24,11 @@ const Footer = () => {
           <div className="row">
             <div className="col-lg-4 ml-auto text-center mb-5 mb-lg-0">
               <FaPhone className={iconClasses} />
-              <div className="text-${theme === 'dark' ? 'white' : 'black'}">(+92) 61 9210134</div>
+              <div className="text-${theme === 'dark' ? 'white' : 'black'}">(+91)88858585</div>
             </div>
             <div className="col-lg-4 mr-auto text-center">
               <FaEnvelope className={iconClasses} />
-              <a className="d-block" href="mailto:cs@bzu.edu.pk">cs@bzu.edu.pk</a>
+              <a className="d-block" href="mailto:paranox@dp.edu.id">paranox@dp.edu.id</a>
             </div>
           </div>
         </div>
@@ -38,12 +38,12 @@ const Footer = () => {
             Copyright © 2024 - Junaid Rana | <a href="https://junaidrana.vercel.app" target="_blank">Portfolio</a>
           </div> */}
           <div className={`small text-center text-${theme === 'dark' ? 'gray-400' : 'muted'}`}>
-            Copyright © 2024 - CS BZU |  {devfooter} <a
+            Copyright © 2025 - CS PARANOX |  {devfooter} <a
               href="https://junaidrana.vercel.app/"
               target="_blank"
               rel="noreferrer"
             >
-              Junaid Rana<GoVerified style={{ fontSize: "12px", marginLeft: "2px", color:"#03b3ff" }} />
+              PARANOX<GoVerified style={{ fontSize: "12px", marginLeft: "2px", color:"#03b3ff" }} />
             </a>
           </div>
         </div>
