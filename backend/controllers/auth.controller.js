@@ -1,7 +1,7 @@
 const bycrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const { User } = require('../models/index');
+const { User } = require('../models/Index');
 
 //login controller
 async function login(req, res, next) {
