@@ -1,4 +1,4 @@
-const {Career,User}=require('../models/index')
+const {Career,User}=require('../models/Index')
 
 
 // print all careers
