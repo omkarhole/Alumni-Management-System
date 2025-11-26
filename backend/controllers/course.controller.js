@@ -1,4 +1,4 @@
-const { Course } = require('../models/index');
+const { Course } = require('../models/Index');
 
 async function listCourses(req, res, next) {
     try {
