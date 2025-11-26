@@ -29,9 +29,9 @@ const About = () => {
     </div> */}
     <div className="row mt-5  h-100 align-items-center justify-content-center text-center">
       <div className="col-lg-10 align-self-end mb-4" style={{ background: "#0000002e", borderRadius: "10px", padding: "20px" }}>
-        <h2 className="text-uppercase text-white font-weight-bold">About Us</h2>
+        <h2 className="text-uppercase text-white font-weight-bold">About Us.</h2>
         <hr className="divider my-4" />
-        <p className="text-white-75 text-light mb-5">Paranox SIH</p>
+        <p className="text-white-75 text-light mb-5">Paranox SIH.</p>
       </div>
     </div>
   </div>
