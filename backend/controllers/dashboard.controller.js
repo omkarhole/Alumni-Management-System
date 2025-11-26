@@ -1,4 +1,4 @@
-const {ForumTopic,Career,Event,User} =require('../models/index');
+const {ForumTopic,Career,Event,User} =require('../models/Index');
 
 //get counts function 
 async function getCounts(req, res, next) {

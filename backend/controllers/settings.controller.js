@@ -1,4 +1,4 @@
-const {SystemSetting}=require('../models/index');
+const {SystemSetting}=require('../models/Index');
 
 // get all settings
 async function getSettings(req, res, next) {

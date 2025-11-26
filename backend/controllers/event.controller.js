@@ -1,4 +1,4 @@
-const {Event}=require('../models/index')
+const {Event}=require('../models/Index')
 
 //all events details
 async function listEvents(req, res, next) {

@@ -1,4 +1,4 @@
-const {ForumTopic,User}=require('../models/index');
+const {ForumTopic,User}=require('../models/Index');
 
 // list all forum topics with user names
 async function listForums(req, res, next) {

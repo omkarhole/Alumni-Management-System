@@ -1,4 +1,4 @@
-const { User, Career, Event, ForumTopic } = require("../models");
+const { User, Career, Event, ForumTopic } = require("../models/Index");
 const bcrypt = require('bcrypt');
 
 async function getMyApplications(req,res,next){
