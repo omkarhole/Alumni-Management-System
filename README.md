@@ -9,7 +9,7 @@ The Alumni Management System is designed to help educational institutions stay c
 ## 🛠️ Tech Stack
 
 - **Frontend:** ⚛️ React, ⚡ Vite, 🎨 Tailwind CSS
-- **Backend:** 🟢 Node.js, 🚀 Express.js
+- **Backend:** 🟢 Node.js, 🚀 Express.js.
 - **Database:** 🍃 MongoDB
 
 ## ✨ Features
