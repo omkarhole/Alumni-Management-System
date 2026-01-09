@@ -42,6 +42,7 @@ npm run dev
 
 ## 👨‍💻 Contributors
 
+- **Omkar**
 - **Priyanshu**
 - **Ashad**
 - **Vedant**
