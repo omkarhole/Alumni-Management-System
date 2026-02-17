@@ -30,11 +30,16 @@ const Careers = () => {
     useEffect(() => {
         axios.get(`${baseUrl}/jobs`, { withCredentials: true })
             .then((res) => {
-                console.log(res.data);
-                setJobs(res.data);
+                const safeJobs = Array.isArray(res.data)
+                    ? res.data.filter((job) => job && typeof job === 'object')
+                    : [];
+                setJobs(safeJobs);
                 setLoading(false);
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                setLoading(false);
+            });
     }, []);
 
     useEffect(() => {
@@ -47,11 +52,13 @@ const Careers = () => {
 
     useEffect(() => {
         // Filter the forum topics based on the search query
-        const filteredCareer = jobs.filter(career =>
-            career.job_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            career.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            career.location.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        const query = searchQuery.toLowerCase();
+        const filteredCareer = jobs.filter((career) => {
+            const title = (career?.job_title || career?.title || '').toLowerCase();
+            const description = (career?.description || '').toLowerCase();
+            const location = (career?.location || '').toLowerCase();
+            return title.includes(query) || description.includes(query) || location.includes(query);
+        });
         setFilteredJob(filteredCareer);
     }, [searchQuery, jobs]);
 
@@ -108,22 +115,22 @@ const Careers = () => {
                         {filteredJob.length > 0 ? <>
                             {/* $event = $conn->query("SELECT c.*,u.name from careers c inner join users u on u.id = c.user_id order by id desc"); */}
                             {filteredJob.map((j, index) => (
-                                <div className="card job-list" key={index}>
+                                <div className="card job-list" key={j._id || j.id || index}>
                                     <div className="card-body">
                                         <div className="row  align-items-center justify-content-center text-center h-100">
                                             <div className="">
-                                                <h3><b className="filter-txt">{j.title}</b></h3>
+                                                <h3><b className="filter-txt">{j.job_title || j.title || 'Untitled Job'}</b></h3>
                                                 <div>
-                                                    <span className="filter-txt"><small><b><FaBuilding />{j.company}</b></small></span>{" "}
-                                                    <span className="filter-txt"><small><b><FaMapMarker />{j.location}</b></small></span>
+                                                    <span className="filter-txt"><small><b><FaBuilding />{j.company || 'Unknown Company'}</b></small></span>{" "}
+                                                    <span className="filter-txt"><small><b><FaMapMarker />{j.location || 'Location not specified'}</b></small></span>
                                                 </div>
                                                 <hr />
-                                                <p dangerouslySetInnerHTML={{ __html: j.description }} className="truncate filter-txt" ></p>
+                                                <p dangerouslySetInnerHTML={{ __html: j.description || '' }} className="truncate filter-txt" ></p>
                                                 <br />
                                                 <hr className="divider" style={{ maxWidth: "calc(80%)" }} />
                                                 <div className='jobbtn d-flex justify-content-between align-items-center '>
                                                     <span className="badge badge-info ">
-                                                        <b><i>Posted by: {j.user.name}</i></b>
+                                                        <b><i>Posted by: {j.user?.name || 'Unknown'}</i></b>
                                                     </span>
                                                     <button className="btn btn-sm  btn-primary " onClick={() => openModal(j)}>Read More</button>
                                                 </div>
