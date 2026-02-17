@@ -15,17 +15,45 @@ const app=express();
 // Connect to MongoDB
 connectDB();
 
-// cors setup 
-const CLIENT_ORIGINS=[
+// cors setup
+const normalizeOrigin = (origin = '') => origin.trim().replace(/\/+$/, '');
+
+const DEFAULT_ORIGINS = [
     'http://localhost:5173',
     'https://alumni-management-system-frontend.onrender.com',
-    'https://alumni-management-system-xi.vercel.app',
-    'http://localhost:5173'
-    // add vercel api here
+    "https://alumni-management-system-copy.onrender.com"
 ];
 
-app.use(cors({ origin: CLIENT_ORIGINS, methods: ['GET','POST','PUT','PATCH','DELETE'], credentials: true }));
-// app.options('/*', cors({ origin: CLIENT_ORIGINS, credentials: true }));
+const ENV_ORIGINS = [
+    process.env.FRONTEND_URL,
+    ...(process.env.FRONTEND_URLS || '')
+        .split(',')
+        .map((origin) => normalizeOrigin(origin))
+        .filter(Boolean)
+];
+
+const CLIENT_ORIGINS = [...new Set(
+    [...DEFAULT_ORIGINS, ...ENV_ORIGINS]
+        .map((origin) => normalizeOrigin(origin))
+        .filter(Boolean)
+)];
+
+console.log('Allowed CORS origins:', CLIENT_ORIGINS);
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        // Allow server-to-server/no-origin requests (curl, Postman, health checks).
+        if (!origin) return callback(null, true);
+        const normalizedOrigin = normalizeOrigin(origin);
+        if (CLIENT_ORIGINS.includes(normalizedOrigin)) return callback(null, true);
+        return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: true
+};
+
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
 
 // middlewares build-in

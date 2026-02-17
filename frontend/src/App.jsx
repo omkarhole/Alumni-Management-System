@@ -84,7 +84,6 @@ function AppRouter() {
     <>
       {!isDashboardRoute && !isStudentDashboardRoute && <Header />}
       <Routes>
-        <Route path="*" element={<NotFound />} />
         <Route path="/" element={<Home />} />
         <Route path="/alumni" element={<AlumniList />} />
         <Route path="/gallery" element={<Gallery />} />
@@ -93,6 +92,7 @@ function AppRouter() {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/not-found" element={<NotFound />} />
         <Route path="/dashboard" element={
           <PrivateRoute allow={['admin']}>
             <Dashboard />
@@ -136,6 +136,7 @@ function AppRouter() {
           <Route path="forum" element={<StudentForum />} />
           <Route path="profile" element={<StudentProfile />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {!isDashboardRoute && !isStudentDashboardRoute && <Footer />}
     </>
