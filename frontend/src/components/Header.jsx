@@ -78,7 +78,6 @@ const Header = () => {
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/jobs")}`} to="/jobs">Jobs</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/forums")}`} to="/forums">Forums</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/about")}`} to="/about">About</Link></li>
-                            <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/contact")}`} to="/contact">Contact</Link></li>
                             {isLoggedIn ? <></> : (<li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/login")}`} to="/login" id="login">Login</Link></li>)}
                             {isLoggedIn ? (<li className="nav-item dropdown">
                                 <Link className="nav-link " role="button" data-bs-toggle="dropdown" aria-expanded="false">
