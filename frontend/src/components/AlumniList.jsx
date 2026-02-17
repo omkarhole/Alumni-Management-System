@@ -17,7 +17,12 @@ const AlumniList = () => {
   useEffect(() => {
     axios
       .get(`${baseUrl}/alumni`)
-      .then((res) => setAlumniList(res.data))
+      .then((res) => {
+        const safeAlumni = Array.isArray(res.data)
+          ? res.data.filter((item) => item && typeof item === "object")
+          : [];
+        setAlumniList(safeAlumni);
+      })
       .catch((err) => console.log(err));
   }, []);
 
@@ -30,20 +35,20 @@ const AlumniList = () => {
 
     return alumniList.filter(
       (list) =>
-        list.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        list.alumnus_bio?.course?.course
+        list?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        list?.alumnus_bio?.course?.course
           ?.toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        list.alumnus_bio?.batch?.toString().includes(searchQuery),
+        list?.alumnus_bio?.batch?.toString().includes(searchQuery),
     );
   }, [searchQuery, alumniList]);
 
   const totalAlumni = alumniList.length;
   const verifiedCount = alumniList.filter(
-    (a) => a.alumnus_bio?.status === 1,
+    (a) => a?.alumnus_bio?.status === 1,
   ).length;
   const unverifiedCount = alumniList.filter(
-    (a) => a.alumnus_bio?.status === 0,
+    (a) => a?.alumnus_bio?.status === 0,
   ).length;
   const resultCount = filteredAlumni.length;
 
@@ -148,7 +153,7 @@ const AlumniList = () => {
               {filteredAlumni.slice(0, 8).map((a, index) => (
                 <div
                   className="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center"
-                  key={index}
+                  key={a._id || a.id || index}
                 >
                   <div className="card alumni-card border-0 shadow-sm">
                     <div className="text-center pt-4">
@@ -164,7 +169,7 @@ const AlumniList = () => {
                     </div>
 
                     <div className="card-body text-center">
-                      <h6 className="fw-semibold mb-2">{a.name}</h6>
+                      <h6 className="fw-semibold mb-2">{a.name || "Unnamed Alumni"}</h6>
 
                       <span
                         className={`badge px-3 py-2 mb-3 ${
@@ -180,7 +185,7 @@ const AlumniList = () => {
 
                       <div className="text-start small mt-3">
                         <p>
-                          <strong>Email:</strong> {a.email}
+                          <strong>Email:</strong> {a.email || "N/A"}
                         </p>
                         <p>
                           <strong>Course:</strong>{" "}
