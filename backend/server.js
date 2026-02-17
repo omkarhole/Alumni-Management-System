@@ -19,7 +19,7 @@ connectDB();
 const CLIENT_ORIGINS=[
     'http://localhost:5173',
     'https://alumni-management-system-frontend.onrender.com',
-    'https://alumni-management-system-xi.vercel.app'
+    'https://alumni-management-system-xi.vercel.app',
     'http://localhost:5173'
     // add vercel api here
 ];
