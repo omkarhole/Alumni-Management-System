@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { ThemeProvider } from "./ThemeContext";
 import ScrollToTop from "./components/ScrollToTop";
+import PrivateRoute from "./components/PrivateRoute";
 
 // Pages
 import Home from "./components/Home";
@@ -62,11 +63,14 @@ function App() {
 }
 
 function AppRouter() {
-  const { isLoggedIn, isAdmin, isStudent } = useAuth();
+  const { isAuthReady } = useAuth();
   const location = useLocation();
 
-  // Hide header/footer for dashboards
-  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/student-dashboard");
+  const hideLayout =
+    location.pathname.startsWith("/dashboard") ||
+    location.pathname.startsWith("/student-dashboard");
+
+  if (!isAuthReady) return null;
 
   return (
     <>
@@ -84,41 +88,58 @@ function AppRouter() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Student Routes */}
-        {isLoggedIn && isStudent && (
-          <Route path="/student-dashboard" element={<StudentDashboard />}>
-            <Route index element={<StudentHome />} />
-            <Route path="jobs" element={<StudentJobs />} />
-            <Route path="applications" element={<StudentsApplications />} />
-            <Route path="events" element={<StudentEvents />} />
-            <Route path="forum" element={<StudentForum />} />
-            <Route path="profile" element={<StudentProfile />} />
-          </Route>
-        )}
+        {/* Admin Dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute allow={["admin"]}>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<AdminHome />} />
+          <Route path="courses" element={<AdminCourses />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="gallery" element={<AdminGallery />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="events" element={<AdminEvents />} />
+          <Route path="forum" element={<AdminForum />} />
+          <Route path="alumnilist" element={<AdminAlumni />} />
+          <Route path="jobs" element={<AdminJobs />} />
+          <Route path="job-applications" element={<AdminJobApplications />} />
+          <Route path="jobs/manage" element={<ManageJobs />} />
+          <Route path="events/manage" element={<ManageEvents />} />
+          <Route path="forum/manage" element={<ManageForum />} />
+          <Route path="users/manage" element={<ManageUser />} />
+          <Route path="alumni/view" element={<ViewAlumni />} />
+        </Route>
 
-        {/* Admin Routes */}
-        {isLoggedIn && isAdmin && (
-          <Route path="/dashboard" element={<Dashboard />}>
-            <Route index element={<AdminHome />} />
-            <Route path="courses" element={<AdminCourses />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="gallery" element={<AdminGallery />} />
-            <Route path="settings" element={<AdminSettings />} />
-            <Route path="events" element={<AdminEvents />} />
-            <Route path="forum" element={<AdminForum />} />
-            <Route path="alumnilist" element={<AdminAlumni />} />
-            <Route path="jobs" element={<AdminJobs />} />
-            <Route path="job-applications" element={<AdminJobApplications />} />
-            <Route path="jobs/manage" element={<ManageJobs />} />
-            <Route path="events/manage" element={<ManageEvents />} />
-            <Route path="forum/manage" element={<ManageForum />} />
-            <Route path="users/manage" element={<ManageUser />} />
-            <Route path="alumni/view" element={<ViewAlumni />} />
-          </Route>
-        )}
+        {/* Student Dashboard */}
+        <Route
+          path="/student-dashboard"
+          element={
+            <PrivateRoute allow={["student"]}>
+              <StudentDashboard />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<StudentHome />} />
+          <Route path="jobs" element={<StudentJobs />} />
+          <Route path="applications" element={<StudentsApplications />} />
+          <Route path="events" element={<StudentEvents />} />
+          <Route path="forum" element={<StudentForum />} />
+          <Route path="profile" element={<StudentProfile />} />
+        </Route>
 
-        {/* My Account (student/admin) */}
-        {isLoggedIn && <Route path="/account" element={<MyAccount />} />}
+        {/* Account (Student + Alumnus) */}
+        <Route
+          path="/account"
+          element={
+            <PrivateRoute allow={["alumnus", "student"]}>
+              <MyAccount />
+            </PrivateRoute>
+          }
+        />
 
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />

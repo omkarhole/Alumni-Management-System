@@ -1,13 +1,18 @@
 // src/utils/globalurl.js
 
-// Base URL for backend API
-export const baseUrl = "http://localhost:5000"; // for local development
+// Get API base URL from environment variable
+// Falls back to localhost for development
+const apiUrl = (import.meta.env.VITE_API_URL || "http://localhost:5000")
+  .replace(/\/+$/, "");
 
 // Admin API endpoint
-export const adminUrl = "https://alumni-management-system-iloj.onrender.com/api/admin";
+export const baseUrl = `${apiUrl}/api/admin`;
 
 // Auth endpoint
-export const authUrl = "https://alumni-management-system-iloj.onrender.com/auth";
+export const authUrl = `${apiUrl}/auth`;
 
 // Student API endpoint
-export const studentUrl = "https://alumni-management-system-iloj.onrender.com/api/student";
+export const studentUrl = `${apiUrl}/api/student`;
+
+// Contact endpoint (optional but recommended for clarity)
+export const contactUrl = `${apiUrl}/api/contact`;
