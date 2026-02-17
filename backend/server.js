@@ -20,7 +20,8 @@ const normalizeOrigin = (origin = '') => origin.trim().replace(/\/+$/, '');
 
 const DEFAULT_ORIGINS = [
     'http://localhost:5173',
-    'https://alumni-management-system-frontend.onrender.com'
+    'https://alumni-management-system-frontend.onrender.com',
+    "https://alumni-management-system-copy.onrender.com"
 ];
 
 const ENV_ORIGINS = [
