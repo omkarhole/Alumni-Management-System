@@ -2,7 +2,6 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { FaBuilding, FaMapMarker, FaPlus, FaSearch } from 'react-icons/fa';
 import ViewJobs from '../admin/view/ViewJobs';
-// import { useNavigate } from 'react-router-dom';
 import ManageJobs from '../admin/save/ManageJobs';
 import { useAuth } from '../AuthContext';
 import { baseUrl } from '../utils/globalurl';

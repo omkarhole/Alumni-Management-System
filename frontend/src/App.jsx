@@ -62,10 +62,14 @@ function App() {
 
 
 function AppRouter() {
-  const { isLoggedIn, isAdmin, isStudent } = useAuth();
+  const { isAuthReady } = useAuth();
   const location = useLocation();
   const isDashboardRoute = location.pathname.startsWith("/dashboard");
   const isStudentDashboardRoute = location.pathname.startsWith("/student-dashboard");
+
+  if (!isAuthReady) {
+    return null;
+  }
 
   // useEffect(() => {
   //   const user = localStorage.getItem('user_type');
@@ -80,7 +84,6 @@ function AppRouter() {
     <>
       {!isDashboardRoute && !isStudentDashboardRoute && <Header />}
       <Routes>
-        <Route path="*" element={<NotFound />} />
         <Route path="/" element={<Home />} />
         <Route path="/alumni" element={<AlumniList />} />
         <Route path="/gallery" element={<Gallery />} />
@@ -89,45 +92,51 @@ function AppRouter() {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        {isLoggedIn && isAdmin && (
-          <Route path="/dashboard" element={
-            // <PrivateRoute>
+        <Route path="/not-found" element={<NotFound />} />
+        <Route path="/dashboard" element={
+          <PrivateRoute allow={['admin']}>
             <Dashboard />
-            //  {/* </PrivateRoute> */}
-          } >
-            <Route path="" element={<AdminHome />} />
-            <Route path="/dashboard/courses" element={<AdminCourses />} />
-            <Route path="/dashboard/users" element={<AdminUsers />} />
-            <Route path="/dashboard/gallery" element={<AdminGallery />} />
-            <Route path="/dashboard/settings" element={<AdminSettings />} />
-            <Route path="/dashboard/events" element={<AdminEvents />} />
-            <Route path="/dashboard/forum" element={<AdminForum />} />
-            <Route path="/dashboard/alumnilist" element={<AdminAlumni />} />
-            <Route path="/dashboard/jobs" element={<AdminJobs />} />
-            <Route path="/dashboard/job-applications" element={<AdminJobApplications />} />
-            <Route path="/dashboard/jobs/manage" element={<ManageJobs />} />
-            <Route path="/dashboard/events/manage" element={<ManageEvents />} />
-            <Route path="/dashboard/forum/manage" element={<ManageForum />} />
-            <Route path="/dashboard/users/manage" element={<ManageUser />} />
-            <Route path="/dashboard/alumni/view" element={<ViewAlumni />} />
-          </Route>
-        )}
+          </PrivateRoute>
+        } >
+          <Route index element={<AdminHome />} />
+          <Route path="courses" element={<AdminCourses />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="gallery" element={<AdminGallery />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="events" element={<AdminEvents />} />
+          <Route path="forum" element={<AdminForum />} />
+          <Route path="alumnilist" element={<AdminAlumni />} />
+          <Route path="jobs" element={<AdminJobs />} />
+          <Route path="job-applications" element={<AdminJobApplications />} />
+          <Route path="jobs/manage" element={<ManageJobs />} />
+          <Route path="events/manage" element={<ManageEvents />} />
+          <Route path="forum/manage" element={<ManageForum />} />
+          <Route path="users/manage" element={<ManageUser />} />
+          <Route path="alumni/view" element={<ViewAlumni />} />
+        </Route>
         <Route path="events/view" element={<View_Event />} />
-        {isLoggedIn  && <Route path="account" element={<MyAccount />} />}
+        <Route path="account" element={
+          <PrivateRoute allow={['alumnus', 'student']}>
+            <MyAccount />
+          </PrivateRoute>
+        } />
         <Route path="forum/view" element={<View_Forum />} />
         <Route path="jobs/add" element={<ManageJobs />} />
         {/* <Route path="jobs/add" element={<Manage_Career />} /> */}
         
-        {isLoggedIn && isStudent && (
-          <Route path="/student-dashboard" element={<StudentDashboard />}>
-            <Route path="" element={<StudentHome />} />
-            <Route path="/student-dashboard/jobs" element={<StudentJobs />} />
-            <Route path="/student-dashboard/applications" element={<StudentsApplications />} />
-            <Route path="/student-dashboard/events" element={<StudentEvents />} />
-            <Route path="/student-dashboard/forum" element={<StudentForum />} />
-            <Route path="/student-dashboard/profile" element={<StudentProfile />} />
-          </Route>
-        )}
+        <Route path="/student-dashboard" element={
+          <PrivateRoute allow={['student']}>
+            <StudentDashboard />
+          </PrivateRoute>
+        }>
+          <Route index element={<StudentHome />} />
+          <Route path="jobs" element={<StudentJobs />} />
+          <Route path="applications" element={<StudentsApplications />} />
+          <Route path="events" element={<StudentEvents />} />
+          <Route path="forum" element={<StudentForum />} />
+          <Route path="profile" element={<StudentProfile />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {!isDashboardRoute && !isStudentDashboardRoute && <Footer />}
     </>

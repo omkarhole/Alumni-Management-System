@@ -1,3 +1,5 @@
-export const baseUrl="https://alumni-management-system-iloj.onrender.com/api/admin";
-export const authUrl="https://alumni-management-system-iloj.onrender.com/auth";
-export const studentUrl="https://alumni-management-system-iloj.onrender.com/api/student";
+const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
+
+export const baseUrl = `${apiUrl}/api/admin`;
+export const authUrl = `${apiUrl}/auth`;
+export const studentUrl = `${apiUrl}/api/student`;
