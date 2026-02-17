@@ -39,7 +39,7 @@ const Home = () => {
     }, [location.state]);
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/admin/events/upcoming`)
+        axios.get(`${baseUrl}/events/upcoming`)
             .then((res) => {
                 console.log("HELLO",res.data);
                 setEvents(res.data);
