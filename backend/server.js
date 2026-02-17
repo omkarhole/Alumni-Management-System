@@ -16,6 +16,8 @@ const app=express();
 connectDB();
 
 // cors setup
+const normalizeOrigin = (origin = '') => origin.trim().replace(/\/+$/, '');
+
 const DEFAULT_ORIGINS = [
     'http://localhost:5173',
     'https://alumni-management-system-frontend.onrender.com'
@@ -25,17 +27,24 @@ const ENV_ORIGINS = [
     process.env.FRONTEND_URL,
     ...(process.env.FRONTEND_URLS || '')
         .split(',')
-        .map((origin) => origin.trim())
+        .map((origin) => normalizeOrigin(origin))
         .filter(Boolean)
 ];
 
-const CLIENT_ORIGINS = [...new Set([...DEFAULT_ORIGINS, ...ENV_ORIGINS])];
+const CLIENT_ORIGINS = [...new Set(
+    [...DEFAULT_ORIGINS, ...ENV_ORIGINS]
+        .map((origin) => normalizeOrigin(origin))
+        .filter(Boolean)
+)];
+
+console.log('Allowed CORS origins:', CLIENT_ORIGINS);
 
 const corsOptions = {
     origin: (origin, callback) => {
         // Allow server-to-server/no-origin requests (curl, Postman, health checks).
         if (!origin) return callback(null, true);
-        if (CLIENT_ORIGINS.includes(origin)) return callback(null, true);
+        const normalizedOrigin = normalizeOrigin(origin);
+        if (CLIENT_ORIGINS.includes(normalizedOrigin)) return callback(null, true);
         return callback(new Error(`CORS blocked for origin: ${origin}`));
     },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
