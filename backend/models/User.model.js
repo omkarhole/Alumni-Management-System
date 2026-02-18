@@ -30,6 +30,10 @@ const alumnusBioSchema = new mongoose.Schema({
     enum: [0, 1],
     default: 0,
     comment: '0= Unverified, 1= Verified'
+  },
+  skills: {
+    type: [String],
+    default: []
   }
 }, { _id: false });
 
