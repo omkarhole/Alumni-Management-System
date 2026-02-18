@@ -48,7 +48,7 @@ const Header = () => {
     // }, [navRef]);
 
     const handleLogout = () => {
-        axios.post(`${authUrl}/logout`)
+        axios.post(`${authUrl}/logout`, {}, { withCredentials: true })
             .then((res) => {
                 navigate("/", { state: { action: "homelogout" } })
                 localStorage.clear();
@@ -77,6 +77,7 @@ const Header = () => {
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/gallery")}`} to="/gallery">Gallery</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/jobs")}`} to="/jobs">Jobs</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/forums")}`} to="/forums">Forums</Link></li>
+                            <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/news")}`} to="/news">News</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/about")}`} to="/about">About</Link></li>
                             {isLoggedIn ? <></> : (<li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/login")}`} to="/login" id="login">Login</Link></li>)}
                             {isLoggedIn ? (<li className="nav-item dropdown">

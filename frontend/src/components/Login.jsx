@@ -25,17 +25,16 @@ const Login = () => {
     }, [location.state]);
 
 
-    axios.defaults.withCredentials = true;
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post(`${authUrl}/login`, values)
+        axios.post(`${authUrl}/login`, values, { withCredentials: true })
             .then((res) => {
                 if (res.data.loginStatus) {
                     localStorage.setItem("user_id", res.data.userId);
                     localStorage.setItem("user_type", res.data.userType);
                     localStorage.setItem("user_name", res.data.userName);
                     localStorage.setItem("alumnus_id", res.data.alumnus_id);
-                    login();
+                    login(res.data.userType);
                     navigate("/", { state: { action: "homelogin" } });
                 } else {
                     setErrors(res.data.Error)

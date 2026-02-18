@@ -1,21 +1,26 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { FaComments, FaEllipsisV, FaPlus, FaSearch } from 'react-icons/fa';
+import React, { useEffect, useMemo, useState } from 'react'
+import { FaComments, FaPlus } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import ManageForum from '../admin/save/ManageForum';
 import { baseUrl } from '../utils/globalurl';
+import SmartSearchBar from './SmartSearchBar';
+import SmartFilterDropdown from './SmartFilterDropdown';
 
 
 
 const Forum = () => {
-    const { isLoggedIn, isAdmin } = useAuth();
+    const { isLoggedIn } = useAuth();
     const [loading, setLoading] = useState(true);
     const [forum, setForum] = useState([]);
     const [filteredForum, setFilteredForum] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
     const [handleAdd, setHandleAdd] = useState(false);
+    const [authorFilter, setAuthorFilter] = useState('all');
+    const [commentsFilter, setCommentsFilter] = useState('all');
+    const [sortBy, setSortBy] = useState('active');
 
     useEffect(() => {
         axios.get(`${baseUrl}/forums`, { withCredentials: true })
@@ -36,17 +41,64 @@ const Forum = () => {
         window.scrollTo(0, 0);
     }, [handleAdd]);
 
-    const handleSearchInputChange = (e) => {
-        setSearchQuery(e.target.value);
-    }
+    const authorOptions = useMemo(() => {
+        const uniqueAuthors = new Set();
+        forum.forEach((topic) => {
+            const authorName = (topic?.user?.name || '').trim();
+            if (authorName) {
+                uniqueAuthors.add(authorName);
+            }
+        });
+        return Array.from(uniqueAuthors).sort((a, b) => a.localeCompare(b));
+    }, [forum]);
 
     useEffect(() => {
-        const filteredTopics = forum.filter(topic =>
-            topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            topic.description.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        const query = searchQuery.trim().toLowerCase();
+        let filteredTopics = forum.filter((topic) => {
+            const title = (topic?.title || '').toLowerCase();
+            const description = (topic?.description || '').toLowerCase();
+            const author = (topic?.user?.name || '').toLowerCase();
+            if (!query) return true;
+            return title.includes(query) || description.includes(query) || author.includes(query);
+        });
+
+        if (authorFilter !== 'all') {
+            filteredTopics = filteredTopics.filter((topic) => (topic?.user?.name || '') === authorFilter);
+        }
+
+        const getCommentsCount = (topic) => (Array.isArray(topic?.comments) ? topic.comments.length : 0);
+
+        if (commentsFilter === '1') {
+            filteredTopics = filteredTopics.filter((topic) => getCommentsCount(topic) >= 1);
+        } else if (commentsFilter === '5') {
+            filteredTopics = filteredTopics.filter((topic) => getCommentsCount(topic) >= 5);
+        } else if (commentsFilter === '10') {
+            filteredTopics = filteredTopics.filter((topic) => getCommentsCount(topic) >= 10);
+        }
+
+        const getTimestamp = (topic) => {
+            const raw = topic?.createdAt || topic?.created_at || '';
+            const parsed = Date.parse(raw);
+            return Number.isNaN(parsed) ? 0 : parsed;
+        };
+
+        if (sortBy === 'recent') {
+            filteredTopics = [...filteredTopics].sort((a, b) => getTimestamp(b) - getTimestamp(a));
+        } else if (sortBy === 'title-asc') {
+            filteredTopics = [...filteredTopics].sort((a, b) => (a?.title || '').localeCompare(b?.title || ''));
+        } else {
+            filteredTopics = [...filteredTopics].sort((a, b) => getCommentsCount(b) - getCommentsCount(a));
+        }
+
         setFilteredForum(filteredTopics);
-    }, [searchQuery, forum]);
+    }, [authorFilter, commentsFilter, forum, searchQuery, sortBy]);
+
+    const resetFilters = () => {
+        setSearchQuery('');
+        setAuthorFilter('all');
+        setCommentsFilter('all');
+        setSortBy('active');
+    };
     if (loading) {
         return <div className="text-center mt-5">Loading forums...</div>;
     }
@@ -84,19 +136,56 @@ const Forum = () => {
                     <div className="container mt-3 pt-2">
                         <div className="card mb-4">
                             <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-8">
-                                        <div className="input-group mb-3">
-                                            <div className="input-group-prepend">
-                                                <span className="input-group-text" id="filter-field"><FaSearch /></span>
-                                            </div>
-                                            <input value={searchQuery} onChange={handleSearchInputChange} type="text" className="form-control" id="filter" placeholder="Filter" aria-label="Filter" aria-describedby="filter-field" />
-                                        </div>
+                                <SmartSearchBar
+                                    value={searchQuery}
+                                    onChange={setSearchQuery}
+                                    placeholder="Search topics by title or content..."
+                                    inputId="forums-filter"
+                                    buttonId="forums-search"
+                                    entityLabel="topics"
+                                    resultsCount={filteredForum.length}
+                                    totalCount={forum.length}
+                                >
+                                    <SmartFilterDropdown
+                                        label="Author"
+                                        value={authorFilter}
+                                        onChange={setAuthorFilter}
+                                        options={[
+                                            { value: 'all', label: 'All' },
+                                            ...authorOptions.map((authorName) => ({ value: authorName, label: authorName }))
+                                        ]}
+                                    />
+                                    <SmartFilterDropdown
+                                        label="Sort"
+                                        value={sortBy}
+                                        onChange={setSortBy}
+                                        options={[
+                                            { value: 'active', label: 'Most Active' },
+                                            { value: 'recent', label: 'Most Recent' },
+                                            { value: 'title-asc', label: 'Title A-Z' },
+                                        ]}
+                                    />
+                                    <div className="smart-chip-group" role="group" aria-label="Minimum comments filter">
+                                        {[
+                                            { label: 'All', value: 'all' },
+                                            { label: '1+ Comments', value: '1' },
+                                            { label: '5+ Comments', value: '5' },
+                                            { label: '10+ Comments', value: '10' },
+                                        ].map((option) => (
+                                            <button
+                                                key={option.value}
+                                                type="button"
+                                                className={`smart-filter-chip ${commentsFilter === option.value ? 'active' : ''}`}
+                                                onClick={() => setCommentsFilter(option.value)}
+                                            >
+                                                {option.label}
+                                            </button>
+                                        ))}
                                     </div>
-                                    <div className="col-md-4">
-                                        <button className="btn btn-primary btn-block btn-sm" id="search">Search</button>
-                                    </div>
-                                </div>
+                                    <button type="button" className="btn btn-outline-secondary btn-sm smart-filter-reset" onClick={resetFilters}>
+                                        Reset
+                                    </button>
+                                </SmartSearchBar>
 
                             </div>
                         </div>
