@@ -320,5 +320,253 @@ header.masthead>.container {
     .jobs-list-shell .jobs-filter-card,
     .jobs-list-shell .job-list {
         width: min(92vw, 1120px) !important;
+.smart-search {
+    width: 100%;
+}
+
+.smart-search-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.smart-search-input-wrap {
+    position: relative;
+}
+
+.smart-search-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5f738b;
+    font-size: 0.95rem;
+    pointer-events: none;
+}
+
+.smart-search-input {
+    width: 100%;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid #cad8e7;
+    background: #ffffff;
+    padding: 0 2.6rem 0 2.5rem;
+    color: #18324a;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.smart-search-input:focus {
+    border-color: #4f97ff;
+    box-shadow: 0 0 0 3px rgba(79, 151, 255, 0.2);
+}
+
+.smart-search-clear {
+    position: absolute;
+    right: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #7f93a8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.smart-search-clear:hover {
+    color: #355a7d;
+}
+
+.smart-search-btn {
+    min-width: 132px;
+    height: 48px;
+    border-radius: 12px;
+    font-weight: 600;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+}
+
+.smart-search-meta {
+    margin-top: 0.55rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    font-size: 0.82rem;
+    color: #5a6f85;
+}
+
+.smart-search-controls {
+    margin-top: 0.8rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.smart-dropdown {
+    position: relative;
+    min-width: 150px;
+}
+
+.smart-dropdown-trigger {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid #d4e0ec;
+    background: #f5f9ff;
+    border-radius: 10px;
+    padding: 0.45rem 0.6rem;
+    color: #1d3d5a;
+}
+
+.smart-dropdown-trigger.open {
+    border-color: #8cb1d9;
+    box-shadow: 0 0 0 3px rgba(110, 165, 222, 0.2);
+}
+
+.smart-dropdown-label {
+    font-size: 0.78rem;
+    color: #4c627b;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.smart-dropdown-value {
+    font-size: 0.84rem;
+    color: #1d3d5a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.smart-dropdown-caret {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: #436280;
+    transition: transform 0.2s ease;
+}
+
+.smart-dropdown-caret.open {
+    transform: rotate(180deg);
+}
+
+.smart-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+    z-index: 30;
+    min-width: 100%;
+    max-height: 230px;
+    overflow-y: auto;
+    border: 1px solid #c8d8e8;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(16, 48, 78, 0.14);
+    padding: 0.3rem;
+}
+
+.smart-dropdown-option {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    color: #1f3d5a;
+    border-radius: 8px;
+    padding: 0.42rem 0.58rem;
+    font-size: 0.83rem;
+}
+
+.smart-dropdown-option:hover {
+    background: #edf5ff;
+}
+
+.smart-dropdown-option.active {
+    background: #1d7cf3;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.smart-chip-group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.smart-filter-chip {
+    border: 1px solid #c9d6e4;
+    background: #ffffff;
+    color: #2a4763;
+    border-radius: 999px;
+    padding: 0.28rem 0.7rem;
+    line-height: 1.2;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.smart-filter-chip:hover {
+    border-color: #9ab8d6;
+    background: #f5faff;
+}
+
+.smart-filter-chip.active {
+    border-color: #1d7cf3;
+    background: #1d7cf3;
+    color: #ffffff;
+}
+
+.smart-filter-reset {
+    border-radius: 999px;
+    font-weight: 700;
+    padding: 0.32rem 0.75rem;
+}
+
+.job-list,
+.Forum-list {
+    border-radius: 14px;
+    border: 1px solid rgba(82, 122, 161, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.job-list:hover,
+.Forum-list:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(22, 56, 89, 0.13);
+}
+
+@media (max-width: 768px) {
+    .smart-search-main {
+        grid-template-columns: 1fr;
+    }
+
+    .smart-search-btn {
+        width: 100%;
+    }
+
+    .smart-search-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 0.65rem;
+    }
+
+    .smart-search-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .smart-dropdown {
+        width: 100%;
+    }
+
+    .smart-chip-group {
+        width: 100%;
+    }
+
+    .smart-filter-chip {
+        flex: 1;
+        text-align: center;
     }
 }

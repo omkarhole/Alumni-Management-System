@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState, useMemo } from "react";
 import {
-  FaSearch,
   FaUsers,
   FaUserCheck,
   FaUserTimes,
@@ -9,10 +8,15 @@ import {
 } from "react-icons/fa";
 import defaultavatar from "../assets/uploads/defaultavatar.jpg";
 import { baseUrl } from "../utils/globalurl";
+import SmartSearchBar from "./SmartSearchBar";
+import SmartFilterDropdown from "./SmartFilterDropdown";
 
 const AlumniList = () => {
   const [alumniList, setAlumniList] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [courseFilter, setCourseFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("name-asc");
 
   useEffect(() => {
     axios
@@ -26,22 +30,67 @@ const AlumniList = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-  };
+  const courseOptions = useMemo(() => {
+    const uniqueCourses = new Set();
+    alumniList.forEach((list) => {
+      const course = (list?.alumnus_bio?.course?.course || "").trim();
+      if (course) uniqueCourses.add(course);
+    });
+    return Array.from(uniqueCourses).sort((a, b) => a.localeCompare(b));
+  }, [alumniList]);
 
   const filteredAlumni = useMemo(() => {
-    if (!searchQuery) return alumniList;
+    const query = searchQuery.trim().toLowerCase();
+    let results = alumniList.filter((list) => {
+      if (!query) return true;
+      return (
+        list?.name?.toLowerCase().includes(query) ||
+        list?.email?.toLowerCase().includes(query) ||
+        list?.alumnus_bio?.course?.course?.toLowerCase().includes(query) ||
+        list?.alumnus_bio?.batch?.toString().includes(query) ||
+        list?.alumnus_bio?.connected_to?.toLowerCase().includes(query)
+      );
+    });
 
-    return alumniList.filter(
-      (list) =>
-        list?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        list?.alumnus_bio?.course?.course
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        list?.alumnus_bio?.batch?.toString().includes(searchQuery),
-    );
-  }, [searchQuery, alumniList]);
+    if (statusFilter === "verified") {
+      results = results.filter((list) => list?.alumnus_bio?.status === 1);
+    } else if (statusFilter === "unverified") {
+      results = results.filter((list) => list?.alumnus_bio?.status === 0);
+    }
+
+    if (courseFilter !== "all") {
+      results = results.filter(
+        (list) => (list?.alumnus_bio?.course?.course || "").trim() === courseFilter,
+      );
+    }
+
+    if (sortBy === "name-desc") {
+      results = [...results].sort((a, b) =>
+        (b?.name || "").localeCompare(a?.name || ""),
+      );
+    } else if (sortBy === "batch-desc") {
+      results = [...results].sort(
+        (a, b) => Number(b?.alumnus_bio?.batch || 0) - Number(a?.alumnus_bio?.batch || 0),
+      );
+    } else if (sortBy === "batch-asc") {
+      results = [...results].sort(
+        (a, b) => Number(a?.alumnus_bio?.batch || 0) - Number(b?.alumnus_bio?.batch || 0),
+      );
+    } else {
+      results = [...results].sort((a, b) =>
+        (a?.name || "").localeCompare(b?.name || ""),
+      );
+    }
+
+    return results;
+  }, [alumniList, courseFilter, searchQuery, sortBy, statusFilter]);
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+    setCourseFilter("all");
+    setSortBy("name-asc");
+  };
 
   const totalAlumni = alumniList.length;
   const verifiedCount = alumniList.filter(
@@ -122,27 +171,56 @@ const AlumniList = () => {
         {/* ================= IMPROVED SEARCH BOX ================= */}
         <div className="card shadow-sm border-0 mb-5 search-wrapper">
           <div className="card-body">
-            <form onSubmit={handleSearch}>
-              <div className="row justify-content-center align-items-center">
-                <div className="col-lg-7 col-md-8">
-                  <div className="input-group input-group-lg">
-                    <span className="input-group-text bg-white">
-                      <FaSearch />
-                    </span>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Search by name, course, or batch..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <button className="btn btn-primary px-4" type="submit">
-                      Search
-                    </button>
-                  </div>
-                </div>
+            <SmartSearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search by name, email, course, batch, or workplace..."
+              inputId="alumni-filter"
+              buttonId="alumni-search"
+              entityLabel="alumni"
+              resultsCount={filteredAlumni.length}
+              totalCount={alumniList.length}
+            >
+              <SmartFilterDropdown
+                label="Course"
+                value={courseFilter}
+                onChange={setCourseFilter}
+                options={[
+                  { value: "all", label: "All" },
+                  ...courseOptions.map((course) => ({ value: course, label: course })),
+                ]}
+              />
+              <SmartFilterDropdown
+                label="Sort"
+                value={sortBy}
+                onChange={setSortBy}
+                options={[
+                  { value: "name-asc", label: "Name A-Z" },
+                  { value: "name-desc", label: "Name Z-A" },
+                  { value: "batch-desc", label: "Newest Batch" },
+                  { value: "batch-asc", label: "Oldest Batch" },
+                ]}
+              />
+              <div className="smart-chip-group" role="group" aria-label="Verification filter">
+                {[
+                  { label: "All", value: "all" },
+                  { label: "Verified", value: "verified" },
+                  { label: "Unverified", value: "unverified" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={`smart-filter-chip ${statusFilter === option.value ? "active" : ""}`}
+                    onClick={() => setStatusFilter(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
               </div>
-            </form>
+              <button type="button" className="btn btn-outline-secondary btn-sm smart-filter-reset" onClick={resetFilters}>
+                Reset
+              </button>
+            </SmartSearchBar>
           </div>
         </div>
 
