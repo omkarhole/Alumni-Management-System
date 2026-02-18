@@ -18,42 +18,19 @@ const app = express();
 connectDB();
 
 /* =========================
-   CORS SETUP (MERGE RESOLVED)
+   CORS SETUP
 ========================= */
 
-const normalizeOrigin = (origin = '') =>
-    origin.trim().replace(/\/+$/, '');
-
-const DEFAULT_ORIGINS = [
-    'http://localhost:5173',
-    'https://alumni-management-system-frontend.onrender.com',
-    'https://alumni-management-system-xi.vercel.app'
-];
-
-const ENV_ORIGINS = [
-    process.env.FRONTEND_URL,
-    ...(process.env.FRONTEND_URLS || '')
-        .split(',')
-        .map((origin) => normalizeOrigin(origin))
-        .filter(Boolean)
-];
-
-const CLIENT_ORIGINS = [...new Set(
-    [...DEFAULT_ORIGINS, ...ENV_ORIGINS]
-        .map((origin) => normalizeOrigin(origin))
-        .filter(Boolean)
-)];
+const CLIENT_ORIGINS = process.env.FRONTEND_URLS 
+    ? process.env.FRONTEND_URLS.split(',').map(origin => origin.trim())
+    : ['http://localhost:5173'];
 
 console.log('Allowed CORS origins:', CLIENT_ORIGINS);
 
 const corsOptions = {
     origin: (origin, callback) => {
         // Allow requests without origin (Postman, curl, health checks)
-        if (!origin) return callback(null, true);
-
-        const normalizedOrigin = normalizeOrigin(origin);
-
-        if (CLIENT_ORIGINS.includes(normalizedOrigin)) {
+        if (!origin || CLIENT_ORIGINS.includes(origin)) {
             return callback(null, true);
         }
 
