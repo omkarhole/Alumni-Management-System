@@ -24,7 +24,13 @@ button.bg-dark:focus {
 
 .dlimg {
     max-height: 70px;
-    margin-right: 6px;
+    margin-right: 20px;
+}
+
+@media only screen and (max-width: 1024px) {
+    .dlimg{
+        margin-left: 25px;
+    }
 }
 
 .gimg {
