@@ -31,6 +31,7 @@ import AdminForum from "./admin/AdminForum";
 import AdminAlumni from "./admin/AdminAlumni";
 import AdminJobs from "./admin/AdminJobs";
 import AdminJobApplications from "./admin/AdminJobApplications";
+import AdminNews from "./admin/AdminNews";
 import ManageJobs from "./admin/save/ManageJobs";
 import ManageEvents from "./admin/save/ManageEvents";
 import ManageForum from "./admin/save/ManageForum";
