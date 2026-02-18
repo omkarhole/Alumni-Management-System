@@ -6,6 +6,7 @@ const { connectDB } = require('./utils/db');
 const authRouter=require('./routes/auth.routes');
 const adminRouter=require('./routes/admin.routes'); 
 const studentRouter=require('./routes/student.routes');
+const newsRouter=require('./routes/news.routes');
 const cookieParser = require('cookie-parser');
 const errorHandler = require('./middlewares/error.middleware');
 const { authenticate } = require('./middlewares/auth.middleware');
@@ -36,6 +37,8 @@ app.use('/public',express.static(path.join(process.cwd(),'public')));
 
 //api routes - admin and auth (student,alumni,admin)
 app.use('/auth',authRouter);
+// public news routes
+app.use('/api/news', newsRouter);
 // admin routes 
 app.use('/api/admin',adminRouter);
 // student routes (with authentication)

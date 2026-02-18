@@ -13,6 +13,7 @@ import About from "./components/About";
 import Login from "./components/Login";;
 import Signup from "./components/Signup";
 import MyAccount from "./components/MyAccount";
+import News from "./components/News";
 import Dashboard from "./admin/Dashboard";
 import AdminHome from "./admin/AdminHome";
 import AdminCourses from "./admin/AdminCourses";
@@ -24,6 +25,7 @@ import AdminForum from "./admin/AdminForum";
 import AdminAlumni from "./admin/AdminAlumni";
 import AdminJobs from "./admin/AdminJobs";
 import AdminJobApplications from "./admin/AdminJobApplications";
+import AdminNews from "./admin/AdminNews";
 import ManageJobs from "./admin/save/ManageJobs";
 import View_Event from "./components/view/View_Event";
 import StudentDashboard from "./students/StudentDashboard";
@@ -87,6 +89,7 @@ function AppRouter() {
         <Route path="/jobs" element={<Careers />} />
         <Route path="/forums" element={<Forum />} />
         <Route path="/about" element={<About />} />
+        <Route path="/news" element={<News />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         {isLoggedIn && isAdmin && (
@@ -105,6 +108,7 @@ function AppRouter() {
             <Route path="/dashboard/alumnilist" element={<AdminAlumni />} />
             <Route path="/dashboard/jobs" element={<AdminJobs />} />
             <Route path="/dashboard/job-applications" element={<AdminJobApplications />} />
+            <Route path="/dashboard/news" element={<AdminNews />} />
             <Route path="/dashboard/jobs/manage" element={<ManageJobs />} />
             <Route path="/dashboard/events/manage" element={<ManageEvents />} />
             <Route path="/dashboard/forum/manage" element={<ManageForum />} />
