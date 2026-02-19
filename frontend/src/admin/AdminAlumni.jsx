@@ -13,7 +13,10 @@ const AdminAlumni = () => {
   useEffect(() => {
     axios.get(`${baseUrl}/alumni`, { withCredentials: true })
       .then((res) => {
-        setAlumni(res.data);
+        const safeAlumni = Array.isArray(res.data)
+          ? res.data.filter((item) => item && typeof item === 'object')
+          : [];
+        setAlumni(safeAlumni);
         // console.log(res.data);
       })
       .catch((err) => console.log(err));
@@ -80,7 +83,7 @@ const AdminAlumni = () => {
                           {/* $alumni = $conn->query("SELECT a.*,c.course,Concat(a.lastname,', ',a.firstname,' ',a.middlename) as name from alumnus_bio a inner join courses c on c.id = a.course_id order by Concat(a.lastname,', ',a.firstname,' ',a.middlename) asc"); */}
                           {alumni.map((a, index) => (
 
-                            <tr key={index}>
+                            <tr key={a._id || a.id || index}>
                               <td className="text-center">{index + 1}</td>
                               <td className="text-center">
                                 <div className="avatar">
@@ -94,7 +97,7 @@ const AdminAlumni = () => {
                                 </div>
                               </td>
                               <td className="">
-                                <p> <b>{a.name}</b></p>
+                                <p> <b>{a.name || 'N/A'}</b></p>
                               </td>
                               <td className="">
                                 <p> <b>{a.alumnus_bio?.course?.course || a.alumnus_bio?.course?.name || 'N/A'}</b></p>

@@ -3,6 +3,14 @@ const jwt = require('jsonwebtoken');
 
 const { User } = require('../models/Index');
 
+const isProd = process.env.NODE_ENV === 'production';
+const cookieOptions = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    maxAge: 24 * 60 * 60 * 1000
+};
+
 //login controller
 async function login(req, res, next) {
     try {
@@ -16,7 +24,7 @@ async function login(req, res, next) {
             return res.json({ loginStatus: false, Error: 'Invalid Credentials' });
         }
         const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        res.cookie('token', token, { httpOnly: true });
+        res.cookie('token', token, cookieOptions);
         
         // response object for admin
         const response = {
@@ -46,6 +54,26 @@ async function login(req, res, next) {
             };
         }
         res.json(response);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// return current authenticated session user
+async function session(req, res, next) {
+    try {
+        const user = await User.findById(req.user.id).select('_id name email type');
+        if (!user) {
+            return res.status(401).json({ authenticated: false, error: 'Unauthorized' });
+        }
+
+        res.json({
+            authenticated: true,
+            userId: user._id,
+            userType: user.type,
+            userName: user.name,
+            email: user.email
+        });
     } catch (err) {
         next(err);
     }
@@ -119,9 +147,13 @@ async function signup(req, res, next) {
 }
 //logout controller
 function logout(req, res) {
-    res.clearCookie('token');
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: cookieOptions.secure,
+        sameSite: cookieOptions.sameSite
+    });
     res.json({ message: 'Logout Successful' });
 }
 
 
-module.exports = { login, signup, logout };
+module.exports = { login, signup, logout, session };

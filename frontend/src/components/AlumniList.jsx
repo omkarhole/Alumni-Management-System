@@ -1,485 +1,358 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { FaSearch, FaFilter, FaDownload, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import defaultavatar from "../assets/uploads/defaultavatar.jpg"
-import { baseUrl } from '../utils/globalurl';
-
+import axios from "axios";
+import React, { useEffect, useState, useMemo } from "react";
+import {
+  FaUsers,
+  FaUserCheck,
+  FaUserTimes,
+  FaFilter,
+} from "react-icons/fa";
+import defaultavatar from "../assets/uploads/defaultavatar.jpg";
+import { baseUrl } from "../utils/globalurl";
+import SmartSearchBar from "./SmartSearchBar";
+import SmartFilterDropdown from "./SmartFilterDropdown";
 
 const AlumniList = () => {
-    const [alumniList, setAlumniList] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    
-    // Filter states
-    const [selectedBatches, setSelectedBatches] = useState([]);
-    const [selectedCourses, setSelectedCourses] = useState([]);
-    const [selectedCompanies, setSelectedCompanies] = useState([]);
-    const [selectedLocations, setSelectedLocations] = useState([]);
-    const [selectedSkills, setSelectedSkills] = useState([]);
-    
-    // Filter options
-    const [filterOptions, setFilterOptions] = useState({
-        batches: [],
-        courses: [],
-        companies: [],
-        locations: [],
-        skills: []
+  const [alumniList, setAlumniList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [courseFilter, setCourseFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("name-asc");
+
+  useEffect(() => {
+    axios
+      .get(`${baseUrl}/alumni`)
+      .then((res) => {
+        const safeAlumni = Array.isArray(res.data)
+          ? res.data.filter((item) => item && typeof item === "object")
+          : [];
+        setAlumniList(safeAlumni);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  const courseOptions = useMemo(() => {
+    const uniqueCourses = new Set();
+    alumniList.forEach((list) => {
+      const course = (list?.alumnus_bio?.course?.course || "").trim();
+      if (course) uniqueCourses.add(course);
     });
-    
-    // Pagination
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [totalAlumni, setTotalAlumni] = useState(0);
-    const itemsPerPage = 12;
+    return Array.from(uniqueCourses).sort((a, b) => a.localeCompare(b));
+  }, [alumniList]);
 
-    // Show/hide filters
-    const [showFilters, setShowFilters] = useState(false);
+  const filteredAlumni = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    let results = alumniList.filter((list) => {
+      if (!query) return true;
+      return (
+        list?.name?.toLowerCase().includes(query) ||
+        list?.email?.toLowerCase().includes(query) ||
+        list?.alumnus_bio?.course?.course?.toLowerCase().includes(query) ||
+        list?.alumnus_bio?.batch?.toString().includes(query) ||
+        list?.alumnus_bio?.connected_to?.toLowerCase().includes(query)
+      );
+    });
 
-    // Fetch filter options on mount
-    useEffect(() => {
-        axios.get(`${baseUrl}/alumni/filter-options`)
-            .then((res) => {
-                setFilterOptions(res.data);
-            })
-            .catch((err) => console.log(err));
-    }, []);
+    if (statusFilter === "verified") {
+      results = results.filter((list) => list?.alumnus_bio?.status === 1);
+    } else if (statusFilter === "unverified") {
+      results = results.filter((list) => list?.alumnus_bio?.status === 0);
+    }
 
-    // Fetch alumni with filters and pagination
-    const fetchAlumni = () => {
-        setLoading(true);
-        const params = new URLSearchParams();
-        
-        if (searchQuery) params.append('search', searchQuery);
-        if (selectedBatches.length > 0) params.append('batch', selectedBatches.join(','));
-        if (selectedCourses.length > 0) params.append('course', selectedCourses.join(','));
-        if (selectedCompanies.length > 0) params.append('company', selectedCompanies.join(','));
-        if (selectedLocations.length > 0) params.append('location', selectedLocations.join(','));
-        if (selectedSkills.length > 0) params.append('skills', selectedSkills.join(','));
-        
-        params.append('page', currentPage);
-        params.append('limit', itemsPerPage);
+    if (courseFilter !== "all") {
+      results = results.filter(
+        (list) => (list?.alumnus_bio?.course?.course || "").trim() === courseFilter,
+      );
+    }
 
-        axios.get(`${baseUrl}/alumni/search?${params.toString()}`)
-            .then((res) => {
-                setAlumniList(res.data.alumni);
-                setTotalPages(res.data.pagination.pages);
-                setTotalAlumni(res.data.pagination.total);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.log(err);
-                setLoading(false);
-            });
-    };
+    if (sortBy === "name-desc") {
+      results = [...results].sort((a, b) =>
+        (b?.name || "").localeCompare(a?.name || ""),
+      );
+    } else if (sortBy === "batch-desc") {
+      results = [...results].sort(
+        (a, b) => Number(b?.alumnus_bio?.batch || 0) - Number(a?.alumnus_bio?.batch || 0),
+      );
+    } else if (sortBy === "batch-asc") {
+      results = [...results].sort(
+        (a, b) => Number(a?.alumnus_bio?.batch || 0) - Number(b?.alumnus_bio?.batch || 0),
+      );
+    } else {
+      results = [...results].sort((a, b) =>
+        (a?.name || "").localeCompare(b?.name || ""),
+      );
+    }
 
-    // Fetch alumni when filters or page changes
-    useEffect(() => {
-        fetchAlumni();
-    }, [currentPage, selectedBatches, selectedCourses, selectedCompanies, selectedLocations, selectedSkills]);
+    return results;
+  }, [alumniList, courseFilter, searchQuery, sortBy, statusFilter]);
 
-    // Debounced search
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setCurrentPage(1);
-            fetchAlumni();
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
+  const resetFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+    setCourseFilter("all");
+    setSortBy("name-asc");
+  };
 
-    const handleSearchInputChange = (e) => {
-        setSearchQuery(e.target.value);
-    };
+  const totalAlumni = alumniList.length;
+  const verifiedCount = alumniList.filter(
+    (a) => a?.alumnus_bio?.status === 1,
+  ).length;
+  const unverifiedCount = alumniList.filter(
+    (a) => a?.alumnus_bio?.status === 0,
+  ).length;
+  const resultCount = filteredAlumni.length;
 
-    const handleBatchChange = (batch) => {
-        setSelectedBatches(prev => 
-            prev.includes(batch) ? prev.filter(b => b !== batch) : [...prev, batch]
-        );
-        setCurrentPage(1);
-    };
+  return (
+    <>
+      <header className="alumni-hero">
+        <div className="container text-center hero-content">
+          <h1 className="display-5 fw-bold mb-3">Alumni Directory</h1>
 
-    const handleCourseChange = (courseId) => {
-        setSelectedCourses(prev => 
-            prev.includes(courseId) ? prev.filter(c => c !== courseId) : [...prev, courseId]
-        );
-        setCurrentPage(1);
-    };
+          <p className="lead mb-4">
+            Connect with graduates, explore careers, and grow your professional
+            network.
+          </p>
 
-    const handleCompanyChange = (company) => {
-        setSelectedCompanies(prev => 
-            prev.includes(company) ? prev.filter(c => c !== company) : [...prev, company]
-        );
-        setCurrentPage(1);
-    };
+          <div className="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="#alumni-section" className="btn btn-primary btn-lg px-4">
+              Explore Alumni
+            </a>
 
-    const handleLocationChange = (location) => {
-        setSelectedLocations(prev => 
-            prev.includes(location) ? prev.filter(l => l !== location) : [...prev, location]
-        );
-        setCurrentPage(1);
-    };
+            <button className="btn btn-outline-light btn-lg px-4">
+              Join Network
+            </button>
+          </div>
+        </div>
+      </header>
 
-    const handleSkillChange = (skill) => {
-        setSelectedSkills(prev => 
-            prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]
-        );
-        setCurrentPage(1);
-    };
-
-    const clearAllFilters = () => {
-        setSearchQuery('');
-        setSelectedBatches([]);
-        setSelectedCourses([]);
-        setSelectedCompanies([]);
-        setSelectedLocations([]);
-        setSelectedSkills([]);
-        setCurrentPage(1);
-    };
-
-    const handleExport = () => {
-        const params = new URLSearchParams();
-        
-        if (searchQuery) params.append('search', searchQuery);
-        if (selectedBatches.length > 0) params.append('batch', selectedBatches.join(','));
-        if (selectedCourses.length > 0) params.append('course', selectedCourses.join(','));
-        if (selectedCompanies.length > 0) params.append('company', selectedCompanies.join(','));
-        if (selectedLocations.length > 0) params.append('location', selectedLocations.join(','));
-        if (selectedSkills.length > 0) params.append('skills', selectedSkills.join(','));
-
-        window.open(`${baseUrl}/alumni/export?${params.toString()}`, '_blank');
-    };
-
-    const goToPage = (page) => {
-        if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);
-        }
-    };
-
-    const renderPagination = () => {
-        const pages = [];
-        const maxVisiblePages = 5;
-        
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-        
-        if (endPage - startPage < maxVisiblePages - 1) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            pages.push(
-                <button
-                    key={i}
-                    className={`btn btn-sm ${currentPage === i ? 'btn-primary' : 'btn-outline-primary'} mx-1`}
-                    onClick={() => goToPage(i)}
-                >
-                    {i}
-                </button>
-            );
-        }
-
-        return (
-            <div className="d-flex justify-content-center align-items-center mt-4">
-                <button 
-                    className="btn btn-sm btn-outline-primary mx-1"
-                    onClick={() => goToPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                >
-                    <FaChevronLeft />
-                </button>
-                {startPage > 1 && <span className="mx-2">...</span>}
-                {pages}
-                {endPage < totalPages && <span className="mx-2">...</span>}
-                <button 
-                    className="btn btn-sm btn-outline-primary mx-1"
-                    onClick={() => goToPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                >
-                    <FaChevronRight />
-                </button>
-                <span className="ml-3 text-muted">
-                    Page {currentPage} of {totalPages} ({totalAlumni} total)
-                </span>
+      <div className="container my-5">
+        {/* ================= 4 SUMMARY CARDS ================= */}
+        <div className="row g-4 mb-5">
+          <div className="col-md-3">
+            <div className="card stat-card shadow-sm border-0 h-100">
+              <div className="card-body text-center">
+                <FaUsers size={28} className="text-primary mb-2" />
+                <h6>Total Alumni</h6>
+                <h4 className="fw-bold">{totalAlumni}</h4>
+              </div>
             </div>
-        );
-    };
+          </div>
 
-    return (
-        <>
-            <header className="masthead">
-                <div className="container-fluid h-100">
-                    <div className="row h-100 align-items-center justify-content-center text-center">
-                        <div className="col-lg-8 align-self-end mb-4 page-title">
-                            <h3 className="text-white">Alumnus/Alumnae List</h3>
-                            <hr className="divider my-4" />
-                        </div>
-                    </div>
-                </div>
-            </header>
-            
-            <div className="container mt-4">
-                <div className="card mb-4">
-                    <div className="card-body">
-                        {/* Search Bar */}
-                        <div className="row mb-3">
-                            <div className="col-md-8">
-                                <div className="input-group">
-                                    <div className="input-group-prepend">
-                                        <span className="input-group-text">
-                                            <FaSearch />
-                                        </span>
-                                    </div>
-                                    <input
-                                        value={searchQuery} 
-                                        onChange={handleSearchInputChange}
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Search by name or email..."
-                                    />
-                                </div>
-                            </div>
-                            <div className="col-md-4">
-                                <div className="d-flex gap-2">
-                                    <button 
-                                        className="btn btn-outline-secondary flex-fill"
-                                        onClick={() => setShowFilters(!showFilters)}
-                                    >
-                                        <FaFilter /> Filters {showFilters ? '▲' : '▼'}
-                                    </button>
-                                    <button 
-                                        className="btn btn-success"
-                                        onClick={handleExport}
-                                        title="Export to CSV"
-                                    >
-                                        <FaDownload />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Advanced Filters */}
-                        {showFilters && (
-                            <div className="row mt-3 border-top pt-3">
-                                {/* Batch Filter */}
-                                <div className="col-md-6 col-lg-2 mb-3">
-                                    <h6 className="font-weight-bold">Batch</h6>
-                                    <div className="filter-scroll" style={{maxHeight: '150px', overflowY: 'auto'}}>
-                                        {filterOptions.batches.map(batch => (
-                                            <div key={batch} className="form-check">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-check-input"
-                                                    id={`batch-${batch}`}
-                                                    checked={selectedBatches.includes(batch)}
-                                                    onChange={() => handleBatchChange(batch)}
-                                                />
-                                                <label className="form-check-label" htmlFor={`batch-${batch}`}>
-                                                    {batch}
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Course Filter */}
-                                <div className="col-md-6 col-lg-3 mb-3">
-                                    <h6 className="font-weight-bold">Course</h6>
-                                    <div className="filter-scroll" style={{maxHeight: '150px', overflowY: 'auto'}}>
-                                        {filterOptions.courses.map(course => (
-                                            <div key={course._id} className="form-check">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-check-input"
-                                                    id={`course-${course._id}`}
-                                                    checked={selectedCourses.includes(course._id)}
-                                                    onChange={() => handleCourseChange(course._id)}
-                                                />
-                                                <label className="form-check-label" htmlFor={`course-${course._id}`}>
-                                                    {course.name}
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Company Filter */}
-                                <div className="col-md-6 col-lg-3 mb-3">
-                                    <h6 className="font-weight-bold">Company</h6>
-                                    <div className="filter-scroll" style={{maxHeight: '150px', overflowY: 'auto'}}>
-                                        {filterOptions.companies.map(company => (
-                                            <div key={company} className="form-check">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-check-input"
-                                                    id={`company-${company}`}
-                                                    checked={selectedCompanies.includes(company)}
-                                                    onChange={() => handleCompanyChange(company)}
-                                                />
-                                                <label className="form-check-label" htmlFor={`company-${company}`}>
-                                                    {company}
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Location Filter */}
-                                <div className="col-md-6 col-lg-2 mb-3">
-                                    <h6 className="font-weight-bold">Location</h6>
-                                    <div className="filter-scroll" style={{maxHeight: '150px', overflowY: 'auto'}}>
-                                        {filterOptions.locations.map(location => (
-                                            <div key={location} className="form-check">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-check-input"
-                                                    id={`location-${location}`}
-                                                    checked={selectedLocations.includes(location)}
-                                                    onChange={() => handleLocationChange(location)}
-                                                />
-                                                <label className="form-check-label" htmlFor={`location-${location}`}>
-                                                    {location}
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Skills Filter */}
-                                <div className="col-md-6 col-lg-2 mb-3">
-                                    <h6 className="font-weight-bold">Skills</h6>
-                                    <div className="filter-scroll" style={{maxHeight: '150px', overflowY: 'auto'}}>
-                                        {filterOptions.skills.map(skill => (
-                                            <div key={skill} className="form-check">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-check-input"
-                                                    id={`skill-${skill}`}
-                                                    checked={selectedSkills.includes(skill)}
-                                                    onChange={() => handleSkillChange(skill)}
-                                                />
-                                                <label className="form-check-label" htmlFor={`skill-${skill}`}>
-                                                    {skill}
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Clear Filters */}
-                                <div className="col-12 mt-2">
-                                    <button 
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={clearAllFilters}
-                                    >
-                                        Clear All Filters
-                                    </button>
-                                    {(selectedBatches.length > 0 || selectedCourses.length > 0 || 
-                                      selectedCompanies.length > 0 || selectedLocations.length > 0 || 
-                                      selectedSkills.length > 0) && (
-                                        <span className="ml-2 text-muted">
-                                            Active filters: {
-                                                selectedBatches.length + selectedCourses.length + 
-                                                selectedCompanies.length + selectedLocations.length + 
-                                                selectedSkills.length
-                                            }
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
+          <div className="col-md-3">
+            <div className="card stat-card shadow-sm border-0 h-100">
+              <div className="card-body text-center">
+                <FaUserCheck size={28} className="text-success mb-2" />
+                <h6>Verified</h6>
+                <h4 className="fw-bold">{verifiedCount}</h4>
+              </div>
             </div>
+          </div>
 
-            {/* Loading State */}
-            {loading && (
-                <div className="container-fluid mt-3 pt-2 text-center">
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="sr-only">Loading...</span>
+          <div className="col-md-3">
+            <div className="card stat-card shadow-sm border-0 h-100">
+              <div className="card-body text-center">
+                <FaUserTimes size={28} className="text-danger mb-2" />
+                <h6>Unverified</h6>
+                <h4 className="fw-bold">{unverifiedCount}</h4>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="card stat-card shadow-sm border-0 h-100">
+              <div className="card-body text-center">
+                <FaFilter size={28} className="text-warning mb-2" />
+                <h6>Search Results</h6>
+                <h4 className="fw-bold">{resultCount}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ================= IMPROVED SEARCH BOX ================= */}
+        <div className="card shadow-sm border-0 mb-5 search-wrapper">
+          <div className="card-body">
+            <SmartSearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search by name, email, course, batch, or workplace..."
+              inputId="alumni-filter"
+              buttonId="alumni-search"
+              entityLabel="alumni"
+              resultsCount={filteredAlumni.length}
+              totalCount={alumniList.length}
+            >
+              <SmartFilterDropdown
+                label="Course"
+                value={courseFilter}
+                onChange={setCourseFilter}
+                options={[
+                  { value: "all", label: "All" },
+                  ...courseOptions.map((course) => ({ value: course, label: course })),
+                ]}
+              />
+              <SmartFilterDropdown
+                label="Sort"
+                value={sortBy}
+                onChange={setSortBy}
+                options={[
+                  { value: "name-asc", label: "Name A-Z" },
+                  { value: "name-desc", label: "Name Z-A" },
+                  { value: "batch-desc", label: "Newest Batch" },
+                  { value: "batch-asc", label: "Oldest Batch" },
+                ]}
+              />
+              <div className="smart-chip-group" role="group" aria-label="Verification filter">
+                {[
+                  { label: "All", value: "all" },
+                  { label: "Verified", value: "verified" },
+                  { label: "Unverified", value: "unverified" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={`smart-filter-chip ${statusFilter === option.value ? "active" : ""}`}
+                    onClick={() => setStatusFilter(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              <button type="button" className="btn btn-outline-secondary btn-sm smart-filter-reset" onClick={resetFilters}>
+                Reset
+              </button>
+            </SmartSearchBar>
+          </div>
+        </div>
+
+        {/* ================= ALUMNI GRID ================= */}
+        <div className="container">
+          {filteredAlumni.length > 0 ? (
+            <div className="row justify-content-center g-5">
+              {filteredAlumni.slice(0, 8).map((a, index) => (
+                <div
+                  className="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center"
+                  key={a._id || a.id || index}
+                >
+                  <div className="card alumni-card border-0 shadow-sm">
+                    <div className="text-center pt-4">
+                      <img
+                        src={
+                          a.alumnus_bio?.avatar
+                            ? `${baseUrl}/${a.alumnus_bio.avatar}`
+                            : defaultavatar
+                        }
+                        alt="avatar"
+                        className="alumni-avatar"
+                      />
                     </div>
-                    <p className="mt-2">Loading alumni...</p>
-                </div>
-            )}
 
-            {/* Alumni Grid */}
-            {!loading && (
-                <div className="container-fluid mt-3 pt-2">
-                    {alumniList.length > 0 ? <>
-                        <div className="row">
-                            {alumniList.map((a, index) => (
-                                <div className="col-md-4 col-lg-3 mb-4" key={index}>
-                                    <div className="card h-100 shadow-sm">
-                                        <center>
-                                            {a.alumnus_bio?.avatar ?
-                                                <img
-                                                    src={`${baseUrl}/${a.alumnus_bio.avatar}`}
-                                                    className="card-img-top img-fluid alimg"
-                                                    alt="avatar"
-                                                /> : <>
-                                                    <img
-                                                        src={defaultavatar}
-                                                        className="card-img-top img-fluid alimg"
-                                                        alt="avatar"
-                                                    />
-                                                </>}
-                                        </center>
-                                        <div className="card-body">
-                                            <h5 className="card-title text-center pad-zero">
-                                                {a.name} 
-                                                <small>
-                                                    <i className={`badge badge-primary ${a.alumnus_bio?.status === 1 ? '' : 'd-none'}`}>
-                                                        Verified
-                                                    </i>
-                                                    <i className={`badge badge-warning ${a.alumnus_bio?.status === 0 ? '' : 'd-none'}`}>
-                                                        Unverified
-                                                    </i>
-                                                </small>
-                                            </h5>
+                    <div className="card-body text-center">
+                      <h6 className="fw-semibold mb-2">{a.name || "Unnamed Alumni"}</h6>
 
-                                            <p className="card-text">
-                                                <strong>Email:</strong> {a.email}
-                                            </p>
-                                            {a.alumnus_bio?.course?.course && <p className="card-text">
-                                                <strong>Course:</strong> {a.alumnus_bio.course.course}
-                                            </p>}
-                                            {a.alumnus_bio?.batch && a.alumnus_bio.batch != "0000" && <p className="card-text">
-                                                <strong>Batch:</strong> {a.alumnus_bio.batch}
-                                            </p>}
-                                            {a.alumnus_bio?.skills && a.alumnus_bio.skills.length > 0 && (
-                                                <p className="card-text">
-                                                    <strong>Skills:</strong> {a.alumnus_bio.skills.join(', ')}
-                                                </p>
-                                            )}
-                                            {a.alumnus_bio?.connected_to && <p className="card-text">
-                                                <strong>Currently working in/as:</strong> {a.alumnus_bio.connected_to}
-                                            </p>}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        
-                        {/* Pagination */}
-                        {totalPages > 1 && renderPagination()}
-                    </> : <>
-                        <div className="d-flex flex-column justify-content-center align-items-center">
-                            <h4 className='text-info-emphasis'>No Alumni Found</h4>
-                            <p className="text-muted">Try adjusting your search or filters</p>
-                            {(selectedBatches.length > 0 || selectedCourses.length > 0 || 
-                              selectedCompanies.length > 0 || selectedLocations.length > 0 || 
-                              selectedSkills.length > 0 || searchQuery) && (
-                                <button 
-                                    className="btn btn-outline-primary mt-2"
-                                    onClick={clearAllFilters}
-                                >
-                                    Clear All Filters
-                                </button>
-                            )}
-                        </div>
-                    </>}
+                      <span
+                        className={`badge px-3 py-2 mb-3 ${
+                          a.alumnus_bio?.status === 1
+                            ? "bg-success"
+                            : "bg-warning text-dark"
+                        }`}
+                      >
+                        {a.alumnus_bio?.status === 1
+                          ? "Verified"
+                          : "Unverified"}
+                      </span>
+
+                      <div className="text-start small mt-3">
+                        <p>
+                          <strong>Email:</strong> {a.email || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Course:</strong>{" "}
+                          {a.alumnus_bio?.course?.course || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Batch:</strong>{" "}
+                          {a.alumnus_bio?.batch || "N/A"}
+                        </p>
+                        <p className="mb-0">
+                          <strong>Working:</strong>{" "}
+                          {a.alumnus_bio?.connected_to || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-            )}
-        </>
-    );
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-5">
+              <h5>No alumni found</h5>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ================= STYLING ================= */}
+      <style jsx>{`
+        .alumni-card {
+          width: 100%;
+          max-width: 280px;
+          border-radius: 16px;
+          transition: 0.25s ease;
+          padding-bottom: 10px;
+        }
+
+        .alumni-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        .alumni-avatar {
+          width: 95px;
+          height: 95px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+
+        .alumni-card p {
+          margin-bottom: 8px;
+        }
+
+        .stat-card {
+          border-radius: 14px;
+          transition: 0.2s ease;
+        }
+
+        .stat-card:hover {
+          transform: translateY(-4px);
+        }
+
+        .search-wrapper {
+          border-radius: 16px;
+        }
+        .alumni-hero {
+          height: 60vh;
+          min-height: 400px;
+          background:
+            linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
+            url("/your-background-image.jpg");
+          background-size: cover;
+          background-position: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+        }
+
+        .hero-content {
+          max-width: 700px;
+        }
+
+        .alumni-hero h1 {
+          letter-spacing: 1px;
+        }
+      `}</style>
+    </>
+  );
 };
 
 export default AlumniList;

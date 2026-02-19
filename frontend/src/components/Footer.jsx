@@ -25,6 +25,8 @@ const Footer = () => {
     { name: 'Jobs', path: '/jobs' },
     { name: 'Forums', path: '/forums' },
     { name: 'About', path: '/about' },
+    { name: 'Contact', path: '/contact' },
+    { name: 'Terms of Service', path: '/terms' },
   ];
 
   const socialLinks = [
@@ -179,7 +181,7 @@ const Footer = () => {
                 <div>
                   <h6 className={`mb-1 ${textColor}`} style={{ fontSize: '0.9rem', fontWeight: '600' }}>Address</h6>
                   <span className={`${mutedTextColor}`} style={{ fontSize: '0.95rem' }}>
-                    123 University Ave, Tech City, TC 12345
+                    India
                   </span>
                 </div>
               </div>
@@ -201,7 +203,7 @@ const Footer = () => {
             <p className={`${mutedTextColor} mb-0`} style={{ fontSize: '0.875rem' }}>
               Developed with {'</>'} by{' '}
               <a
-                href="https://junaidrana.vercel.app/"
+                href=""
                 target="_blank"
                 rel="noreferrer"
                 className="text-decoration-none font-weight-bold"

@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-// import { baseUrl } from '../../utils/globalurl
+import { baseUrl } from '../../utils/globalurl';
 import { useAuth } from '../../AuthContext';
 
 const ManageJobs = ({ setHandleAdd }) => {
@@ -90,9 +90,9 @@ const ManageJobs = ({ setHandleAdd }) => {
 
       let response;
       if (location.state?.action === 'edit' && jobId) {
-        response = await axios.put(`http://localhost:5000/api/admin/jobs/${jobId}`, formData, config);
+        response = await axios.put(`${baseUrl}/jobs/${jobId}`, formData, config);
       } else {
-        response = await axios.post(`http://localhost:5000/api/admin/jobs/`, formData, config);
+        response = await axios.post(`${baseUrl}/jobs/`, formData, config);
       }
 
       toast.success(response.data.message || "Job saved successfully");

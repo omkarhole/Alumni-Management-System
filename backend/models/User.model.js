@@ -60,7 +60,8 @@ const studentBioSchema=new mongoose.Schema({
   },
   roll_number:{
     type:String,
-    unique:true
+    trim: true,
+    default: undefined
   },
   //  avatar: {
   //   type: String,
@@ -103,7 +104,15 @@ const userSchema = new mongoose.Schema({
 });
 
 // Indexes
-userSchema.index({ email: 1 });
 userSchema.index({ type: 1 });
+userSchema.index(
+  { 'student_bio.roll_number': 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      'student_bio.roll_number': { $exists: true, $type: 'string' }
+    }
+  }
+);
 
 module.exports = mongoose.model('User', userSchema);
