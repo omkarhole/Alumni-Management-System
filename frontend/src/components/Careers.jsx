@@ -1,11 +1,12 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { FaBuilding, FaMapMarker, FaPlus, FaSearch } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import ViewJobs from '../admin/view/ViewJobs';
 import ManageJobs from '../admin/save/ManageJobs';
 import { useAuth } from '../AuthContext';
 import { baseUrl } from '../utils/globalurl';
+import { smoothScrollToTop } from '../utils/smoothScroll';
 import SmartSearchBar from './SmartSearchBar';
 import SmartFilterDropdown from './SmartFilterDropdown';
 
@@ -43,6 +44,7 @@ const Careers = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [handleAdd, setHandleAdd] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [, setRecommendations] = useState([]);
     const [locationFilter, setLocationFilter] = useState('all');
     const [modeFilter, setModeFilter] = useState('all');
     const [sortBy, setSortBy] = useState('recent');
@@ -104,7 +106,7 @@ const Careers = () => {
 
 
     useEffect(() => {
-        window.scrollTo(0, 0);
+        smoothScrollToTop();
     }, [handleAdd]);
 
     const locationOptions = useMemo(() => {

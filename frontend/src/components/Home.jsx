@@ -1,191 +1,476 @@
-
-
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import axios from "axios";
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
-import { FiBook, FiUsers, FiClipboard, FiTool } from 'react-icons/fi';
-import { FaCalendar, FaTimes, FaNewspaper, FaTag, FaUser } from 'react-icons/fa';
+import {
+    FiArrowRight,
+    FiBook,
+    FiBriefcase,
+    FiClipboard,
+    FiMessageSquare,
+    FiTool,
+    FiTrendingUp,
+    FiUsers
+} from 'react-icons/fi';
+import { FaCalendar, FaMapMarkerAlt } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import { useAuth } from '../AuthContext';
 import { useTheme } from '../ThemeContext';
-import imgcs from "../assets/uploads/imgcs.jpg";
+import imgcs from '../assets/uploads/imgcs.jpg';
 import { baseUrl } from '../utils/globalurl';
 import Newsletter from './Newsletter';
-// import head_cover from "../assets/uploads/head_cover.jpg";
-// import img3 from "../assets/uploads/gallery/img3.jpg"
+
+const benefitCards = [
+    {
+        key: 'career',
+        icon: FiClipboard,
+        title: 'Career Support',
+        summary: 'Mentorship, interview prep, and alumni-led guidance for every stage.',
+        detail: 'Book focused sessions with alumni mentors to review resumes, portfolios, and hiring strategy.'
+    },
+    {
+        key: 'library',
+        icon: FiBook,
+        title: 'Learning Library',
+        summary: 'Access curated playbooks, resources, and community knowledge.',
+        detail: 'Explore interview banks, project ideas, and alumni-authored guides in one place.'
+    },
+    {
+        key: 'sports',
+        icon: FiTool,
+        title: 'Campus Facilities',
+        summary: 'Continue using selected campus sports and recreation spaces.',
+        detail: 'Stay connected to campus life with alumni facility access and community activities.'
+    },
+    {
+        key: 'network',
+        icon: FiUsers,
+        title: 'Alumni Network',
+        summary: 'Find graduates by role, batch, and domain to unlock opportunities.',
+        detail: 'Build relationships that open doors to referrals, collaborations, and long-term support.'
+    }
+];
+
+const quickLinks = [
+    {
+        key: 'jobs',
+        title: 'Explore Jobs',
+        description: 'Discover fresh opportunities shared by alumni and recruiters.',
+        to: '/jobs',
+        icon: FiBriefcase
+    },
+    {
+        key: 'forums',
+        title: 'Join Forums',
+        description: 'Ask questions, share wins, and get tactical feedback quickly.',
+        to: '/forums',
+        icon: FiMessageSquare
+    },
+    {
+        key: 'alumni',
+        title: 'Browse Alumni',
+        description: 'Search the directory and connect with professionals in your field.',
+        to: '/alumni',
+        icon: FiTrendingUp
+    }
+];
+
+const summarizeHtml = (html = '') =>
+    html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
 const Home = () => {
     const { theme } = useTheme();
-    const { isLoggedIn, isAdmin } = useAuth();;
+    const { isLoggedIn, isAdmin } = useAuth();
     const [events, setEvents] = useState([]);
+    const [activeBenefit, setActiveBenefit] = useState(0);
+    const [eventView, setEventView] = useState('soonest');
+    const [benefitTilt, setBenefitTilt] = useState({});
+    const [statValues, setStatValues] = useState({});
     const location = useLocation();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (isLoggedIn) {
-            const user_name = localStorage.getItem("user_name");
-            if (location.state && location.state.action === 'homelogin') {
-                // console.log("location my::",location);
-                toast.success(`Welcome ${user_name}`);
-            }
+        if (isLoggedIn && location.state?.action === 'homelogin') {
+            const userName = localStorage.getItem('user_name') || 'back';
+            toast.success(`Welcome ${userName}`);
         }
-        if (location.state && location.state.action === 'homelogout') {
-            // console.log("location my::",location);
-            toast.info("Logout Success");
+        if (location.state?.action === 'homelogout') {
+            toast.info('Logout Success');
         }
-        return () => {
-            location
-        }
+    }, [isLoggedIn, location.state]);
 
-    }, [location.state]);
-
-    
     useEffect(() => {
+        let active = true;
         axios.get(`${baseUrl}/events/upcoming`)
             .then((res) => {
-                console.log("HELLO",res.data);
-                setEvents(res.data);
+                if (!active) return;
+                const safeEvents = Array.isArray(res.data)
+                    ? res.data.filter((event) => event && typeof event === 'object')
+                    : [];
+                setEvents(safeEvents);
             })
             .catch((err) => console.log(err));
+
+        return () => {
+            active = false;
+        };
     }, []);
 
+    const statTargets = useMemo(() => ([
+        { key: 'members', label: 'Community Members', value: 12000, suffix: '+' },
+        { key: 'events', label: 'Live Events', value: Math.max(events.length, 18), suffix: '+' },
+        { key: 'tracks', label: 'Benefit Tracks', value: benefitCards.length, suffix: '' },
+        { key: 'match', label: 'Mentor Match Rate', value: 92, suffix: '%' }
+    ]), [events.length]);
 
+    useEffect(() => {
+        let animationFrameId;
+        let startTime = null;
+        const duration = 920;
 
+        const animate = (time) => {
+            if (!startTime) startTime = time;
+            const progress = Math.min((time - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const nextValues = {};
+
+            statTargets.forEach((stat) => {
+                nextValues[stat.key] = Math.round(stat.value * eased);
+            });
+            setStatValues(nextValues);
+
+            if (progress < 1) {
+                animationFrameId = window.requestAnimationFrame(animate);
+            }
+        };
+
+        animationFrameId = window.requestAnimationFrame(animate);
+        return () => window.cancelAnimationFrame(animationFrameId);
+    }, [statTargets]);
+
+    const sortedEvents = useMemo(() => {
+        const list = [...events];
+        if (eventView === 'latest') {
+            return list.sort((a, b) => {
+                const aStamp = Date.parse(a?.createdAt || a?.schedule || '');
+                const bStamp = Date.parse(b?.createdAt || b?.schedule || '');
+                return (Number.isNaN(bStamp) ? 0 : bStamp) - (Number.isNaN(aStamp) ? 0 : aStamp);
+            });
+        }
+        return list.sort((a, b) => {
+            const aStamp = Date.parse(a?.schedule || '');
+            const bStamp = Date.parse(b?.schedule || '');
+            return (Number.isNaN(aStamp) ? 0 : aStamp) - (Number.isNaN(bStamp) ? 0 : bStamp);
+        });
+    }, [eventView, events]);
+
+    const featuredEvents = sortedEvents.slice(0, 3);
 
     const formatDate = (timestamp) => {
-        const options = {
-            month: 'long',
+        const parsed = Date.parse(timestamp);
+        if (Number.isNaN(parsed)) return 'Schedule to be announced';
+        return new Date(parsed).toLocaleDateString('en-US', {
+            month: 'short',
             day: 'numeric',
             year: 'numeric',
             hour: 'numeric',
             minute: 'numeric'
-        };
-        return new Date(timestamp).toLocaleDateString('en-US', options);
+        });
+    };
+
+    const handleBenefitMove = (index, event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const pointX = (event.clientX - rect.left) / rect.width;
+        const pointY = (event.clientY - rect.top) / rect.height;
+        const rotateY = (pointX - 0.5) * 12;
+        const rotateX = (0.5 - pointY) * 12;
+        setBenefitTilt((prev) => ({ ...prev, [index]: { rotateX, rotateY } }));
+    };
+
+    const handleBenefitLeave = (index) => {
+        setBenefitTilt((prev) => ({ ...prev, [index]: { rotateX: 0, rotateY: 0 } }));
     };
 
     return (
-        <div>
-            <ToastContainer hideProgressBar="true" position="top-center" pauseOnHover="false" pauseOnFocusLoss="false" />
-            <header className="masthead" style={{ backgroundImage: `url(${imgcs})`, backgroundPosition: "center", backgroundRepeat: "no-repeat", backgroundSize: "cover", height: "100vh" }}>
-                <div className="container h-100">
-                    <div className="row h-100 align-items-center justify-content-center">
-                        <div className="col-lg-8  text-center">
-                            <h1 className="text-white font-weight-bold display-3 mb-4">Welcome to ALUMNI DashBoard</h1>
-                            <p className="text-white-75 font-weight-light lead mb-5">Join thousands of graduates building meaningfull connections, advancing careers, and creating lasting impact together.</p>
-                            {!isAdmin && <Link className="btn btn-primary btn-xl" to="about">Find Out More</Link>}
-                            {!isLoggedIn && <Link className="btn btn-info  ms-2   btn-xl" to="login">Login</Link>}
-                            {isLoggedIn && isAdmin && <Link className="btn btn-primary btn-xl" to="dashboard">Admin Dashboard</Link>}
-                            {isLoggedIn && !isAdmin && <Link className="btn btn-info  ms-2   btn-xl" to="account">Profile</Link>}
-                        </div>
-                    </div>
-                </div>
-            </header>
+        <div className={`home-page ${theme === 'dark' ? 'home-theme-dark' : 'home-theme-light'}`}>
+            <ToastContainer hideProgressBar position="top-center" pauseOnHover={false} pauseOnFocusLoss={false} />
 
+            <section className="home-hero">
+                <img src={imgcs} alt="" className="home-hero-image" />
+                <div className="home-hero-mask" />
+                <motion.div
+                    className="home-orb home-orb-one"
+                    animate={{ x: [0, 14, -8, 0], y: [0, -10, 7, 0] }}
+                    transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <motion.div
+                    className="home-orb home-orb-two"
+                    animate={{ x: [0, -16, 10, 0], y: [0, 8, -12, 0] }}
+                    transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <div className="container home-hero-container">
+                    <div className="row align-items-center g-4">
+                        <motion.div
+                            className="col-lg-7"
+                            initial={{ opacity: 0, y: 26 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+                        >
+                            <span className="home-kicker">ALUMNI HUB</span>
+                            <h1 className="home-hero-title">Build connections that outlast graduation.</h1>
+                            <p className="home-hero-subtitle">
+                                Collaborate with mentors, discover curated opportunities, and stay plugged into
+                                events that keep your professional network active.
+                            </p>
+                            <div className="home-hero-actions">
+                                {!isAdmin && (
+                                    <Link className="btn btn-primary btn-lg home-pill-btn" to="/about">
+                                        Find Out More
+                                    </Link>
+                                )}
+                                {!isLoggedIn && (
+                                    <Link className="btn btn-light btn-lg home-pill-btn" to="/login">
+                                        Login
+                                    </Link>
+                                )}
+                                {isLoggedIn && isAdmin && (
+                                    <Link className="btn btn-primary btn-lg home-pill-btn" to="/dashboard">
+                                        Admin Dashboard
+                                    </Link>
+                                )}
+                                {isLoggedIn && !isAdmin && (
+                                    <Link className="btn btn-light btn-lg home-pill-btn" to="/account">
+                                        My Profile
+                                    </Link>
+                                )}
+                            </div>
+                        </motion.div>
 
-            <section className={`page-section bg-${theme}`} id="alumni-benefits">
-                <div className="container">
-                    <div className="text-center">
-                        <h2 className="section-heading text-uppercase">Alumni Benefits</h2>
-                        <h3 className=" card-title text-muted">As a member of the global BZU alumni network, you have access to a variety of exclusive services and benefits.</h3>
-                    </div>
-                    <div className="row">
-                        <div className="col-lg-3 col-sm-6 mb-4">
-                            <div className="card h-100 benefit-card">
-                                <div className="card-body text-center">
-                                    <FiClipboard size={40} className="mb-3 text-primary" />
-                                    <h4 className="card-title">Career Support</h4>
-                                    <p className="card-text">Get assistance with your career goals.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-lg-3 col-sm-6 mb-4">
-                            <div className="card h-100 benefit-card">
-                                <div className="card-body text-center">
-                                    <FiBook size={40} className="mb-3 text-primary" />
-                                    <h4 className="card-title">Library</h4>
-                                    <p className="card-text">Access to the alumni library.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-lg-3 col-sm-6 mb-4">
-                            <div className="card h-100 benefit-card">
-                                <div className="card-body text-center">
-                                    <FiTool size={40} className="mb-3 text-primary" />
-                                    <h4 className="card-title">Sports Facilities</h4>
-                                    <p className="card-text">Access to sports facilities.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-lg-3 col-sm-6 mb-4">
-                            <div className="card h-100 benefit-card">
-                                <div className="card-body text-center">
-                                    <FiUsers size={40} className="mb-3 text-primary  " />
-                                    <h4 className="card-title">Alumni Directory</h4>
-                                    <p className="card-text">Connect with fellow alumni.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section className={`py-4 bg-${theme}`} id="upcoming-events">
-                <div className="container">
-                    <h2 className="section-heading text-center">Upcoming Events</h2>
-                    <hr className="divider my-4" />
-                    {events?.length > 0 ? <>
-                        {events.map((e, index) => (
-                            <div className="card event-list" key={index} >
-                                <div className='banner'>
-                                    <img src="" alt="" />
-                                </div>
-                                <div className="card-body">
-                                    <div className="row align-items-center justify-content-center text-center h-100">
-                                        <div className="">
-                                            <h3><b className="filter-txt">{e.title}</b></h3>
-                                            <div><small><p><b><FaCalendar className='me-1 ' />{formatDate(e.schedule)}</b></p></small></div>
-                                            <hr />
-                                            <p className="truncate filter-txt" dangerouslySetInnerHTML={{ __html: e.content }}></p>
-                                            <br />
-                                            <hr className="divider" style={{ maxWidth: "calc(80%)" }} />
-                                            <button className="btn btn-primary float-right read_more" onClick={() => navigate("events/view", { state: { action: "view", data: e } })}>Read More</button>
+                        <motion.div
+                            className="col-lg-5"
+                            initial={{ opacity: 0, x: 28 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.7, delay: 0.1, ease: [0.2, 0.8, 0.2, 1] }}
+                        >
+                            <div className="home-hero-panel">
+                                <h3 className="home-panel-heading">Community Pulse</h3>
+                                <div className="home-stat-grid">
+                                    {statTargets.map((stat) => (
+                                        <div key={stat.key} className="home-stat-item">
+                                            <span className="home-stat-value">
+                                                {statValues[stat.key] ?? 0}
+                                                {stat.suffix}
+                                            </span>
+                                            <span className="home-stat-label">{stat.label}</span>
                                         </div>
-                                    </div>
+                                    ))}
                                 </div>
-                            </div>))}</> : <>
-                        <div className="d-flex flex-column justify-content-center align-items-center">
-                            <h4 className='text-info-emphasis'>No Upcoming Event Available</h4>
-                        </div>
-                    </>}
-                </div>
-            </section>
-            {/* Newsletter Subscription Section */}
-            <Newsletter />
-
-            {/* <section className="page-section" id="about">
-                <div className="container">
-                    <div className="text-center">
-                        <h2 className="section-heading text-uppercase">About Us</h2>
-                        <h3 className="section-subheading text-muted">Learn more about our community</h3>
+                                <div className="home-quick-links">
+                                    {quickLinks.map((item) => {
+                                        const Icon = item.icon;
+                                        return (
+                                            <Link key={item.key} to={item.to} className="home-quick-link">
+                                                <Icon size={18} />
+                                                <span className="home-quick-link-copy">
+                                                    <strong>{item.title}</strong>
+                                                    <small>{item.description}</small>
+                                                </span>
+                                                <FiArrowRight size={16} />
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </motion.div>
                     </div>
                 </div>
             </section>
-            <section className="page-section bg-light" id="faculties">
-                <div className="container">
-                    <h2 className="section-heading text-center">Our Efficient Faculties</h2>
-                    <hr className="divider my-4" />
-                    Placeholders for faculties content
-                </div>
-            </section>
-            <section className="page-section" id="forums">
-                <div className="container">
-                    <h2 className="section-heading text-center">Forums</h2>
-                    <hr className="divider my-4" />
-                    Placeholders for forums content
-                </div>
-            </section> */}
+
+            <div className="home-mid-surface">
+                <section className="home-section home-benefits" id="alumni-benefits">
+                    <div className="container">
+                    <motion.div
+                        className="home-section-head text-center"
+                        initial={{ opacity: 0, y: 22 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.35 }}
+                        transition={{ duration: 0.55 }}
+                    >
+                        <span className="home-section-tag">Why Alumni Stay Active</span>
+                        <h2 className="section-heading text-uppercase">Alumni Benefits</h2>
+                        <p className="home-section-summary">
+                            Unlock practical services designed to strengthen your network and career progression.
+                        </p>
+                    </motion.div>
+
+                    <div className="row g-4">
+                        {benefitCards.map((benefit, index) => {
+                            const Icon = benefit.icon;
+                            const currentTilt = benefitTilt[index] || { rotateX: 0, rotateY: 0 };
+
+                            return (
+                                <motion.div
+                                    key={benefit.key}
+                                    className="col-sm-6 col-xl-3"
+                                    initial={{ opacity: 0, y: 22 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true, amount: 0.25 }}
+                                    transition={{ duration: 0.55, delay: index * 0.08 }}
+                                >
+                                    <motion.article
+                                        className={`home-benefit-card ${activeBenefit === index ? 'active' : ''}`}
+                                        animate={{
+                                            rotateX: currentTilt.rotateX,
+                                            rotateY: currentTilt.rotateY,
+                                            y: activeBenefit === index ? -6 : 0
+                                        }}
+                                        transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+                                        onMouseMove={(event) => handleBenefitMove(index, event)}
+                                        onMouseLeave={() => handleBenefitLeave(index)}
+                                        onMouseEnter={() => setActiveBenefit(index)}
+                                        onFocus={() => setActiveBenefit(index)}
+                                        tabIndex={0}
+                                    >
+                                        <div className="home-benefit-icon">
+                                            <Icon size={24} />
+                                        </div>
+                                        <h4>{benefit.title}</h4>
+                                        <p>{benefit.summary}</p>
+                                    </motion.article>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+
+                    <motion.div
+                        className="home-benefit-focus"
+                        key={benefitCards[activeBenefit].key}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <strong>{benefitCards[activeBenefit].title}</strong>
+                        <p>{benefitCards[activeBenefit].detail}</p>
+                    </motion.div>
+                    </div>
+                </section>
+
+                <section className="home-section home-events" id="upcoming-events">
+                    <div className="container">
+                    <motion.div
+                        className="home-events-head"
+                        initial={{ opacity: 0, y: 22 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{ duration: 0.55 }}
+                    >
+                        <div>
+                            <h2 className="section-heading">Upcoming Events</h2>
+                            <p className="home-section-summary mb-0">
+                                Switch views to browse nearest schedules or recently added activities.
+                            </p>
+                        </div>
+                        <div className="home-event-toggle" role="group" aria-label="Event sorting">
+                            <button
+                                type="button"
+                                className={`home-event-toggle-btn ${eventView === 'soonest' ? 'active' : ''}`}
+                                onClick={() => setEventView('soonest')}
+                            >
+                                Soonest
+                            </button>
+                            <button
+                                type="button"
+                                className={`home-event-toggle-btn ${eventView === 'latest' ? 'active' : ''}`}
+                                onClick={() => setEventView('latest')}
+                            >
+                                Latest
+                            </button>
+                        </div>
+                    </motion.div>
+
+                    {featuredEvents.length > 0 ? (
+                        <div className="row g-4">
+                            {featuredEvents.map((event, index) => {
+                                const summary = summarizeHtml(event.content);
+                                return (
+                                    <div className="col-md-6 col-xl-4" key={event._id || event.id || index}>
+                                        <motion.article
+                                            className="home-event-card"
+                                            initial={{ opacity: 0, y: 22 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            whileHover={{ y: -8 }}
+                                            viewport={{ once: true, amount: 0.25 }}
+                                            transition={{ duration: 0.45, delay: index * 0.07 }}
+                                        >
+                                            <span className="home-event-date">
+                                                <FaCalendar className="me-2" />
+                                                {formatDate(event.schedule)}
+                                            </span>
+                                            <h3>{event.title || 'Untitled Event'}</h3>
+                                            <p className="home-event-location">
+                                                <FaMapMarkerAlt className="me-2" />
+                                                {event.location || event.venue || 'Campus / Online'}
+                                            </p>
+                                            <p className="home-event-content">
+                                                {summary.slice(0, 170) || 'Details will be announced soon.'}
+                                                {summary.length > 170 ? '...' : ''}
+                                            </p>
+                                            <button
+                                                className="btn btn-primary btn-sm home-read-btn"
+                                                onClick={() => navigate('/events/view', { state: { action: 'view', data: event } })}
+                                            >
+                                                Read More <FiArrowRight className="ms-1" />
+                                            </button>
+                                        </motion.article>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <motion.div
+                            className="home-empty-events"
+                            initial={{ opacity: 0, y: 12 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, amount: 0.45 }}
+                            transition={{ duration: 0.4 }}
+                        >
+                            <h4>No Upcoming Event Available</h4>
+                            <p>Check back soon. New gatherings and sessions are published regularly.</p>
+                            <button className="btn btn-outline-primary btn-sm" onClick={() => navigate('/forums')}>
+                                Visit Community Forums
+                            </button>
+                        </motion.div>
+                    )}
+                    </div>
+                </section>
+            </div>
+
+            <div className="home-tail-surface">
+                <section className="home-section home-cta-band">
+                    <div className="container">
+                        <motion.div
+                            className="home-cta-inner"
+                            initial={{ opacity: 0, y: 22 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, amount: 0.35 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <h3>Move your alumni journey forward today.</h3>
+                            <p>
+                                Track opportunities, stay visible in the network, and participate in events that shape your next move.
+                            </p>
+                            <div className="home-cta-actions">
+                                <Link className="btn btn-primary btn-lg home-pill-btn" to="/jobs">Browse Jobs</Link>
+                                <Link className="btn btn-outline-light btn-lg home-pill-btn" to="/forums">Join Discussions</Link>
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
+
+                <Newsletter />
+            </div>
         </div>
-    )
-}
+    );
+};
 
 export default Home;

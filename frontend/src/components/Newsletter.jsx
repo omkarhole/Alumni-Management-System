@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import { FaEnvelope, FaPaperPlane } from 'react-icons/fa';
@@ -32,12 +32,12 @@ const Newsletter = () => {
     };
 
     return (
-        <section className={`page-section bg-${theme === 'light' ? 'light' : 'dark'} py-5`} id="newsletter">
+        <section className={`page-section newsletter-shell ${theme === 'light' ? 'newsletter-theme-light' : 'newsletter-theme-dark'}`} id="newsletter">
             <ToastContainer hideProgressBar="true" position="top-center" pauseOnHover="false" pauseOnFocusLoss="false" />
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-lg-8 text-center">
-                        <div className="newsletter-section p-4 rounded shadow-sm" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                        <div className="newsletter-section newsletter-card p-4 rounded shadow-sm">
                             <h3 className="text-white mb-3">
                                 <FaEnvelope className="me-2" />
                                 Subscribe to Our Newsletter
