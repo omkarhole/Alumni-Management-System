@@ -91,6 +91,18 @@ const Careers = () => {
         };
     }, [isLoggedIn]);
 
+    // Fetch recommendations for logged in users
+    useEffect(() => {
+        if (isLoggedIn) {
+            axios.get(`${baseUrl}/jobs/recommendations`, { withCredentials: true })
+                .then((res) => {
+                    setRecommendations(res.data.slice(0, 3)); // Show top 3 recommendations
+                })
+                .catch((err) => console.log('Error fetching recommendations:', err));
+        }
+    }, [isLoggedIn]);
+
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [handleAdd]);
@@ -233,6 +245,7 @@ const Careers = () => {
             ) : handleAdd ?
                 (<>
                     <div className="container mt-5  pt-2">
+
                         <div className="col-lg-12">
                             <div className="card mb-4">
                                 <div className="card-body">
