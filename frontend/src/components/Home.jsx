@@ -39,6 +39,7 @@ const Home = () => {
 
     }, [location.state]);
 
+    
     useEffect(() => {
         axios.get(`${baseUrl}/events/upcoming`)
             .then((res) => {
