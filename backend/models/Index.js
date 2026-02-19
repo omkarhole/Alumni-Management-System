@@ -8,6 +8,10 @@ const Gallery = require('./Gallery.model');
 const SystemSetting = require('./SystemSetting.model');
 const News = require('./News.model');
 const Newsletter = require('./Newsletter.model');
+const MentorProfile = require('./MentorProfile.model');
+const MentorshipMatch = require('./MentorshipMatch.model');
+const MentorshipSession = require('./MentorshipSession.model');
+const MentorshipMessage = require('./MentorshipMessage.model');
 
 module.exports = {
   User,
@@ -18,5 +22,9 @@ module.exports = {
   Gallery,
   SystemSetting,
   News,
-  Newsletter
+  Newsletter,
+  MentorProfile,
+  MentorshipMatch,
+  MentorshipSession,
+  MentorshipMessage
 };
