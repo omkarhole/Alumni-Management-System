@@ -1,10 +1,11 @@
-const {Gallery} =require('../models/Index');
-
-const fs=require('fs');
-const path = require('path');
+const { Gallery } = require('../models/Index');
+const { uploadImage, deleteImage } = require('../utils/image-storage');
 
 function normalizeGalleryPath(storedPath = '') {
     const normalized = String(storedPath || '').replace(/\\/g, '/');
+    if (/^https?:\/\//i.test(normalized)) {
+        return normalized;
+    }
     const publicMatch = normalized.match(/public\/.*/i);
 
     if (publicMatch) {
@@ -12,17 +13,6 @@ function normalizeGalleryPath(storedPath = '') {
     }
 
     return normalized.replace(/^\/+/, '');
-}
-
-function resolveDiskPath(storedPath = '') {
-    if (!storedPath) return '';
-
-    if (path.isAbsolute(storedPath)) {
-        return storedPath;
-    }
-
-    const normalized = normalizeGalleryPath(storedPath);
-    return path.join(process.cwd(), normalized.split('/').join(path.sep));
 }
 
 // print all gallery
@@ -45,8 +35,15 @@ async function addGallery(req, res, next) {
         if (!req.file) {
             return res.status(400).json({ message: 'Image file is required' });
         }
-        const imagePath = `public/images/${req.file.filename}`;
-        const record = await Gallery.create({ image_path: imagePath, about: req.body.about });
+        const uploaded = await uploadImage(req.file, {
+            folder: 'images',
+            prefix: 'gallery',
+        });
+        const record = await Gallery.create({
+            image_path: uploaded.path,
+            image_public_id: uploaded.publicId || '',
+            about: req.body.about,
+        });
         res.status(201).json({ message: 'Gallery image uploaded successfully', ...record.toObject() });
     } catch (err) { next(err); }
 }
@@ -56,9 +53,10 @@ async function deleteGallery(req, res, next) {
     try {
         const img = await Gallery.findById(req.params.id);
         if (img) {
-            const diskPath = resolveDiskPath(img.image_path);
-            if (diskPath && fs.existsSync(diskPath)) {
-                fs.unlinkSync(diskPath);
+            try {
+                await deleteImage(img.image_path, img.image_public_id);
+            } catch (cleanupError) {
+                console.error('Failed to delete gallery image file:', cleanupError.message);
             }
         }
         await Gallery.findByIdAndDelete(req.params.id);

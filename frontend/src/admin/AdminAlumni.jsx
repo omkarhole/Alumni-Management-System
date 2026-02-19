@@ -4,7 +4,7 @@ import { FaPlus } from "react-icons/fa";
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import defaultavatar from "../assets/uploads/defaultavatar.jpg"
-import { baseUrl } from '../utils/globalurl';
+import { baseUrl, toPublicUrl } from '../utils/globalurl';
 
 
 const AdminAlumni = () => {
@@ -87,13 +87,11 @@ const AdminAlumni = () => {
                               <td className="text-center">{index + 1}</td>
                               <td className="text-center">
                                 <div className="avatar">
-                                  {a.avatar ? <img src={`${baseUrl}/${a.avatar}`} className="gimg" alt="avatar" /> :
-                                    <img
-                                      src={defaultavatar}
-                                      className="gimg"
-                                      alt="avatar"
-                                    />
-                                  }
+                                  <img
+                                    src={toPublicUrl(a.alumnus_bio?.avatar) || defaultavatar}
+                                    className="gimg"
+                                    alt="avatar"
+                                  />
                                 </div>
                               </td>
                               <td className="">
