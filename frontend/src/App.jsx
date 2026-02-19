@@ -11,7 +11,9 @@ import Home from "./components/Home";
 import AlumniList from "./components/AlumniList";
 import Gallery from "./components/Gallery";
 import Careers from "./components/Careers";
+import Mentorship from "./components/Mentorship";
 import Forum from "./components/Forum";
+import News from "./components/News";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import TermsOfService from "./components/TermsOfService";
@@ -88,7 +90,9 @@ function AppRouter() {
         <Route path="/alumni" element={<AlumniList />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/jobs" element={<Careers />} />
+        <Route path="/mentorship" element={<Mentorship />} />
         <Route path="/forums" element={<Forum />} />
+        <Route path="/news" element={<News />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<TermsOfService />} />

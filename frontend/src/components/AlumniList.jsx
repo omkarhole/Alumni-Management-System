@@ -7,7 +7,7 @@ import {
   FaFilter,
 } from "react-icons/fa";
 import defaultavatar from "../assets/uploads/defaultavatar.jpg";
-import { baseUrl } from "../utils/globalurl";
+import { baseUrl, toPublicUrl } from "../utils/globalurl";
 import SmartSearchBar from "./SmartSearchBar";
 import SmartFilterDropdown from "./SmartFilterDropdown";
 
@@ -236,11 +236,7 @@ const AlumniList = () => {
                   <div className="card alumni-card border-0 shadow-sm">
                     <div className="text-center pt-4">
                       <img
-                        src={
-                          a.alumnus_bio?.avatar
-                            ? `${baseUrl}/${a.alumnus_bio.avatar}`
-                            : defaultavatar
-                        }
+                        src={toPublicUrl(a.alumnus_bio?.avatar) || defaultavatar}
                         alt="avatar"
                         className="alumni-avatar"
                       />
@@ -332,9 +328,7 @@ const AlumniList = () => {
         .alumni-hero {
           height: 60vh;
           min-height: 400px;
-          background:
-            linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
-            url("/your-background-image.jpg");
+          background: linear-gradient(135deg, #0b2a47 0%, #174b7f 52%, #1f65a9 100%);
           background-size: cover;
           background-position: center;
           display: flex;
