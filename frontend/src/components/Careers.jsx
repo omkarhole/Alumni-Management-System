@@ -1,11 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { FaBuilding, FaMapMarker, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaBuilding, FaMapMarker, FaPlus, FaSearch, FaStar, FaArrowRight } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import ViewJobs from '../admin/view/ViewJobs';
 // import { useNavigate } from 'react-router-dom';
 import ManageJobs from '../admin/save/ManageJobs';
 import { useAuth } from '../AuthContext';
 import { baseUrl } from '../utils/globalurl';
+
 
 
 const Careers = () => {
@@ -17,6 +19,8 @@ const Careers = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [handleAdd, setHandleAdd] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [recommendations, setRecommendations] = useState([]);
+
 
     const openModal = (job) => {
         setSelectedJob(job);
@@ -37,6 +41,18 @@ const Careers = () => {
             })
             .catch((err) => console.log(err));
     }, []);
+
+    // Fetch recommendations for logged in users
+    useEffect(() => {
+        if (isLoggedIn) {
+            axios.get(`${baseUrl}/jobs/recommendations`, { withCredentials: true })
+                .then((res) => {
+                    setRecommendations(res.data.slice(0, 3)); // Show top 3 recommendations
+                })
+                .catch((err) => console.log('Error fetching recommendations:', err));
+        }
+    }, [isLoggedIn]);
+
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -78,9 +94,60 @@ const Careers = () => {
                     </div>
                 </div>
             </header>
+            {/* Recommended Jobs Section */}
+            {isLoggedIn && recommendations.length > 0 && !handleAdd && (
+                <div className="container mt-3 pt-2">
+                    <div className="card mb-4 border-warning">
+                        <div className="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                            <h5 className="mb-0">
+                                <FaStar className="me-2" />
+                                Recommended For You
+                            </h5>
+                            <Link to="/job-recommendations" className="btn btn-sm btn-dark">
+                                View All <FaArrowRight />
+                            </Link>
+                        </div>
+                        <div className="card-body">
+                            <div className="row">
+                                {recommendations.map((job, index) => (
+                                    <div className="col-md-4 mb-3" key={index}>
+                                        <div className="card h-100">
+                                            <div className="card-body">
+                                                <div className="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 className="card-title mb-0">{job.job_title}</h6>
+                                                    <span className="badge bg-success">{job.matchPercentage}% Match</span>
+                                                </div>
+                                                <p className="card-text text-muted small mb-2">
+                                                    <FaBuilding className="me-1" />{job.company}
+                                                </p>
+                                                {job.matchedSkills && job.matchedSkills.length > 0 && (
+                                                    <div className="mb-2">
+                                                        <small className="text-muted">Matched: </small>
+                                                        {job.matchedSkills.slice(0, 3).map((skill, idx) => (
+                                                            <span key={idx} className="badge bg-success me-1">{skill}</span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                <button 
+                                                    className="btn btn-sm btn-outline-primary w-100"
+                                                    onClick={() => openModal(job)}
+                                                >
+                                                    View Details
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {handleAdd ?
                 (<>
                     <div className="container mt-5  pt-2">
+
                         <div className="col-lg-12">
                             <div className="card mb-4">
                                 <div className="card-body">

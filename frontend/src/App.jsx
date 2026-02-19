@@ -51,6 +51,8 @@ import MyMentorship from "./components/MyMentorship";
 import MentorshipChat from "./components/MentorshipChat";
 import ScheduleSession from "./components/ScheduleSession";
 import BecomeMentor from "./components/BecomeMentor";
+import JobRecommendations from "./components/JobRecommendations";
+
 
 import 'react-quill/dist/quill.snow.css';
 import { ThemeProvider } from "./ThemeContext";
@@ -140,8 +142,10 @@ function AppRouter() {
         <Route path="/mentorship/chat/:mentorshipId" element={<MentorshipChat />} />
         <Route path="/mentorship/sessions/:mentorshipId" element={<ScheduleSession />} />
         <Route path="/mentorship/become-mentor" element={<BecomeMentor />} />
+        <Route path="/job-recommendations" element={<JobRecommendations />} />
         
         {isLoggedIn && isStudent && (
+
           <Route path="/student-dashboard" element={<StudentDashboard />}>
             <Route path="" element={<StudentHome />} />
             <Route path="/student-dashboard/jobs" element={<StudentJobs />} />

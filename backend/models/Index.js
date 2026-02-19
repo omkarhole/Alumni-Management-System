@@ -12,6 +12,7 @@ const MentorProfile = require('./MentorProfile.model');
 const MentorshipMatch = require('./MentorshipMatch.model');
 const MentorshipSession = require('./MentorshipSession.model');
 const MentorshipMessage = require('./MentorshipMessage.model');
+const JobSubscription = require('./JobSubscription.model');
 
 module.exports = {
   User,
@@ -24,7 +25,8 @@ module.exports = {
   News,
   Newsletter,
   MentorProfile,
-  MentorshipMatch,
+MentorshipMatch,
   MentorshipSession,
-  MentorshipMessage
+  MentorshipMessage,
+  JobSubscription
 };
