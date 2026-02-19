@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { ThemeProvider } from "./ThemeContext";
 import ScrollToTop from "./components/ScrollToTop";
+import SmoothWheelScroll from "./components/SmoothWheelScroll";
 import PrivateRoute from "./components/PrivateRoute";
 
 // Pages
@@ -61,6 +62,7 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <ScrollToTop />
+          <SmoothWheelScroll />
           <AppRouter />
         </AuthProvider>
       </ThemeProvider>
