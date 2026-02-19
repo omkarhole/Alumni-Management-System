@@ -17,7 +17,10 @@ const AdminJobApplications = () => {
     try {
       const res = await axios.get(`${baseUrl}/jobs`, { withCredentials: true });
       // Filter only jobs that have applicants
-      const jobsWithApplicants = res.data.filter(job => job.applicants && job.applicants.length > 0);
+      const safeJobs = Array.isArray(res.data)
+        ? res.data.filter((job) => job && typeof job === 'object')
+        : [];
+      const jobsWithApplicants = safeJobs.filter((job) => job.applicants && job.applicants.length > 0);
       setJobs(jobsWithApplicants);
       setLoading(false);
     } catch (err) {

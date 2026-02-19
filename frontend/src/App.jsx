@@ -1,19 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import "./styles/style.css";
-import "react-toastify/dist/ReactToastify.css";
-import Home from './components/Home';
-import Footer from './components/Footer';
-import Header from "./components/Header";
+import React from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AuthProvider, useAuth } from "./AuthContext";
+import { ThemeProvider } from "./ThemeContext";
+import ScrollToTop from "./components/ScrollToTop";
+import PrivateRoute from "./components/PrivateRoute";
+
+// Pages
+import Home from "./components/Home";
 import AlumniList from "./components/AlumniList";
 import Gallery from "./components/Gallery";
 import Careers from "./components/Careers";
 import Forum from "./components/Forum";
 import About from "./components/About";
-import Login from "./components/Login";;
+import Contact from "./components/Contact";
+import TermsOfService from "./components/TermsOfService";
+import Login from "./components/Login";
 import Signup from "./components/Signup";
 import MyAccount from "./components/MyAccount";
-import News from "./components/News";
+import NotFound from "./components/NotFound";
+
+// Admin
 import Dashboard from "./admin/Dashboard";
 import AdminHome from "./admin/AdminHome";
 import AdminCourses from "./admin/AdminCourses";
@@ -29,7 +35,12 @@ import AdminNews from "./admin/AdminNews";
 import AdminMentorship from "./admin/AdminMentorship";
 
 import ManageJobs from "./admin/save/ManageJobs";
-import View_Event from "./components/view/View_Event";
+import ManageEvents from "./admin/save/ManageEvents";
+import ManageForum from "./admin/save/ManageForum";
+import ManageUser from "./admin/save/ManageUser";
+import ViewAlumni from "./admin/view/ViewAlumni";
+
+// Students
 import StudentDashboard from "./students/StudentDashboard";
 import StudentHome from "./students/StudentHome";
 import StudentJobs from "./students/StudentJobs";
@@ -37,26 +48,10 @@ import StudentEvents from "./students/StudentEvents";
 import StudentForum from "./students/StudentForum";
 import StudentProfile from "./students/StudentProfile";
 import StudentsApplications from "./students/StudentsApplications";
-import ManageEvents from "./admin/save/ManageEvents";
-import View_Forum from "./components/view/View_Forum";
-import ManageForum from "./admin/save/ManageForum";
-import ManageUser from "./admin/save/ManageUser";
-import ViewAlumni from "./admin/view/ViewAlumni";
-import { AuthProvider, useAuth } from './AuthContext';
-import ScrollToTop from "./components/ScrollToTop";
-import Manage_Career from "./components/manage/Manage_Career";
-import Mentorship from "./components/Mentorship";
-import MentorProfile from "./components/MentorProfile";
-import MyMentorship from "./components/MyMentorship";
-import MentorshipChat from "./components/MentorshipChat";
-import ScheduleSession from "./components/ScheduleSession";
-import BecomeMentor from "./components/BecomeMentor";
 
-import 'react-quill/dist/quill.snow.css';
-import { ThemeProvider } from "./ThemeContext";
-import PrivateRoute from "./components/PrivateRoute";
-import NotFound from "./components/NotFound";
-
+// Layout
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -71,88 +66,91 @@ function App() {
   );
 }
 
-
 function AppRouter() {
-  const { isLoggedIn, isAdmin, isStudent } = useAuth();
+  const { isAuthReady } = useAuth();
   const location = useLocation();
-  const isDashboardRoute = location.pathname.startsWith("/dashboard");
-  const isStudentDashboardRoute = location.pathname.startsWith("/student-dashboard");
 
-  // useEffect(() => {
-  //   const user = localStorage.getItem('user_type');
-  //   // This effect is now handled in AuthProvider
-  // }, []);
+  const hideLayout =
+    location.pathname.startsWith("/dashboard") ||
+    location.pathname.startsWith("/student-dashboard");
 
-  // setTimeout(() => {
-    
-  // }, 1000);
+  if (!isAuthReady) return null;
 
   return (
     <>
-      {!isDashboardRoute && !isStudentDashboardRoute && <Header />}
+      {!hideLayout && <Header />}
+
       <Routes>
-        <Route path="*" element={<NotFound />} />
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/alumni" element={<AlumniList />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/jobs" element={<Careers />} />
         <Route path="/forums" element={<Forum />} />
         <Route path="/about" element={<About />} />
-        <Route path="/news" element={<News />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<TermsOfService />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        {isLoggedIn && isAdmin && (
-          <Route path="/dashboard" element={
-            // <PrivateRoute>
-            <Dashboard />
-            //  {/* </PrivateRoute> */}
-          } >
-            <Route path="" element={<AdminHome />} />
-            <Route path="/dashboard/courses" element={<AdminCourses />} />
-            <Route path="/dashboard/users" element={<AdminUsers />} />
-            <Route path="/dashboard/gallery" element={<AdminGallery />} />
-            <Route path="/dashboard/settings" element={<AdminSettings />} />
-            <Route path="/dashboard/events" element={<AdminEvents />} />
-            <Route path="/dashboard/forum" element={<AdminForum />} />
-            <Route path="/dashboard/alumnilist" element={<AdminAlumni />} />
-            <Route path="/dashboard/jobs" element={<AdminJobs />} />
-            <Route path="/dashboard/job-applications" element={<AdminJobApplications />} />
-            <Route path="/dashboard/news" element={<AdminNews />} />
-            <Route path="/dashboard/mentorship" element={<AdminMentorship />} />
-            <Route path="/dashboard/jobs/manage" element={<ManageJobs />} />
 
-            <Route path="/dashboard/events/manage" element={<ManageEvents />} />
-            <Route path="/dashboard/forum/manage" element={<ManageForum />} />
-            <Route path="/dashboard/users/manage" element={<ManageUser />} />
-            <Route path="/dashboard/alumni/view" element={<ViewAlumni />} />
-          </Route>
-        )}
-        <Route path="events/view" element={<View_Event />} />
-        {isLoggedIn  && <Route path="account" element={<MyAccount />} />}
-        <Route path="forum/view" element={<View_Forum />} />
-        <Route path="jobs/add" element={<ManageJobs />} />
-        {/* <Route path="jobs/add" element={<Manage_Career />} /> */}
+        {/* Admin Dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute allow={["admin"]}>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<AdminHome />} />
+          <Route path="courses" element={<AdminCourses />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="gallery" element={<AdminGallery />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="events" element={<AdminEvents />} />
+          <Route path="forum" element={<AdminForum />} />
+          <Route path="alumnilist" element={<AdminAlumni />} />
+          <Route path="jobs" element={<AdminJobs />} />
+          <Route path="job-applications" element={<AdminJobApplications />} />
+          <Route path="jobs/manage" element={<ManageJobs />} />
+          <Route path="events/manage" element={<ManageEvents />} />
+          <Route path="forum/manage" element={<ManageForum />} />
+          <Route path="users/manage" element={<ManageUser />} />
+          <Route path="alumni/view" element={<ViewAlumni />} />
+        </Route>
 
-        {/* Mentorship Routes */}
-        <Route path="/mentorship" element={<Mentorship />} />
-        <Route path="/mentorship/mentor/:mentorId" element={<MentorProfile />} />
-        <Route path="/mentorship/my" element={<MyMentorship />} />
-        <Route path="/mentorship/chat/:mentorshipId" element={<MentorshipChat />} />
-        <Route path="/mentorship/sessions/:mentorshipId" element={<ScheduleSession />} />
-        <Route path="/mentorship/become-mentor" element={<BecomeMentor />} />
-        
-        {isLoggedIn && isStudent && (
-          <Route path="/student-dashboard" element={<StudentDashboard />}>
-            <Route path="" element={<StudentHome />} />
-            <Route path="/student-dashboard/jobs" element={<StudentJobs />} />
-            <Route path="/student-dashboard/applications" element={<StudentsApplications />} />
-            <Route path="/student-dashboard/events" element={<StudentEvents />} />
-            <Route path="/student-dashboard/forum" element={<StudentForum />} />
-            <Route path="/student-dashboard/profile" element={<StudentProfile />} />
-          </Route>
-        )}
+        {/* Student Dashboard */}
+        <Route
+          path="/student-dashboard"
+          element={
+            <PrivateRoute allow={["student"]}>
+              <StudentDashboard />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<StudentHome />} />
+          <Route path="jobs" element={<StudentJobs />} />
+          <Route path="applications" element={<StudentsApplications />} />
+          <Route path="events" element={<StudentEvents />} />
+          <Route path="forum" element={<StudentForum />} />
+          <Route path="profile" element={<StudentProfile />} />
+        </Route>
+
+        {/* Account (Student + Alumnus) */}
+        <Route
+          path="/account"
+          element={
+            <PrivateRoute allow={["alumnus", "student"]}>
+              <MyAccount />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Fallback */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
-      {!isDashboardRoute && !isStudentDashboardRoute && <Footer />}
+
+      {!hideLayout && <Footer />}
     </>
   );
 }

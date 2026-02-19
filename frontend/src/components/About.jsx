@@ -1,18 +1,19 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import logo from "../assets/uploads/logo.png"
 import { baseUrl } from '../utils/globalurl';
 
 const About = () => {
-  const [system, setSystem] = useState([]);
+  const [system, setSystem] = useState(null);
 
 
   useEffect(() => {
     // axios.get('http://localhost:3000/auth/settings')
     axios.get(`${baseUrl}/settings`)
       .then((res) => {
-        setSystem(res.data);
-        console.log(res.data);
+        const settings = Array.isArray(res.data)
+          ? res.data.find((item) => item && typeof item === 'object')
+          : res.data;
+        setSystem(settings || null);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -37,15 +38,12 @@ const About = () => {
   </div>
 </header>
 
-
-
-
-      {system.length > 0 && (
+      {system && (
         <section className="page-section">
           <div className="container">
-            <h2 className='text-center'>{system[0].name}</h2>
+            <h2 className='text-center'>{system.name || 'Alumni Management System'}</h2>
             <br />
-            <p dangerouslySetInnerHTML={{ __html: system[0].about_content }}></p>
+            <p dangerouslySetInnerHTML={{ __html: system.about_content || '' }}></p>
           </div>
         </section>
       )}
