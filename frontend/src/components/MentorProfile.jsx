@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { toast } from 'react-toastify';
+import defaultavatar from '../assets/uploads/defaultavatar.jpg';
 import { toPublicUrl } from '../utils/globalurl';
 import { 
   ArrowLeft, 
@@ -183,7 +184,7 @@ const MentorProfile = () => {
           <div className="px-8 pb-8">
             <div className="relative flex flex-col md:flex-row items-start md:items-end -mt-16 mb-6 gap-6">
               <img
-                src={toPublicUrl(mentor.user?.alumnus_bio?.avatar) || '/default-avatar.jpg'}
+                src={toPublicUrl(mentor.user?.alumnus_bio?.avatar) || defaultavatar}
                 alt={mentor.user?.name}
                 className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
               />

@@ -11,8 +11,6 @@ import { useTheme } from '../ThemeContext';
 import imgcs from "../assets/uploads/imgcs.jpg";
 import { baseUrl } from '../utils/globalurl';
 import Newsletter from './Newsletter';
-// import head_cover from "../assets/uploads/head_cover.jpg";
-// import img3 from "../assets/uploads/gallery/img3.jpg"
 
 const Home = () => {
     const { theme } = useTheme();

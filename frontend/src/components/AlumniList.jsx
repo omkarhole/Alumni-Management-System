@@ -328,9 +328,7 @@ const AlumniList = () => {
         .alumni-hero {
           height: 60vh;
           min-height: 400px;
-          background:
-            linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
-            url("/your-background-image.jpg");
+          background: linear-gradient(135deg, #0b2a47 0%, #174b7f 52%, #1f65a9 100%);
           background-size: cover;
           background-position: center;
           display: flex;
