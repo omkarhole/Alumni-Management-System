@@ -1,6 +1,7 @@
 import axios from 'axios';
-import React, { useEffect, useMemo, useState } from 'react'
-import { FaBuilding, FaMapMarker, FaPlus } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react'
+import { FaBuilding, FaMapMarker, FaPlus, FaSearch } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import ViewJobs from '../admin/view/ViewJobs';
 import ManageJobs from '../admin/save/ManageJobs';
 import { useAuth } from '../AuthContext';
@@ -8,6 +9,30 @@ import { baseUrl } from '../utils/globalurl';
 import SmartSearchBar from './SmartSearchBar';
 import SmartFilterDropdown from './SmartFilterDropdown';
 
+
+const previewJobs = [
+    {
+        id: 1,
+        job_title: 'Junior Frontend Developer',
+        company: 'Nova Systems',
+        location: 'Austin, TX',
+        description: 'Build reusable React components, improve page performance, and collaborate with design to ship clean user interfaces for alumni-facing dashboards.'
+    },
+    {
+        id: 2,
+        job_title: 'Backend API Engineer',
+        company: 'Orbit Labs',
+        location: 'Seattle, WA',
+        description: 'Design secure REST endpoints, optimize MongoDB queries, and maintain authentication flows for job applications, events, and discussion modules.'
+    },
+    {
+        id: 3,
+        job_title: 'Product Support Analyst',
+        company: 'Bridgepoint Digital',
+        location: 'Chicago, IL',
+        description: 'Investigate user issues, document reproducible steps, and coordinate with engineering to ensure smooth releases and reliable platform experience.'
+    }
+];
 
 const Careers = () => {
     const { isLoggedIn, isStudent } = useAuth();
@@ -33,19 +58,38 @@ const Careers = () => {
     };
 
     useEffect(() => {
+        if (!isLoggedIn) {
+            setJobs([]);
+            setFilteredJob([]);
+            setLoading(false);
+            return;
+        }
+
+        let active = true;
+        setLoading(true);
+
         axios.get(`${baseUrl}/jobs`, { withCredentials: true })
             .then((res) => {
+                if (!active) return;
                 const safeJobs = Array.isArray(res.data)
                     ? res.data.filter((job) => job && typeof job === 'object')
                     : [];
                 setJobs(safeJobs);
-                setLoading(false);
             })
             .catch((err) => {
+                if (!active) return;
                 console.log(err);
+                setJobs([]);
+            })
+            .finally(() => {
+                if (!active) return;
                 setLoading(false);
             });
-    }, []);
+
+        return () => {
+            active = false;
+        };
+    }, [isLoggedIn]);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -148,7 +192,45 @@ const Careers = () => {
                     </div>
                 </div>
             </header>
-            {handleAdd ?
+            {!isLoggedIn ? (
+                <div className="container-fluid mt-4 pt-2 jobs-list-shell">
+                    <div className="jobs-preview-stack">
+                        {previewJobs.map((job) => (
+                            <div className="card job-list" key={job.id}>
+                                <div className="card-body">
+                                    <div className="row align-items-center justify-content-center text-center h-100">
+                                        <div>
+                                            <h3><b className="filter-txt">{job.job_title}</b></h3>
+                                            <div>
+                                                <span className="filter-txt"><small><b><FaBuilding />{job.company}</b></small></span>{" "}
+                                                <span className="filter-txt"><small><b><FaMapMarker />{job.location}</b></small></span>
+                                            </div>
+                                            <hr />
+                                            <p className="truncate filter-txt">{job.description}</p>
+                                            <br />
+                                            <hr className="divider" style={{ maxWidth: "calc(80%)" }} />
+                                            <div className='jobbtn d-flex justify-content-between align-items-center '>
+                                                <span className="badge badge-info ">
+                                                    <b><i>Posted by: {job.company}</i></b>
+                                                </span>
+                                                <Link className="btn btn-sm btn-primary" to="/login">Read More</Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        <div className="glass-login-cover">
+                            <div className="glass-login-cover-card text-center">
+                                <h4 className="mb-2">Sign in to access complete job opportunities.</h4>
+                                <p className="mb-3">This is a limited preview. Log in to view full descriptions, qualifications, and apply directly.</p>
+                                <Link className="btn btn-primary btn-sm" to="/login">Login</Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ) : handleAdd ?
                 (<>
                     <div className="container mt-5  pt-2">
                         <div className="col-lg-12">
@@ -158,8 +240,8 @@ const Careers = () => {
                                         <ManageJobs setHandleAdd={setHandleAdd} />
                                     </div></div></div></div></div>
                 </>) : (<>
-                    <div className="container mt-3 pt-2">
-                        <div className="card mb-4">
+                    <div className="container-fluid mt-3 pt-2 jobs-list-shell">
+                        <div className="card mb-4 jobs-filter-card">
                             <div className="card-body">
                                 <SmartSearchBar
                                     value={searchQuery}
