@@ -5,11 +5,12 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import { FiBook, FiUsers, FiClipboard, FiTool } from 'react-icons/fi';
-import { FaCalendar, FaTimes } from 'react-icons/fa';
+import { FaCalendar, FaTimes, FaNewspaper, FaTag, FaUser } from 'react-icons/fa';
 import { useAuth } from '../AuthContext';
 import { useTheme } from '../ThemeContext';
 import imgcs from "../assets/uploads/imgcs.jpg";
 import { baseUrl } from '../utils/globalurl';
+import Newsletter from './Newsletter';
 // import head_cover from "../assets/uploads/head_cover.jpg";
 // import img3 from "../assets/uploads/gallery/img3.jpg"
 
@@ -38,6 +39,7 @@ const Home = () => {
 
     }, [location.state]);
 
+    
     useEffect(() => {
         axios.get(`${baseUrl}/events/upcoming`)
             .then((res) => {
@@ -157,6 +159,9 @@ const Home = () => {
                     </>}
                 </div>
             </section>
+            {/* Newsletter Subscription Section */}
+            <Newsletter />
+
             {/* <section className="page-section" id="about">
                 <div className="container">
                     <div className="text-center">

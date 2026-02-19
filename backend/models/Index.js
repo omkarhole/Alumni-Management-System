@@ -6,6 +6,12 @@ const Event = require('./Event.model');
 const ForumTopic = require('./ForumTopic.model');
 const Gallery = require('./Gallery.model');
 const SystemSetting = require('./SystemSetting.model');
+const News = require('./News.model');
+const Newsletter = require('./Newsletter.model');
+const MentorProfile = require('./MentorProfile.model');
+const MentorshipMatch = require('./MentorshipMatch.model');
+const MentorshipSession = require('./MentorshipSession.model');
+const MentorshipMessage = require('./MentorshipMessage.model');
 
 module.exports = {
   User,
@@ -14,5 +20,11 @@ module.exports = {
   Event,
   ForumTopic,
   Gallery,
-  SystemSetting
+  SystemSetting,
+  News,
+  Newsletter,
+  MentorProfile,
+  MentorshipMatch,
+  MentorshipSession,
+  MentorshipMessage
 };

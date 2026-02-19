@@ -13,6 +13,7 @@ import Careers from "./components/Careers";
 import Forum from "./components/Forum";
 import About from "./components/About";
 import Contact from "./components/Contact";
+import TermsOfService from "./components/TermsOfService";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import MyAccount from "./components/MyAccount";
@@ -30,6 +31,9 @@ import AdminForum from "./admin/AdminForum";
 import AdminAlumni from "./admin/AdminAlumni";
 import AdminJobs from "./admin/AdminJobs";
 import AdminJobApplications from "./admin/AdminJobApplications";
+import AdminNews from "./admin/AdminNews";
+import AdminMentorship from "./admin/AdminMentorship";
+
 import ManageJobs from "./admin/save/ManageJobs";
 import ManageEvents from "./admin/save/ManageEvents";
 import ManageForum from "./admin/save/ManageForum";
@@ -85,6 +89,7 @@ function AppRouter() {
         <Route path="/forums" element={<Forum />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<TermsOfService />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
