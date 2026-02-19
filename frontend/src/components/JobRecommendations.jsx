@@ -115,7 +115,7 @@ const JobRecommendations = () => {
     }
 
     return (
-        <div className="container mt-5 pt-3">
+        <div className="container py-5">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="text-primary">
                     <FaBriefcase className="me-2" />

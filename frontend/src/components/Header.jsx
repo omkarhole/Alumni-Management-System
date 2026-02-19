@@ -76,6 +76,7 @@ const Header = () => {
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/alumni")}`} to="/alumni">Alumni</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/gallery")}`} to="/gallery">Gallery</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/jobs")}`} to="/jobs">Jobs</Link></li>
+                            <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/job-recommendations")}`} to="/job-recommendations">Job Recommendations</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/mentorship")}`} to="/mentorship">Mentorship</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/forums")}`} to="/forums">Forums</Link></li>
 
