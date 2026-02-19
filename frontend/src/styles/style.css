@@ -489,8 +489,8 @@ mark,
 
 
 .dlimg {
-  width: 60px;         /* or any size you want */
-  height: 60px;        /* must match width for a perfect circle */
+  width: 36px;         /* or any size you want */
+  height: 36px;        /* must match width for a perfect circle */
   border-radius: 50%;   /* makes it circular */
   object-fit: cover;    /* keeps the image from stretching */
 }

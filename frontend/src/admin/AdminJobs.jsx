@@ -26,8 +26,10 @@ const AdminJobs = () => {
     useEffect(() => {
         axios.get(`${baseUrl}/jobs`, { withCredentials: true })
             .then((res) => {
-                console.log(res.data);
-                setJobs(res.data);
+                const safeJobs = Array.isArray(res.data)
+                    ? res.data.filter((job) => job && typeof job === 'object')
+                    : [];
+                setJobs(safeJobs);
             })
             .catch((err) => console.log(err));
     }, []);
@@ -83,11 +85,11 @@ const AdminJobs = () => {
                                             <tbody>
                                                 {jobs.length > 0 ? <>
                                                     {jobs.map((job, index) => (
-                                                        <tr key={index}>
+                                                        <tr key={job._id || job.id || index}>
                                                             <td className="text-center">{index + 1}</td>
-                                                            <td className=""><b>{job.company}</b></td>
-                                                            <td className=""><b>{job.job_title}</b></td>
-                                                            <td className=""><b>{job.user.name}</b></td>
+                                                            <td className=""><b>{job.company || 'Unknown Company'}</b></td>
+                                                            <td className=""><b>{job.job_title || 'Untitled Job'}</b></td>
+                                                            <td className=""><b>{job.user?.name || 'Unknown'}</b></td>
                                                             <td className="text-center justify-content-center border-0 d-flex gap-1">
                                                                 <button className="btn btn-sm btn-outline-primary view_career" type="button" onClick={() => openModal(job)}>View</button>
                                                                 <Link to="/dashboard/jobs/manage" state={{ action: "edit", data: job }} className="btn btn-sm btn-outline-primary edit_career" >Edit</Link>
