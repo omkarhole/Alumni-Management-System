@@ -26,6 +26,8 @@ import AdminAlumni from "./admin/AdminAlumni";
 import AdminJobs from "./admin/AdminJobs";
 import AdminJobApplications from "./admin/AdminJobApplications";
 import AdminNews from "./admin/AdminNews";
+import AdminMentorship from "./admin/AdminMentorship";
+
 import ManageJobs from "./admin/save/ManageJobs";
 import View_Event from "./components/view/View_Event";
 import StudentDashboard from "./students/StudentDashboard";
@@ -43,6 +45,13 @@ import ViewAlumni from "./admin/view/ViewAlumni";
 import { AuthProvider, useAuth } from './AuthContext';
 import ScrollToTop from "./components/ScrollToTop";
 import Manage_Career from "./components/manage/Manage_Career";
+import Mentorship from "./components/Mentorship";
+import MentorProfile from "./components/MentorProfile";
+import MyMentorship from "./components/MyMentorship";
+import MentorshipChat from "./components/MentorshipChat";
+import ScheduleSession from "./components/ScheduleSession";
+import BecomeMentor from "./components/BecomeMentor";
+
 import 'react-quill/dist/quill.snow.css';
 import { ThemeProvider } from "./ThemeContext";
 import PrivateRoute from "./components/PrivateRoute";
@@ -109,7 +118,9 @@ function AppRouter() {
             <Route path="/dashboard/jobs" element={<AdminJobs />} />
             <Route path="/dashboard/job-applications" element={<AdminJobApplications />} />
             <Route path="/dashboard/news" element={<AdminNews />} />
+            <Route path="/dashboard/mentorship" element={<AdminMentorship />} />
             <Route path="/dashboard/jobs/manage" element={<ManageJobs />} />
+
             <Route path="/dashboard/events/manage" element={<ManageEvents />} />
             <Route path="/dashboard/forum/manage" element={<ManageForum />} />
             <Route path="/dashboard/users/manage" element={<ManageUser />} />
@@ -121,6 +132,14 @@ function AppRouter() {
         <Route path="forum/view" element={<View_Forum />} />
         <Route path="jobs/add" element={<ManageJobs />} />
         {/* <Route path="jobs/add" element={<Manage_Career />} /> */}
+
+        {/* Mentorship Routes */}
+        <Route path="/mentorship" element={<Mentorship />} />
+        <Route path="/mentorship/mentor/:mentorId" element={<MentorProfile />} />
+        <Route path="/mentorship/my" element={<MyMentorship />} />
+        <Route path="/mentorship/chat/:mentorshipId" element={<MentorshipChat />} />
+        <Route path="/mentorship/sessions/:mentorshipId" element={<ScheduleSession />} />
+        <Route path="/mentorship/become-mentor" element={<BecomeMentor />} />
         
         {isLoggedIn && isStudent && (
           <Route path="/student-dashboard" element={<StudentDashboard />}>

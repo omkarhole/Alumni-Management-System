@@ -7,6 +7,8 @@ const authRouter=require('./routes/auth.routes');
 const adminRouter=require('./routes/admin.routes'); 
 const studentRouter=require('./routes/student.routes');
 const newsRouter=require('./routes/news.routes');
+const mentorshipRouter=require('./routes/mentorship.routes');
+
 const cookieParser = require('cookie-parser');
 const errorHandler = require('./middlewares/error.middleware');
 const { authenticate } = require('./middlewares/auth.middleware');
@@ -43,6 +45,9 @@ app.use('/api/news', newsRouter);
 app.use('/api/admin',adminRouter);
 // student routes (with authentication)
 app.use('/api/student', authenticate, studentRouter);
+// mentorship routes
+app.use('/api/mentorship', mentorshipRouter);
+
 
 //routes
 app.get('/',(req,res)=>{
