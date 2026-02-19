@@ -25,6 +25,10 @@ const alumnusBioSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  avatar_public_id: {
+    type: String,
+    default: ''
+  },
   status: {
     type: Number,
     enum: [0, 1],

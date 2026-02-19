@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User, Career, Course } = require('../models/Index');
-const path = require('path');
+const { uploadImage, deleteImage } = require('../utils/image-storage');
 
 
 // print alumnilist
@@ -42,6 +42,16 @@ async function updateAlumnusStatus(req, res, next) {
 // delete alumnus
 async function deleteAlumnus(req, res, next) {
     try {
+        const user = await User.findById(req.params.id).select(
+            'alumnus_bio.avatar alumnus_bio.avatar_public_id'
+        );
+        if (user?.alumnus_bio?.avatar) {
+            try {
+                await deleteImage(user.alumnus_bio.avatar, user.alumnus_bio.avatar_public_id);
+            } catch (cleanupError) {
+                console.error('Failed to delete alumnus avatar:', cleanupError.message);
+            }
+        }
         await User.findByIdAndDelete(req.params.id);
         res.json({ message: 'Deleted' });
     } catch (err) {
@@ -52,10 +62,18 @@ async function deleteAlumnus(req, res, next) {
 
 // update account with avatar upload
 async function updateAccount(req, res, next) {
-    console.log("update acccccccccc");
     try {
-        console.log("SERVER");
         const userId = req.body.user_id;
+        if (!userId) {
+            return res.status(400).json({ message: 'User id is required' });
+        }
+
+        const currentUser = await User.findById(userId).select(
+            'alumnus_bio.avatar alumnus_bio.avatar_public_id'
+        );
+        if (!currentUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
         // Build user update payload
         const userData = {
@@ -66,11 +84,15 @@ async function updateAccount(req, res, next) {
             'alumnus_bio.course': req.body.course_id,
             'alumnus_bio.connected_to': req.body.connected_to,
         };
+        let uploadedAvatar = null;
         
         if (req.file) {
-            const fullPath = req.file.path;
-            const relPath = path.relative(process.cwd(), fullPath);
-            userData['alumnus_bio.avatar'] = relPath.replace(/\\/g, '/');
+            uploadedAvatar = await uploadImage(req.file, {
+                folder: 'avatars',
+                prefix: 'avatar',
+            });
+            userData['alumnus_bio.avatar'] = uploadedAvatar.path;
+            userData['alumnus_bio.avatar_public_id'] = uploadedAvatar.publicId || '';
         }
 
         if (req.body.password) {
@@ -80,6 +102,21 @@ async function updateAccount(req, res, next) {
 
         // Update user
         await User.findByIdAndUpdate(userId, userData);
+
+        if (
+            uploadedAvatar &&
+            currentUser.alumnus_bio?.avatar &&
+            currentUser.alumnus_bio.avatar !== uploadedAvatar.path
+        ) {
+            try {
+                await deleteImage(
+                    currentUser.alumnus_bio.avatar,
+                    currentUser.alumnus_bio.avatar_public_id
+                );
+            } catch (cleanupError) {
+                console.error('Failed to delete previous avatar:', cleanupError.message);
+            }
+        }
 
         res.json({ message: 'Account updated successfully' });
     } catch (err) {
