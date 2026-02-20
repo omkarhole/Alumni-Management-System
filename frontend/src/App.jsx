@@ -21,6 +21,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import MyAccount from "./components/MyAccount";
 import NotFound from "./components/NotFound";
+import ViewEvent from "./components/view/View_Event";
 
 // Admin
 import Dashboard from "./admin/Dashboard";
@@ -98,6 +99,7 @@ function AppRouter() {
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/events/view" element={<ViewEvent />} />
 
         {/* Admin Dashboard */}
         <Route
