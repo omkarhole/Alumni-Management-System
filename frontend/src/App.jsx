@@ -13,6 +13,7 @@ import Gallery from "./components/Gallery";
 import Careers from "./components/Careers";
 import Mentorship from "./components/Mentorship";
 import Forum from "./components/Forum";
+import ViewTopic from "./components/view/View_Forum";
 import News from "./components/News";
 import About from "./components/About";
 import Contact from "./components/Contact";
@@ -92,6 +93,7 @@ function AppRouter() {
         <Route path="/jobs" element={<Careers />} />
         <Route path="/mentorship" element={<Mentorship />} />
         <Route path="/forums" element={<Forum />} />
+        <Route path="/forum/view" element={<ViewTopic />} />
         <Route path="/news" element={<News />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
