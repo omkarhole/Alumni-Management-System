@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaPlus } from "react-icons/fa";
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import defaultavatar from "../assets/uploads/defaultavatar.jpg"
-import { baseUrl } from '../utils/globalurl';
+import { baseUrl, toPublicUrl } from '../utils/globalurl';
 
 
 const AdminAlumni = () => {
@@ -13,7 +13,10 @@ const AdminAlumni = () => {
   useEffect(() => {
     axios.get(`${baseUrl}/alumni`, { withCredentials: true })
       .then((res) => {
-        setAlumni(res.data);
+        const safeAlumni = Array.isArray(res.data)
+          ? res.data.filter((item) => item && typeof item === 'object')
+          : [];
+        setAlumni(safeAlumni);
         // console.log(res.data);
       })
       .catch((err) => console.log(err));
@@ -33,9 +36,7 @@ const AdminAlumni = () => {
 
   return (
     <>
-      <ToastContainer position="top-center" />
-
-      <div className="container-fluid">
+<div className="container-fluid">
 
         <div className="col-lg-12">
           <div className="row mb-4 mt-4">
@@ -80,21 +81,19 @@ const AdminAlumni = () => {
                           {/* $alumni = $conn->query("SELECT a.*,c.course,Concat(a.lastname,', ',a.firstname,' ',a.middlename) as name from alumnus_bio a inner join courses c on c.id = a.course_id order by Concat(a.lastname,', ',a.firstname,' ',a.middlename) asc"); */}
                           {alumni.map((a, index) => (
 
-                            <tr key={index}>
+                            <tr key={a._id || a.id || index}>
                               <td className="text-center">{index + 1}</td>
                               <td className="text-center">
                                 <div className="avatar">
-                                  {a.avatar ? <img src={`${baseUrl}/${a.avatar}`} className="gimg" alt="avatar" /> :
-                                    <img
-                                      src={defaultavatar}
-                                      className="gimg"
-                                      alt="avatar"
-                                    />
-                                  }
+                                  <img
+                                    src={toPublicUrl(a.alumnus_bio?.avatar) || defaultavatar}
+                                    className="gimg"
+                                    alt="avatar"
+                                  />
                                 </div>
                               </td>
                               <td className="">
-                                <p> <b>{a.name}</b></p>
+                                <p> <b>{a.name || 'N/A'}</b></p>
                               </td>
                               <td className="">
                                 <p> <b>{a.alumnus_bio?.course?.course || a.alumnus_bio?.course?.name || 'N/A'}</b></p>
@@ -129,3 +128,4 @@ const AdminAlumni = () => {
 }
 
 export default AdminAlumni
+

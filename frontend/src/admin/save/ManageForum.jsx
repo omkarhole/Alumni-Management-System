@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import ReactQuill from 'react-quill'
 import { baseUrl } from '../../utils/globalurl'
 
@@ -74,8 +74,7 @@ const ManageForum = ({ setHandleAdd }) => {
 
   return (
     <div className="container-fluid">
-      <ToastContainer position="top-center" />
-      <form onSubmit={handleSubmit}>
+<form onSubmit={handleSubmit}>
         <div className="form-group row">
           <label className="col-md-2 col-form-label">Title</label>
           <div className="col-md-8">
@@ -127,3 +126,4 @@ const ManageForum = ({ setHandleAdd }) => {
 }
 
 export default ManageForum
+

@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { baseUrl } from '../utils/globalurl';
 
 const AdminUsers = () => {
@@ -11,8 +11,10 @@ const AdminUsers = () => {
   useEffect(() => {
     axios.get(`${baseUrl}/users`, { withCredentials: true })
       .then((res) => {
-        setUsers(res.data);
-        console.log(users);
+        const safeUsers = Array.isArray(res.data)
+          ? res.data.filter((user) => user && typeof user === 'object')
+          : [];
+        setUsers(safeUsers);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -28,9 +30,7 @@ const AdminUsers = () => {
 
   return (
     <div className="container-fluid mt-4">
-      <ToastContainer position="top-center" />
-
-      {/* <div className="row">
+{/* <div className="row">
         <div className="col-lg-12">
           <button onClick={()=>navigate("/dashboard/users/manage")} className="btn btn-primary float-right btn-sm" id="new_user">
             <FaPlus /> New user
@@ -55,11 +55,11 @@ const AdminUsers = () => {
                   </thead>
                   <tbody>
                     {users.map((user, index) => (
-                      <tr key={index}>
+                      <tr key={user._id || user.id || index}>
                         <td className="text-center">{index + 1}</td>
-                        <td>{user.name}</td>
-                        <td>{user.email}</td>
-                        <td>{user.type}</td>
+                        <td>{user.name || 'N/A'}</td>
+                        <td>{user.email || 'N/A'}</td>
+                        <td>{user.type || 'N/A'}</td>
                         <td className="text-center">
                           <Link to="/dashboard/users/manage" state={{ status: "edit", data: user }} className="btn btn-primary btn-sm mr-2">
                             <FaEdit /> Edit
@@ -82,3 +82,4 @@ const AdminUsers = () => {
 };
 
 export default AdminUsers;
+
