@@ -35,29 +35,30 @@ const About = () => {
             padding: 10rem 0;
           }
 
-          .hero-overlay {
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(4px); /* Modern glass effect */
-            padding: 4rem;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: fadeInUp 1s ease-out;
-          }
-
           .hero-title {
-            font-size: 4.5rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            text-shadow: 2px 4px 10px rgba(0,0,0,0.3);
-            margin-bottom: 1.5rem;
+            font-size: 3rem; /* Reduced from 4.5rem */
+            font-weight: 700; /* Slightly less heavy */
+            letter-spacing: 2px; /* Increased spacing for a cleaner look */
+            text-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+            margin-bottom: 1rem;
           }
 
           .hero-subtitle {
-            font-size: 1.4rem;
-            max-width: 800px;
+            font-size: 1.15rem; /* Slightly smaller for better contrast */
+            max-width: 700px;
             margin: 0 auto;
             line-height: 1.6;
+            font-weight: 300; /* Light weight for elegance */
             opacity: 0.9;
+          }
+
+          .hero-overlay {
+            background: rgba(0, 0, 0, 0.45); /* Softened overlay */
+            backdrop-filter: blur(8px); /* Increased blur for premium feel */
+            padding: 3.5rem; /* Slightly tighter padding */
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            animation: fadeInUp 1s ease-out;
           }
 
           .hover-card {
@@ -196,7 +197,7 @@ const About = () => {
           {system.length > 0 ? (
             <div className="card border-0 shadow-lg" style={{ borderRadius: '30px', overflow: 'hidden' }}>
               <div className="row g-0">
-                <div className="col-md-4 bg-primary d-flex align-items-center justify-content-center p-5 text-white shadow-inset">
+                <div className="col-md-4 bg-primary d-flex align-items-center justify-content-center p-5 text-white">
                   <div className="text-center">
                     <div className="mb-3" style={{ fontSize: '3rem' }}>🚀</div>
                     <h2 className="font-weight-bold">System Profile</h2>
@@ -215,8 +216,15 @@ const About = () => {
             </div>
           ) : (
             <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status"></div>
-              <h4 className="text-muted mt-3">Fetching details...</h4>
+              <div className="p-5 border rounded-3 bg-white shadow-sm">
+                <h4 className="text-dark font-weight-bold">Welcome to our Alumni Portal</h4>
+                <p className="text-muted">
+                  We are currently updating our institutional profile. 
+                  Please check back soon for detailed information about our mission and history.
+                </p>
+                <hr className="divider my-4" style={{maxWidth: '50px'}} />
+                <p className="small text-uppercase tracking-wider">Paranox SIH Ecosystem</p>
+              </div>
             </div>
           )}
         </div>
