@@ -21,6 +21,11 @@ const Footer = () => {
     { name: 'About Us', path: '/about' },
   ];
 
+  // Logic to split links into two columns
+  const half = Math.ceil(quickLinks.length / 2);
+  const leftColLinks = quickLinks.slice(0, half);
+  const rightColLinks = quickLinks.slice(half);
+
   const socialLinks = [
     { icon: FaLinkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
     { icon: FaTwitter, href: 'https://twitter.com', label: 'Twitter' },
@@ -93,15 +98,15 @@ const Footer = () => {
       <div className="container">
         <div className="row gy-4">
           {/* Brand Section */}
-          <div className="col-lg-4 col-md-6">
+          <div className="col-lg-4 col-md-12">
             <div className="d-flex align-items-center mb-3">
               <img src={logo} alt="CS Paranox Logo" className="rounded-circle me-3" style={{ width: '45px', height: '45px' }} />
               <h5 className="mb-0 fw-bold letter-spacing-1">CS PARANOX</h5>
             </div>
-            <p className="small lh-lg mb-4 opacity-75">
-              Empowering the academic community by bridging the gap between alumni, students, and faculty. Join our unified platform to unlock networking opportunities and career growth.
+            <p className="small lh-lg mb-4 opacity-75" style={{ maxWidth: '350px' }}>
+              Empowering the academic community by bridging the gap between alumni, students, and faculty through a unified digital network.
             </p>
-            <div className="d-flex gap-2">
+            <div className="d-flex gap-2 mb-4">
               {socialLinks.map((social, idx) => (
                 <a key={idx} href={social.href} target="_blank" rel="noopener noreferrer" className="social-icon" aria-label={social.label}>
                   <social.icon size={18} />
@@ -110,40 +115,53 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="col-lg-3 col-md-6 ps-lg-5">
+          {/* Quick Links Section - Now Split into 2 columns */}
+          <div className="col-lg-4 col-md-6">
             <h6 className="fw-bold mb-4 text-uppercase small">Quick Navigation</h6>
-            <ul className="list-unstyled">
-              {quickLinks.map((link, idx) => (
-                <li key={idx} className="mb-2">
-                  <Link to={link.path} className="footer-link small d-inline-block text-decoration-none">
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div className="row">
+              <div className="col-6">
+                <ul className="list-unstyled">
+                  {leftColLinks.map((link, idx) => (
+                    <li key={idx} className="mb-2">
+                      <Link to={link.path} className="footer-link small d-inline-block text-decoration-none">
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="col-6">
+                <ul className="list-unstyled">
+                  {rightColLinks.map((link, idx) => (
+                    <li key={idx} className="mb-2">
+                      <Link to={link.path} className="footer-link small d-inline-block text-decoration-none">
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
 
           {/* Contact Details */}
-          <div className="col-lg-5 col-md-12">
+          <div className="col-lg-4 col-md-6">
             <h6 className="fw-bold mb-4 text-uppercase small">Get In Touch</h6>
-            <div className="row g-3">
+            <div className="d-flex flex-column gap-3">
               {contactInfo.map((info, idx) => (
-                <div key={idx} className="col-sm-6 col-lg-12">
-                  <div className="d-flex align-items-center">
-                    <div className="contact-circle rounded-circle d-flex align-items-center justify-content-center me-3">
-                      {info.icon}
-                    </div>
-                    <div>
-                      <p className="small fw-bold mb-0">{info.title}</p>
-                      {info.link !== '#' ? (
-                        <a href={info.link} className="small text-decoration-none opacity-75 hover-opacity-100 transition-all text-reset">
-                          {info.value}
-                        </a>
-                      ) : (
-                        <span className="small opacity-75">{info.value}</span>
-                      )}
-                    </div>
+                <div key={idx} className="d-flex align-items-center">
+                  <div className="contact-circle rounded-circle d-flex align-items-center justify-content-center me-3">
+                    {info.icon}
+                  </div>
+                  <div>
+                    <p className="small fw-bold mb-0">{info.title}</p>
+                    {info.link !== '#' ? (
+                      <a href={info.link} className="small text-decoration-none opacity-75 hover-opacity-100 transition-all text-reset">
+                        {info.value}
+                      </a>
+                    ) : (
+                      <span className="small opacity-75">{info.value}</span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -157,7 +175,7 @@ const Footer = () => {
         <div className="row align-items-center">
           <div className="col-md-6 text-center text-md-start">
             <p className="small opacity-50 mb-md-0">
-              © {currentYear} <span className="fw-bold">CS PARANOX</span>. All academic rights reserved.
+              © {currentYear} <span className="fw-bold">CS PARANOX</span>. All rights reserved.
             </p>
           </div>
           <div className="col-md-6 text-center text-md-end">
