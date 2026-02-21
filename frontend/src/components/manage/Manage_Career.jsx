@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react'
 import ReactQuill from 'react-quill';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { baseUrl } from '../../utils/globalurl';
 
 
@@ -42,8 +42,7 @@ const Manage_Career = () => {
 
     return (
         <>
-            <ToastContainer position="top-center" />
-            <div className="container-fluid">
+<div className="container-fluid">
                 <form onSubmit={handleSubmit}>
                     <input type="hidden" name="id" value={formData.id} className="form-control" />
                     <div className="row form-group">

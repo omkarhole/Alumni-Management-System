@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import defaultavatar from "../../assets/uploads/defaultavatar.jpg";
 import { baseUrl, toPublicUrl } from '../../utils/globalurl';
 // import { baseUrl } from '../../utils/globalurl';
@@ -39,8 +39,7 @@ const ViewAlumni = () => {
 
     return (
         <>
-            <ToastContainer position="top-center" />
-            <div className="container-field">
+<div className="container-field">
                 <div className="col-lg-12">
                     <div>
                         <center>
@@ -85,3 +84,4 @@ const ViewAlumni = () => {
 }
 
 export default ViewAlumni
+

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { baseUrl, toPublicUrl } from '../utils/globalurl';
 
 const AdminGallery = () => {
@@ -87,8 +87,7 @@ const AdminGallery = () => {
 
   return (
     <div className="container-fluid">
-      <ToastContainer position="top-center" />
-      <div className="row">
+<div className="row">
         <div className="col-lg-4 col-md-12">
           <form onSubmit={handleSubmit} id="manage-gallery">
             <div className="card">
@@ -164,3 +163,4 @@ const AdminGallery = () => {
 }
 
 export default AdminGallery;
+

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import {
     FiArrowRight,
     FiBook,
@@ -193,9 +193,7 @@ const Home = () => {
 
     return (
         <div className={`home-page ${theme === 'dark' ? 'home-theme-dark' : 'home-theme-light'}`}>
-            <ToastContainer hideProgressBar position="top-center" pauseOnHover={false} pauseOnFocusLoss={false} />
-
-            <section className="home-hero">
+<section className="home-hero">
                 <img src={imgcs} alt="" className="home-hero-image" />
                 <div className="home-hero-mask" />
                 <motion.div
@@ -474,3 +472,4 @@ const Home = () => {
 };
 
 export default Home;
+

@@ -2,8 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bounce, ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Bounce, toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -129,8 +128,7 @@ const ManageJobs = ({ setHandleAdd }) => {
 
   return (
     <>
-      <ToastContainer position="top-center" />
-      <div className="container-fluid">
+<div className="container-fluid">
         <form onSubmit={handleSubmit}>
           <div className="row form-group">
             <div className="col-md-8">
@@ -169,3 +167,4 @@ const ManageJobs = ({ setHandleAdd }) => {
 };
 
 export default ManageJobs;
+

@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { ThemeProvider } from "./ThemeContext";
 import ScrollToTop from "./components/ScrollToTop";
@@ -85,6 +86,12 @@ function AppRouter() {
   return (
     <>
       {!hideLayout && <Header />}
+      <ToastContainer
+        position="top-center"
+        hideProgressBar
+        pauseOnHover={false}
+        pauseOnFocusLoss={false}
+      />
 
       <Routes>
         {/* Public Routes */}
