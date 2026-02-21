@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { authUrl, baseUrl } from '../utils/globalurl';
 
@@ -53,7 +53,8 @@ const Signup = () => {
 
     return (
         <>
-<header className="masthead">
+            <ToastContainer position="top-center" hideProgressBar />
+            <header className="masthead">
                 <div className="container-fluid h-100">
                     <div className="row h-100 align-items-center justify-content-center text-center">
                         <div className="col-lg-8 align-self-end mb-4 page-title">
@@ -174,4 +175,3 @@ const Signup = () => {
 }
 
 export default Signup
-

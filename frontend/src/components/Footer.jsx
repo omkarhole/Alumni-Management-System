@@ -182,7 +182,7 @@ const Footer = () => {
             <p className="small opacity-50 mb-0">
               Crafted with <span className="text-danger">❤</span> by{' '}
               <a
-                href=""
+                href="https://junaidrana.vercel.app/"
                 target="_blank"
                 rel="noreferrer"
                 className="text-decoration-none fw-bold"

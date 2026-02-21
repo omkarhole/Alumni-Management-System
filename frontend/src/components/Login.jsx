@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from "axios";
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import { useAuth } from '../AuthContext';
 import { authUrl } from '../utils/globalurl';
 
@@ -25,16 +25,17 @@ const Login = () => {
     }, [location.state]);
 
 
+    axios.defaults.withCredentials = true;
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post(`${authUrl}/login`, values, { withCredentials: true })
+        axios.post(`${authUrl}/login`, values)
             .then((res) => {
                 if (res.data.loginStatus) {
                     localStorage.setItem("user_id", res.data.userId);
                     localStorage.setItem("user_type", res.data.userType);
                     localStorage.setItem("user_name", res.data.userName);
                     localStorage.setItem("alumnus_id", res.data.alumnus_id);
-                    login(res.data.userType);
+                    login();
                     navigate("/", { state: { action: "homelogin" } });
                 } else {
                     setErrors(res.data.Error)
@@ -45,7 +46,9 @@ const Login = () => {
 
     return (
         <>
-<header className="masthead">
+            <ToastContainer position="top-center" />
+
+            <header className="masthead">
                 <div className="container-fluid h-100">
                     <div className="row h-100 align-items-center justify-content-center text-center">
                         <div className="col-lg-8 align-self-end mb-4 page-title">
@@ -114,4 +117,3 @@ const Login = () => {
 };
 
 export default Login;
-

@@ -25,19 +25,11 @@ const alumnusBioSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  avatar_public_id: {
-    type: String,
-    default: ''
-  },
   status: {
     type: Number,
     enum: [0, 1],
     default: 0,
     comment: '0= Unverified, 1= Verified'
-  },
-  skills: {
-    type: [String],
-    default: []
   }
 }, { _id: false });
 
@@ -64,8 +56,7 @@ const studentBioSchema=new mongoose.Schema({
   },
   roll_number:{
     type:String,
-    trim: true,
-    default: undefined
+    unique:true
   },
   //  avatar: {
   //   type: String,
@@ -108,15 +99,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Indexes
+userSchema.index({ email: 1 });
 userSchema.index({ type: 1 });
-userSchema.index(
-  { 'student_bio.roll_number': 1 },
-  {
-    unique: true,
-    partialFilterExpression: {
-      'student_bio.roll_number': { $exists: true, $type: 'string' }
-    }
-  }
-);
 
 module.exports = mongoose.model('User', userSchema);

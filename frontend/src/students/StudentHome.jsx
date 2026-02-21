@@ -4,7 +4,6 @@ import { IoCalendar } from "react-icons/io5";
 import { RiSuitcaseFill } from "react-icons/ri";
 import { MdForum } from "react-icons/md";
 import axios from "axios";
-import { studentUrl } from '../utils/globalurl';
 
 const InfoCard = ({ title, count, Icon, className }) => (
   <div className="col-xxl-4 col-xl-6">
@@ -32,7 +31,7 @@ const StudentHome = () => {
       applications:0
     });
      useEffect(() => {
-    axios.get(`${studentUrl}/dashboard/counts`, { withCredentials: true })
+    axios.get(`http://localhost:5000/api/student/dashboard/counts`, { withCredentials: true })
       .then((res) => {
         console.log("Counts data:", res.data);
         setCounts(res.data);

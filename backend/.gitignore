@@ -24,9 +24,3 @@ dist-ssr
 *.sw?
 .env.local
 .env
-
-# Runtime uploads (local fallback)
-public/avatars/*
-public/images/*
-!public/avatars/.gitkeep
-!public/images/.gitkeep

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios';
 import { baseUrl } from '../utils/globalurl';
 import { FaBriefcase, FaUser, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
@@ -17,10 +17,7 @@ const AdminJobApplications = () => {
     try {
       const res = await axios.get(`${baseUrl}/jobs`, { withCredentials: true });
       // Filter only jobs that have applicants
-      const safeJobs = Array.isArray(res.data)
-        ? res.data.filter((job) => job && typeof job === 'object')
-        : [];
-      const jobsWithApplicants = safeJobs.filter((job) => job.applicants && job.applicants.length > 0);
+      const jobsWithApplicants = res.data.filter(job => job.applicants && job.applicants.length > 0);
       setJobs(jobsWithApplicants);
       setLoading(false);
     } catch (err) {
@@ -79,7 +76,9 @@ const AdminJobApplications = () => {
 
   return (
     <div className="container-fluid mt-4">
-<div className="row mb-4">
+      <ToastContainer position="top-center" />
+
+      <div className="row mb-4">
         <div className="col-lg-12">
           <h3 className="mb-4">
             <FaBriefcase className="me-2" />
@@ -217,4 +216,3 @@ const AdminJobApplications = () => {
 };
 
 export default AdminJobApplications;
-

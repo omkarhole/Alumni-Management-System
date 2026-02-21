@@ -1,15 +1,14 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { smoothScrollToTop } from '../utils/smoothScroll';
 
-const ScrollToTop = () => {
+const ScrollToTop = ({ children }) => {
     const location = useLocation();
 
     useEffect(() => {
-        smoothScrollToTop();
+        window.scrollTo(0, 0);
     }, [location.pathname]); 
 
-    return null;
+    return <>{children}</>;
 };
 
 export default ScrollToTop;

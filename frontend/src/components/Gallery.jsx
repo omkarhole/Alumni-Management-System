@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { baseUrl, toPublicUrl } from '../utils/globalurl';
+import { baseUrl } from '../utils/globalurl';
 
 const Gallery = () => {
     const [gallery, setGallery] = useState([])
@@ -8,10 +8,8 @@ const Gallery = () => {
     useEffect(() => {
         axios.get(`${baseUrl}/gallery`)
             .then((res) => {
-                const safeGallery = Array.isArray(res.data)
-                    ? res.data.filter((item) => item && typeof item === 'object')
-                    : [];
-                setGallery(safeGallery);
+                console.log(res.data);
+                setGallery(res.data);
             })
             .catch((err) => console.log(err));
     }, []);
@@ -39,10 +37,10 @@ const Gallery = () => {
                         <div className="row">
                             {/* <div className="col-md-6"> */}
                             {gallery.map((g, index) => (
-                                <div className="col-md-6 padzero" key={g._id || g.id || index}>
+                                <div className="col-md-6 padzero" key={index}>
                                     <div className="card gallery-list"  >
                                         <div className="">
-                                            <img src={toPublicUrl(g.image_path)} className='card-img-top img-fluid galleryimg' alt="img" />
+                                            <img src={`${baseUrl}/${g.image_path}`} className='card-img-top img-fluid galleryimg' alt="img" />
                                         </div>
                                         <div className="card-body">
                                             <div className="row align-items-center justify-content-center text-center h-100">

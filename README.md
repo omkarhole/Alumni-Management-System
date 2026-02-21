@@ -242,13 +242,6 @@ JWT_EXPIRE=7d
 # Frontend URL (for CORS)
 FRONTEND_URL=http://localhost:5173
 
-# Optional: Cloud image storage (avatars + gallery)
-# If these are not set, uploads are stored locally under backend/public
-# CLOUDINARY_CLOUD_NAME=your-cloud-name
-# CLOUDINARY_API_KEY=your-api-key
-# CLOUDINARY_API_SECRET=your-api-secret
-# CLOUDINARY_FOLDER=alumni-management-system
-
 # Optional: Email Configuration (for future email features)
 # EMAIL_SERVICE=gmail
 # EMAIL_USER=your-email@gmail.com

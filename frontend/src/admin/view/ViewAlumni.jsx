@@ -1,9 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import defaultavatar from "../../assets/uploads/defaultavatar.jpg";
-import { baseUrl, toPublicUrl } from '../../utils/globalurl';
+import { ToastContainer, toast } from 'react-toastify';
+import { baseUrl } from '../../utils/globalurl';
 // import { baseUrl } from '../../utils/globalurl';
 
 
@@ -39,16 +38,13 @@ const ViewAlumni = () => {
 
     return (
         <>
-<div className="container-field">
+            <ToastContainer position="top-center" />
+            <div className="container-field">
                 <div className="col-lg-12">
                     <div>
                         <center>
                             <div className="avatar">
-                                <img
-                                    src={toPublicUrl(alumni.alumnus_bio?.avatar) || defaultavatar}
-                                    className="vaimg"
-                                    alt="avatar"
-                                />
+                                <img src={`${baseUrl}/${alumni.alumnus_bio?.avatar}`} className="vaimg" alt="avatar" />
                             </div>
                         </center>
                     </div>
@@ -84,4 +80,3 @@ const ViewAlumni = () => {
 }
 
 export default ViewAlumni
-

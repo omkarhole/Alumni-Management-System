@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FaTimes } from "react-icons/fa";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
 import { baseUrl } from '../../utils/globalurl';
 
@@ -73,7 +73,8 @@ const ManageEvents = () => {
     return (
         <>
             <div className="container-fluid">
-<div className="col-lg-12">
+                <ToastContainer />
+                <div className="col-lg-12">
                     <div className="card">
                         <div className="card-body">
                             <form action="" id="manage-event">
