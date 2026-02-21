@@ -19,6 +19,7 @@ const Footer = () => {
     { name: 'Career Opportunities', path: '/jobs' },
     { name: 'Community Forums', path: '/forums' },
     { name: 'About Us', path: '/about' },
+    { name: 'Terms Of Service', path: '/terms'}
   ];
 
   // Logic to split links into two columns
