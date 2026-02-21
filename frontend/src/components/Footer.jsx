@@ -26,7 +26,8 @@ const Footer = () => {
     { name: 'Forums', path: '/forums' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
-    { name: 'Terms of Service', path: '/terms' },
+{ name: 'Terms of Service', path: '/terms' },
+    { name: 'Privacy Policy', path: '/privacy' },
   ];
 
   const socialLinks = [
