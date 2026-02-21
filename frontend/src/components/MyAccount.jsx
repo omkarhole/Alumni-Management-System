@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FaStar } from 'react-icons/fa';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { baseUrl } from '../utils/globalurl';
 import { useAuth } from '../AuthContext';
 const MyAccount = () => {
@@ -88,8 +88,7 @@ const MyAccount = () => {
 
     return (
         <>
-            <ToastContainer position="top-center" />
-            <header className="masthead">
+<header className="masthead">
                 <div className="container-fluid h-100">
                     <div className="row h-100 align-items-center justify-content-center text-center">
                         <div className="col-lg-8 align-self-end mb-4 page-title">
@@ -237,3 +236,4 @@ const MyAccount = () => {
 }
 
 export default MyAccount;
+

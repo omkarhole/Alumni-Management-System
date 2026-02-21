@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaPlus } from "react-icons/fa";
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import defaultavatar from "../assets/uploads/defaultavatar.jpg"
 import { baseUrl, toPublicUrl } from '../utils/globalurl';
 
@@ -36,9 +36,7 @@ const AdminAlumni = () => {
 
   return (
     <>
-      <ToastContainer position="top-center" />
-
-      <div className="container-fluid">
+<div className="container-fluid">
 
         <div className="col-lg-12">
           <div className="row mb-4 mt-4">
@@ -130,3 +128,4 @@ const AdminAlumni = () => {
 }
 
 export default AdminAlumni
+

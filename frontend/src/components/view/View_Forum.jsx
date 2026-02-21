@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaComments } from "react-icons/fa";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useAuth } from '../../AuthContext';
 import { baseUrl } from '../../utils/globalurl';
 
@@ -103,8 +103,7 @@ const ViewTopic = () => {
 
     return (
         <>
-            <ToastContainer position="top-center" />
-            <header className="masthead">
+<header className="masthead">
                 <div className="container-fluid h-100">
                     <div className="row h-100 align-items-center justify-content-center text-center">
                         <div className="col-lg-8 align-self-end mb-4 page-title">
@@ -236,3 +235,4 @@ const ViewTopic = () => {
 };
 
 export default ViewTopic;
+

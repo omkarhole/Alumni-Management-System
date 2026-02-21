@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { FaEnvelope, FaPaperPlane } from 'react-icons/fa';
 import { useTheme } from '../ThemeContext';
 import { baseUrl } from '../utils/globalurl';
@@ -33,8 +33,7 @@ const Newsletter = () => {
 
     return (
         <section className={`page-section newsletter-shell ${theme === 'light' ? 'newsletter-theme-light' : 'newsletter-theme-dark'}`} id="newsletter">
-            <ToastContainer hideProgressBar="true" position="top-center" pauseOnHover="false" pauseOnFocusLoss="false" />
-            <div className="container">
+<div className="container">
                 <div className="row justify-content-center">
                     <div className="col-lg-8 text-center">
                         <div className="newsletter-section newsletter-card p-4 rounded shadow-sm">
@@ -90,3 +89,4 @@ const Newsletter = () => {
 };
 
 export default Newsletter;
+
