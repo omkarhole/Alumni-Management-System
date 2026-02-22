@@ -130,6 +130,7 @@ Alumni-Management-System/
 │   │   └── config.js          # Database configuration
 │   ├── 📂 controllers/        # Route controllers
 │   │   ├── auth.controller.js
+│   │   ├── oauth.controller.js
 │   │   ├── user.controller.js
 │   │   ├── alumni.controller.js
 │   │   ├── event.controller.js
@@ -253,6 +254,10 @@ FRONTEND_URL=http://localhost:5173
 # EMAIL_SERVICE=gmail
 # EMAIL_USER=your-email@gmail.com
 # EMAIL_PASS=your-app-password
+
+# Optional: Google Oauth
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
 ```
 
 **Important:** Replace `your_super_secret_jwt_key_change_this_in_production` with a strong, random string for JWT signing.

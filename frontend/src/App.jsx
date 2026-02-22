@@ -23,6 +23,7 @@ import TermsOfService from "./components/TermsOfService";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import OAuthCompleteSignup from "./components/OAuthCompleteSignup";
 import MyAccount from "./components/MyAccount";
 import NotFound from "./components/NotFound";
 import ViewEvent from "./components/view/View_Event";
@@ -113,6 +114,7 @@ function AppRouter() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/oauth/complete-signup" element={<OAuthCompleteSignup />} />
         <Route path="/events/view" element={<ViewEvent />} />
 
         {/* Admin Dashboard */}
@@ -172,7 +174,7 @@ function AppRouter() {
         <Route
           path="/job-recommendations"
           element={
-            <PrivateRoute allow={["admin","alumnus", "student"]}>
+            <PrivateRoute allow={["admin", "alumnus", "student"]}>
               <JobRecommendations />
             </PrivateRoute>
           }
