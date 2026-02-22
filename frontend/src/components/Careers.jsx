@@ -9,6 +9,7 @@ import { baseUrl } from '../utils/globalurl';
 import { smoothScrollToTop } from '../utils/smoothScroll';
 import SmartSearchBar from './SmartSearchBar';
 import SmartFilterDropdown from './SmartFilterDropdown';
+import ReferralForm from './ReferralForm';
 
 
 const previewJobs = [
@@ -36,7 +37,7 @@ const previewJobs = [
 ];
 
 const Careers = () => {
-    const { isLoggedIn, isStudent } = useAuth();
+    const { isLoggedIn, isStudent, user } = useAuth();
     const [filteredJob, setFilteredJob] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [jobs, setJobs] = useState([]);
@@ -48,6 +49,8 @@ const Careers = () => {
     const [locationFilter, setLocationFilter] = useState('all');
     const [modeFilter, setModeFilter] = useState('all');
     const [sortBy, setSortBy] = useState('recent');
+    const [referralJob, setReferralJob] = useState(null);
+    const [referralSuccess, setReferralSuccess] = useState(false);
 
     const openModal = (job) => {
         setSelectedJob(job);
@@ -58,6 +61,22 @@ const Careers = () => {
         setSelectedJob(null);
         setIsModalOpen(false);
     };
+
+    const openReferralModal = (job) => {
+        setReferralJob(job);
+    };
+
+    const closeReferralModal = () => {
+        setReferralJob(null);
+        setReferralSuccess(false);
+    };
+
+    const handleReferralSuccess = () => {
+        setReferralSuccess(true);
+    };
+
+    // Check if user is alumni (can post jobs/refer candidates)
+    const isAlumnus = user?.type === 'alumnus' || user?.type === 'admin';
 
     useEffect(() => {
         if (!isLoggedIn) {
@@ -311,8 +330,7 @@ const Careers = () => {
                                 </SmartSearchBar>
                             </div>
                         </div>
-                        {filteredJob.length > 0 ? <>
-                            {/* $event = $conn->query("SELECT c.*,u.name from careers c inner join users u on u.id = c.user_id order by id desc"); */}
+                        {filteredJob.length > 0 ? <div className="jobs-grid">
                             {filteredJob.map((j, index) => (
                                 <div className="card job-list" key={j._id || j.id || index}>
                                     <div className="card-body">
@@ -331,12 +349,23 @@ const Careers = () => {
                                                     <span className="badge badge-info ">
                                                         <b><i>Posted by: {j.user?.name || 'Unknown'}</i></b>
                                                     </span>
-                                                    <button className="btn btn-sm  btn-primary " onClick={() => openModal(j)}>Read More</button>
+                                                    <div>
+                                                        {isAlumnus && (
+                                                            <button 
+                                                                className="btn btn-sm btn-success me-2" 
+                                                                onClick={() => openReferralModal(j)}
+                                                                title="Refer a Candidate"
+                                                            >
+                                                                <FaUserPlus /> Refer
+                                                            </button>
+                                                        )}
+                                                        <button className="btn btn-sm  btn-primary " onClick={() => openModal(j)}>Read More</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>))}</> : <>
+                                </div>))}</div> : <>
                             <div className="d-flex flex-column justify-content-center align-items-center">
                                 <p >{searchQuery}</p>
                                 <h4 className='text-info-emphasis'>No Job Available</h4>
@@ -346,6 +375,19 @@ const Careers = () => {
                     </div></>)}
             {isModalOpen && (
                 selectedJob && <ViewJobs job={selectedJob} closeModal={closeModal} />
+            )}
+            {referralJob && (
+                <ReferralForm 
+                    job={referralJob} 
+                    onClose={closeReferralModal} 
+                    onSuccess={handleReferralSuccess}
+                />
+            )}
+            {referralSuccess && (
+                <div className="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3" role="alert">
+                    Referral submitted successfully!
+                    <button type="button" className="btn-close" onClick={() => setReferralSuccess(false)}></button>
+                </div>
             )}
         </>
     )
