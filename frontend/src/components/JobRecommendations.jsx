@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaBuilding, FaMapMarker, FaBriefcase, FaPercentage, FaBell, FaBellSlash, FaCog } from 'react-icons/fa';
 import { baseUrl } from '../utils/globalurl';
@@ -115,7 +115,7 @@ const JobRecommendations = () => {
     }
 
     return (
-        <div className="container py-5">
+        <div className="container pt-5 mt-5">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="text-primary">
                     <FaBriefcase className="me-2" />

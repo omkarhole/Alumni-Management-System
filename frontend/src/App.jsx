@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -60,6 +61,7 @@ import StudentsApplications from "./students/StudentsApplications";
 // Layout
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import JobRecommendations from "./components/JobRecommendations";
 
 function App() {
   return (
@@ -163,6 +165,15 @@ function AppRouter() {
           element={
             <PrivateRoute allow={["alumnus", "student"]}>
               <MyAccount />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/job-recommendations"
+          element={
+            <PrivateRoute allow={["admin","alumnus", "student"]}>
+              <JobRecommendations />
             </PrivateRoute>
           }
         />
