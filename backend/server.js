@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { connectDB } = require('./utils/db');
 const authRouter = require('./routes/auth.routes');
+const oauthRouter = require('./routes/oauth.routes');
 const adminRouter = require('./routes/admin.routes');
 const studentRouter = require('./routes/student.routes');
 const cookieParser = require('cookie-parser');
@@ -88,6 +89,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', authRouter);
+app.use('/api/oauth', oauthRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/student', authenticate, studentRouter);
 app.use('/api/contact', contactRouter);

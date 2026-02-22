@@ -30,6 +30,9 @@ export const baseUrl = `${apiUrl}/api/admin`;
 // Auth endpoint
 export const authUrl = `${apiUrl}/auth`;
 
+// Admin API endpoint
+export const oauthUrl = `${apiUrl}/api/oauth`;
+
 // Student API endpoint
 export const studentUrl = `${apiUrl}/api/student`;
 
