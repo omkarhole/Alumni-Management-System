@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaHome, FaUserGraduate, FaUsers, FaImage, FaBriefcase, FaNewspaper, FaChalkboardTeacher } from "react-icons/fa";
+import { FaHome, FaUserGraduate, FaUsers, FaImage, FaBriefcase, FaNewspaper, FaChalkboardTeacher, FaUserFriends } from "react-icons/fa";
 
 import { ImBooks } from "react-icons/im";
 import { IoSettingsSharp, IoCalendar } from "react-icons/io5";
@@ -53,6 +53,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <Link  className={`nav-link ${isActive("/dashboard/job-applications")}`} to={"/dashboard/job-applications"}>
                         <FaBriefcase />
                         <span className='ms-1'>Job Applications</span>
+                    </Link>
+                </li>
+                <li onClick={toggleSidebar} className="nav-item">
+                    <Link  className={`nav-link ${isActive("/dashboard/referrals")}`} to={"/dashboard/referrals"}>
+                        <FaUserFriends />
+                        <span className='ms-1'>Referrals</span>
                     </Link>
                 </li>
                 <li onClick={toggleSidebar} className="nav-item">

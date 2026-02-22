@@ -1,4 +1,4 @@
-const {Career, User, JobSubscription}=require('../models/Index');
+const {Career, User, JobSubscription, JobReferral}=require('../models/Index');
 const sendEmail = require('../utils/mailer');
 
 
@@ -446,6 +446,201 @@ async function notifyUsersForNewJob(career) {
     }
 }
 
+// Job Referral Functions
+
+// Refer a candidate for a job
+async function referCandidate(req, res, next) {
+    try {
+        const { jobId } = req.params;
+        const { 
+            candidateName, 
+            candidateEmail, 
+            candidatePhone, 
+            candidateResume, 
+            candidateLinkedIn,
+            candidateExperience,
+            notes 
+        } = req.body;
+
+        // Check if job exists
+        const job = await Career.findById(jobId);
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        // Check if candidate already referred for this job
+        const existingReferral = await JobReferral.findOne({
+            job: jobId,
+            candidateEmail: candidateEmail.toLowerCase()
+        });
+
+        if (existingReferral) {
+            return res.status(400).json({ message: 'This candidate has already been referred for this job' });
+        }
+
+        // Create new referral
+        const referral = await JobReferral.create({
+            job: jobId,
+            referrer: req.user.id,
+            candidateName,
+            candidateEmail: candidateEmail.toLowerCase(),
+            candidatePhone: candidatePhone || '',
+            candidateResume: candidateResume || '',
+            candidateLinkedIn: candidateLinkedIn || '',
+            candidateExperience: candidateExperience || '',
+            notes: notes || '',
+            status: 'pending'
+        });
+
+        // Populate job and referrer details
+        await referral.populate([
+            { path: 'job', select: 'company job_title location' },
+            { path: 'referrer', select: 'name email' }
+        ]);
+
+        res.status(201).json({
+            message: 'Candidate referred successfully',
+            referral
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Get my referrals (for alumni who made referrals)
+async function getMyReferrals(req, res, next) {
+    try {
+        const referrals = await JobReferral.find({ referrer: req.user.id })
+            .populate('job', 'company job_title location status')
+            .populate('referrer', 'name email')
+            .sort({ createdAt: -1 });
+
+        res.json(referrals);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Get all referrals (for admin)
+async function getAllReferrals(req, res, next) {
+    try {
+        const { status, jobId, referrerId } = req.query;
+        
+        const query = {};
+        
+        if (status) {
+            query.status = status;
+        }
+        if (jobId) {
+            query.job = jobId;
+        }
+        if (referrerId) {
+            query.referrer = referrerId;
+        }
+
+        const referrals = await JobReferral.find(query)
+            .populate('job', 'company job_title location status')
+            .populate('referrer', 'name email type')
+            .sort({ createdAt: -1 });
+
+        res.json(referrals);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Get referrals for a specific job (for job poster)
+async function getJobReferrals(req, res, next) {
+    try {
+        const { jobId } = req.params;
+
+        // Check if job exists and user is the poster
+        const job = await Career.findById(jobId);
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        // Only job poster or admin can view referrals
+        if (job.user.toString() !== req.user.id && req.user.type !== 'admin') {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+
+        const referrals = await JobReferral.find({ job: jobId })
+            .populate('referrer', 'name email')
+            .sort({ createdAt: -1 });
+
+        res.json(referrals);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Update referral status
+async function updateReferralStatus(req, res, next) {
+    try {
+        const { id } = req.params;
+        const { status, notes, outcome } = req.body;
+
+        const referral = await JobReferral.findById(id);
+        if (!referral) {
+            return res.status(404).json({ message: 'Referral not found' });
+        }
+
+        // Update status
+        if (status) {
+            referral.status = status;
+        }
+        
+        // Add notes
+        if (notes) {
+            referral.notes = notes;
+        }
+        
+        // Add outcome
+        if (outcome) {
+            referral.outcome = outcome;
+        }
+
+        await referral.save();
+
+        // Populate details for response
+        await referral.populate([
+            { path: 'job', select: 'company job_title location' },
+            { path: 'referrer', select: 'name email' }
+        ]);
+
+        res.json({
+            message: 'Referral status updated successfully',
+            referral
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Delete a referral
+async function deleteReferral(req, res, next) {
+    try {
+        const { id } = req.params;
+
+        const referral = await JobReferral.findById(id);
+        if (!referral) {
+            return res.status(404).json({ message: 'Referral not found' });
+        }
+
+        // Only referrer or admin can delete
+        if (referral.referrer.toString() !== req.user.id && req.user.type !== 'admin') {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+
+        await JobReferral.findByIdAndDelete(id);
+
+        res.json({ message: 'Referral deleted successfully' });
+    } catch (err) {
+        next(err);
+    }
+}
+
 module.exports={
     listCarrers,
     addCareer,
@@ -458,5 +653,11 @@ module.exports={
     getJobRecommendations,
     subscribeToJobs,
     unsubscribeFromJobs,
-    getSubscription
+    getSubscription,
+    referCandidate,
+    getMyReferrals,
+    getAllReferrals,
+    getJobReferrals,
+    updateReferralStatus,
+    deleteReferral
 };

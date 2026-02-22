@@ -12,10 +12,16 @@ const {
     getJobRecommendations,
     subscribeToJobs,
     unsubscribeFromJobs,
-    getSubscription
+    getSubscription,
+    referCandidate,
+    getMyReferrals,
+    getAllReferrals,
+    getJobReferrals,
+    updateReferralStatus,
+    deleteReferral
 }=require('../controllers/career.controller');
 
-const { authenticate, canPostJobs, isStudent } = require('../middlewares/auth.middleware');
+const { authenticate, canPostJobs, isStudent, isAdmin } = require('../middlewares/auth.middleware');
 
 const router=express.Router();
 
@@ -37,5 +43,24 @@ router.get('/recommendations', authenticate, getJobRecommendations);
 router.get('/subscription', authenticate, getSubscription);
 router.post('/subscribe', authenticate, subscribeToJobs);
 router.post('/unsubscribe', authenticate, unsubscribeFromJobs);
+
+// Job Referral Routes
+// Refer a candidate for a job (alumni only)
+router.post('/:jobId/refer', authenticate, canPostJobs, referCandidate);
+
+// Get referrals for a specific job (job poster or admin)
+router.get('/:jobId/referrals', authenticate, getJobReferrals);
+
+// Get my referrals (for alumni who made them)
+router.get('/my-referrals', authenticate, getMyReferrals);
+
+// Get all referrals (admin only)
+router.get('/all-referrals', authenticate, isAdmin, getAllReferrals);
+
+// Update referral status
+router.put('/referrals/:id/status', authenticate, updateReferralStatus);
+
+// Delete a referral
+router.delete('/referrals/:id', authenticate, deleteReferral);
 
 module.exports=router;
