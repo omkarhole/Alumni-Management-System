@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { baseUrl } from '../utils/globalurl';
 
 const StudentEvents = () => {
@@ -72,8 +72,7 @@ const StudentEvents = () => {
 
   return (
     <div className="container-fluid">
-      <ToastContainer position="top-center" />
-      <div className="col-lg-12">
+<div className="col-lg-12">
         <div className="row mb-4 mt-4">
           <div className="col-md-12"></div>
         </div>
@@ -139,3 +138,4 @@ const StudentEvents = () => {
 };
 
 export default StudentEvents;
+
