@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaNewspaper, FaEnvelope, FaUsers } from 'react-icons/fa';
 import { useTheme } from '../ThemeContext';
 import { baseUrl } from '../utils/globalurl';
@@ -146,9 +146,7 @@ const AdminNews = () => {
 
     return (
         <div className={`page-section bg-${theme}`}>
-            <ToastContainer hideProgressBar="true" position="top-center" pauseOnHover="false" pauseOnFocusLoss="false" />
-            
-            <div className="container-fluid">
+<div className="container-fluid">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h2 className="section-heading text-uppercase mb-0">
                         <FaNewspaper className="me-2" />
@@ -416,3 +414,4 @@ const AdminNews = () => {
 };
 
 export default AdminNews;
+

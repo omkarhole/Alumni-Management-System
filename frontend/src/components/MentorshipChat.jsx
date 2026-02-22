@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { toast } from 'react-toastify';
+import defaultavatar from '../assets/uploads/defaultavatar.jpg';
+import { toPublicUrl } from '../utils/globalurl';
 import { 
   ArrowLeft, 
   Send, 
@@ -210,7 +212,7 @@ const MentorshipChat = () => {
               </button>
               <div className="flex items-center gap-3">
                 <img
-                  src={otherPerson?.alumnus_bio?.avatar ? `${API_URL}/${otherPerson.alumnus_bio.avatar}` : '/default-avatar.jpg'}
+                  src={toPublicUrl(otherPerson?.alumnus_bio?.avatar) || defaultavatar}
                   alt={otherPerson?.name}
                   className="w-10 h-10 rounded-full object-cover"
                 />

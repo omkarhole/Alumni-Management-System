@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { baseUrl } from '../../utils/globalurl';
 
 
@@ -44,8 +44,7 @@ const ManageUser = () => {
 
     return (
         <>
-            <ToastContainer position="top-center" />
-            <div className="container-fluid">
+<div className="container-fluid">
                 <div id="msg"></div>
                 <form onSubmit={handleSubmit} id="manage-user">
                     <input type="hidden" name="id" value="id" />

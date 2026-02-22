@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import axios from 'axios';
 import { baseUrl } from '../utils/globalurl';
 import { FaBriefcase, FaUser, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
@@ -79,9 +79,7 @@ const AdminJobApplications = () => {
 
   return (
     <div className="container-fluid mt-4">
-      <ToastContainer position="top-center" />
-
-      <div className="row mb-4">
+<div className="row mb-4">
         <div className="col-lg-12">
           <h3 className="mb-4">
             <FaBriefcase className="me-2" />
@@ -219,3 +217,4 @@ const AdminJobApplications = () => {
 };
 
 export default AdminJobApplications;
+

@@ -1,10 +1,11 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { FaComments, FaPlus, FaSearch } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import ManageForum from '../admin/save/ManageForum';
 import { baseUrl } from '../utils/globalurl';
+import { smoothScrollToTop } from '../utils/smoothScroll';
 import SmartSearchBar from './SmartSearchBar';
 import SmartFilterDropdown from './SmartFilterDropdown';
 
@@ -83,7 +84,7 @@ const Forum = () => {
     }
 
     useEffect(() => {
-        window.scrollTo(0, 0);
+        smoothScrollToTop();
     }, [handleAdd]);
 
     const authorOptions = useMemo(() => {

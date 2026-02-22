@@ -1,8 +1,10 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { ThemeProvider } from "./ThemeContext";
 import ScrollToTop from "./components/ScrollToTop";
+import SmoothWheelScroll from "./components/SmoothWheelScroll";
 import PrivateRoute from "./components/PrivateRoute";
 
 // Pages
@@ -10,7 +12,10 @@ import Home from "./components/Home";
 import AlumniList from "./components/AlumniList";
 import Gallery from "./components/Gallery";
 import Careers from "./components/Careers";
+import Mentorship from "./components/Mentorship";
 import Forum from "./components/Forum";
+import ViewTopic from "./components/view/View_Forum";
+import News from "./components/News";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import TermsOfService from "./components/TermsOfService";
@@ -19,6 +24,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import MyAccount from "./components/MyAccount";
 import NotFound from "./components/NotFound";
+import ViewEvent from "./components/view/View_Event";
 
 // Admin
 import Dashboard from "./admin/Dashboard";
@@ -61,6 +67,7 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <ScrollToTop />
+          <SmoothWheelScroll />
           <AppRouter />
         </AuthProvider>
       </ThemeProvider>
@@ -81,6 +88,12 @@ function AppRouter() {
   return (
     <>
       {!hideLayout && <Header />}
+      <ToastContainer
+        position="top-center"
+        hideProgressBar
+        pauseOnHover={false}
+        pauseOnFocusLoss={false}
+      />
 
       <Routes>
         {/* Public Routes */}
@@ -88,13 +101,17 @@ function AppRouter() {
         <Route path="/alumni" element={<AlumniList />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/jobs" element={<Careers />} />
+        <Route path="/mentorship" element={<Mentorship />} />
         <Route path="/forums" element={<Forum />} />
+        <Route path="/forum/view" element={<ViewTopic />} />
+        <Route path="/news" element={<News />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/events/view" element={<ViewEvent />} />
 
         {/* Admin Dashboard */}
         <Route
