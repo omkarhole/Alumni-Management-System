@@ -4,8 +4,10 @@ import axios from "axios";
 import { toast } from 'react-toastify';
 import { useAuth } from '../AuthContext';
 import { authUrl } from '../utils/globalurl';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
+    const [showPassword, setShowPassword] = useState(false);
     const { login } = useAuth();
     const [values, setValues] = useState({
         email: '',
@@ -45,7 +47,7 @@ const Login = () => {
 
     return (
         <>
-<header className="masthead">
+            <header className="masthead">
                 <div className="container-fluid h-100">
                     <div className="row h-100 align-items-center justify-content-center text-center">
                         <div className="col-lg-8 align-self-end mb-4 page-title">
@@ -81,14 +83,33 @@ const Login = () => {
                                             <label htmlFor="password" className="control-label">
                                                 Password
                                             </label>
-                                            <input
-                                                onChange={(e) => setValues({ ...values, password: e.target.value })}
-                                                type="password"
-                                                id="password"
-                                                name="password"
-                                                required
-                                                className="form-control"
-                                            />
+                                            <div className="position-relative">
+                                                <input
+                                                    onChange={(e) =>
+                                                        setValues({ ...values, password: e.target.value })
+                                                    }
+                                                    type={showPassword ? "text" : "password"}
+                                                    id="password"
+                                                    name="password"
+                                                    required
+                                                    className="form-control pe-5"
+                                                />
+
+                                                {/* Eye Icon */}
+                                                <span
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    style={{
+                                                        position: "absolute",
+                                                        right: "15px",
+                                                        top: "50%",
+                                                        transform: "translateY(-50%)",
+                                                        cursor: "pointer",
+                                                        color: "#6c757d"
+                                                    }}
+                                                >
+                                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                </span>
+                                            </div>
                                             <div className='text-danger mt-2'>
                                                 {errors && errors}
                                             </div>

@@ -3,8 +3,10 @@ import axios from "axios";
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { authUrl, baseUrl } from '../utils/globalurl';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Signup = () => {
+    const [showPassword, setShowPassword] = useState(false);
     const [values, setValues] = useState({
         name: "",
         email: "",
@@ -53,7 +55,7 @@ const Signup = () => {
 
     return (
         <>
-<header className="masthead">
+            <header className="masthead">
                 <div className="container-fluid h-100">
                     <div className="row h-100 align-items-center justify-content-center text-center">
                         <div className="col-lg-8 align-self-end mb-4 page-title">
@@ -80,7 +82,33 @@ const Signup = () => {
                                         </div>
                                         <div className="form-group">
                                             <label htmlFor="password" className="control-label">Password</label>
-                                            <input onChange={(e) => setValues({ ...values, password: e.target.value })} type="password" className="form-control" id="password" name="password" required />
+                                            <div className="position-relative">
+                                                <input
+                                                    onChange={(e) =>
+                                                        setValues({ ...values, password: e.target.value })
+                                                    }
+                                                    type={showPassword ? "text" : "password"}
+                                                    id="password"
+                                                    name="password"
+                                                    required
+                                                    className="form-control pe-5"
+                                                />
+
+                                                {/* Eye Icon */}
+                                                <span
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    style={{
+                                                        position: "absolute",
+                                                        right: "15px",
+                                                        top: "50%",
+                                                        transform: "translateY(-50%)",
+                                                        cursor: "pointer",
+                                                        color: "#6c757d"
+                                                    }}
+                                                >
+                                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                </span>
+                                            </div>
                                         </div>
                                         <div className="form-group">
                                             <label htmlFor="userType" className="control-label">User Type</label>
@@ -135,7 +163,7 @@ const Signup = () => {
                                                         <option value="other">Other</option>
                                                     </select>
                                                 </div>
-                                                <div className='flex items-center gap-4 w-full'> 
+                                                <div className='flex items-center gap-4 w-full'>
                                                     <div className="flex flex-col">
                                                         <label htmlFor="enrollment_year" className="control-label">Enrollment Year</label>
                                                         <input type="number" className="form-control" name="enrollment_year" value={values.enrollment_year} onChange={(e) => setValues({ ...values, enrollment_year: parseInt(e.target.value) })} required />
