@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { FaStar } from 'react-icons/fa';
+import { FaPlus, FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { baseUrl } from '../utils/globalurl';
 import { useAuth } from '../AuthContext';
