@@ -35,3 +35,6 @@ export const studentUrl = `${apiUrl}/api/student`;
 
 // Contact endpoint (optional but recommended for clarity)
 export const contactUrl = `${apiUrl}/api/contact`;
+
+// Skills API endpoint
+export const skillsUrl = `${apiUrl}/api/admin/skills`;
