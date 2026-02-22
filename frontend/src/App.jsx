@@ -34,6 +34,7 @@ import AdminJobs from "./admin/AdminJobs";
 import AdminJobApplications from "./admin/AdminJobApplications";
 import AdminNews from "./admin/AdminNews";
 import AdminMentorship from "./admin/AdminMentorship";
+import AdminReferrals from "./admin/AdminReferrals";
 
 import ManageJobs from "./admin/save/ManageJobs";
 import ManageEvents from "./admin/save/ManageEvents";
@@ -90,7 +91,7 @@ function AppRouter() {
         <Route path="/forums" element={<Forum />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-<Route path="/terms" element={<TermsOfService />} />
+        <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -114,6 +115,7 @@ function AppRouter() {
           <Route path="alumnilist" element={<AdminAlumni />} />
           <Route path="jobs" element={<AdminJobs />} />
           <Route path="job-applications" element={<AdminJobApplications />} />
+          <Route path="referrals" element={<AdminReferrals />} />
           <Route path="jobs/manage" element={<ManageJobs />} />
           <Route path="events/manage" element={<ManageEvents />} />
           <Route path="forum/manage" element={<ManageForum />} />
