@@ -409,8 +409,8 @@ const AlumniList = () => {
                       </div>
                     </div>
                   </div>
-                );
-              })}
+                ),
+              )})
             </div>
           ) : (
             <div className="text-center py-5">
@@ -421,7 +421,7 @@ const AlumniList = () => {
       </div>
 
       {/* ================= STYLING ================= */}
-      <style jsx>{`
+      <style>{`
         .alumni-card {
           width: 100%;
           max-width: 280px;
