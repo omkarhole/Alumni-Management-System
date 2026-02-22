@@ -10,6 +10,7 @@ const userRouter=require('./user.routes.js');
 const dashboardRouter=require('./dashboard.routes.js');
 const alumniRouter=require('./alumni.routes.js');
 const newsRouter=require('./news.routes.js');
+const skillRouter=require('./skill.routes.js');
 
 const router=express.Router();
 
@@ -26,6 +27,7 @@ router.use('/gallery', galleryRouter);
 router.use('/alumni', alumniRouter);
 router.use('/settings', settingsRouter);
 router.use('/news', newsRouter);
+router.use('/skills', skillRouter);
 
 
 module.exports=router;
