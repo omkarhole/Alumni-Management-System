@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
   FaUsers,
   FaUserCheck,
@@ -7,13 +8,16 @@ import {
   FaFilter,
   FaThumbsUp,
 } from "react-icons/fa";
+import { FaMessage } from "react-icons/fa6";
 import { ToastContainer, toast } from "react-toastify";
 import defaultavatar from "../assets/uploads/defaultavatar.jpg";
 import { baseUrl, skillsUrl } from "../utils/globalurl";
 import SmartSearchBar from "./SmartSearchBar";
 import SmartFilterDropdown from "./SmartFilterDropdown";
+import { useAuth } from "../AuthContext";
 
 const AlumniList = () => {
+  const { isLoggedIn } = useAuth();
   const [alumniList, setAlumniList] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -411,7 +415,7 @@ const AlumniList = () => {
                               )}
                             </div>
                           </div>
-                        )}
+)}
                       </div>
                     </div>
                   </div>

@@ -7,7 +7,8 @@ import { useAuth } from '../AuthContext';
 import { useTheme } from '../ThemeContext';
 import axios from 'axios';
 import { Fade as Hamburger } from 'hamburger-react'
-import { authUrl } from '../utils/globalurl';
+import { authUrl, messagesUrl } from '../utils/globalurl';
+import { FaMessage } from "react-icons/fa6";
 
 const Header = () => {
 
@@ -16,8 +17,9 @@ const Header = () => {
     const { theme, toggleTheme } = useTheme();
     const { logout, isLoggedIn, isAdmin, isStudent } = useAuth();
 
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [name, setName] = useState();
+    const [unreadMessages, setUnreadMessages] = useState(0);
     const navRef = useRef(null);
 
     const toggleMenu = () => {
@@ -29,10 +31,28 @@ const Header = () => {
         return location.pathname === path ? 'headnavactive' : '';
     };
 
-    useEffect(() => {
+useEffect(() => {
         const user_name = localStorage.getItem("user_name");
         setName(user_name);
-    }, [location.state]);
+        
+        // Fetch unread message count if logged in
+        if (isLoggedIn) {
+            fetchUnreadCount();
+        }
+    }, [location.state, isLoggedIn]);
+
+    const fetchUnreadCount = async () => {
+        try {
+            const response = await axios.get(`${messagesUrl}/messages/unread-count`, {
+                withCredentials: true
+            });
+            if (response.data?.unreadCount) {
+                setUnreadMessages(response.data.unreadCount);
+            }
+        } catch (error) {
+            console.log('Error fetching unread count:', error);
+        }
+    };
 
     // useEffect(() => {
     //     const handleClickOutside = (event) => {
@@ -77,7 +97,22 @@ const Header = () => {
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/gallery")}`} to="/gallery">Gallery</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/jobs")}`} to="/jobs">Jobs</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/job-recommendations")}`} to="/job-recommendations">Job Recommendations</Link></li>
-                            <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/mentorship")}`} to="/mentorship">Mentorship</Link></li>
+<li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/mentorship")}`} to="/mentorship">Mentorship</Link></li>
+                            {isLoggedIn && (
+                                <li className="nav-item">
+                                    <Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/messages")}`} to="/messages">
+                                        <span className="d-flex align-items-center gap-1">
+                                            <FaMessage />
+                                            Messages
+                                            {unreadMessages > 0 && (
+                                                <span className="badge bg-danger rounded-pill ms-1">
+                                                    {unreadMessages > 99 ? '99+' : unreadMessages}
+                                                </span>
+                                            )}
+                                        </span>
+                                    </Link>
+                                </li>
+                            )}
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/forums")}`} to="/forums">Forums</Link></li>
 
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/news")}`} to="/news">News</Link></li>

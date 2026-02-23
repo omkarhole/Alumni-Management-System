@@ -9,6 +9,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import Home from "./components/Home";
 import AlumniList from "./components/AlumniList";
 import Gallery from "./components/Gallery";
+import Messages from "./components/Messages";
+import DirectChat from "./components/DirectChat";
 import Careers from "./components/Careers";
 import Forum from "./components/Forum";
 import About from "./components/About";
@@ -96,7 +98,25 @@ function AppRouter() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/achievements" element={<Achievements />} />
+<Route path="/achievements" element={<Achievements />} />
+
+        {/* Direct Messages */}
+        <Route
+          path="/messages"
+          element={
+            <PrivateRoute allow={["alumnus", "student", "admin"]}>
+              <Messages />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/messages/:userId"
+          element={
+            <PrivateRoute allow={["alumnus", "student", "admin"]}>
+              <DirectChat />
+            </PrivateRoute>
+          }
+        />
 
         {/* Admin Dashboard */}
         <Route
