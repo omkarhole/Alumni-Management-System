@@ -19,6 +19,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import MyAccount from "./components/MyAccount";
 import NotFound from "./components/NotFound";
+import Achievements from "./components/Achievements";
 
 // Admin
 import Dashboard from "./admin/Dashboard";
@@ -83,7 +84,7 @@ function AppRouter() {
       {!hideLayout && <Header />}
 
       <Routes>
-        {/* Public Routes */}
+{/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/alumni" element={<AlumniList />} />
         <Route path="/gallery" element={<Gallery />} />
@@ -95,6 +96,7 @@ function AppRouter() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/achievements" element={<Achievements />} />
 
         {/* Admin Dashboard */}
         <Route
