@@ -1,8 +1,11 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { ThemeProvider } from "./ThemeContext";
 import ScrollToTop from "./components/ScrollToTop";
+import SmoothWheelScroll from "./components/SmoothWheelScroll";
 import PrivateRoute from "./components/PrivateRoute";
 
 // Pages
@@ -12,16 +15,20 @@ import Gallery from "./components/Gallery";
 import Messages from "./components/Messages";
 import DirectChat from "./components/DirectChat";
 import Careers from "./components/Careers";
+import Mentorship from "./components/Mentorship";
 import Forum from "./components/Forum";
+import ViewTopic from "./components/view/View_Forum";
+import News from "./components/News";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import TermsOfService from "./components/TermsOfService";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import OAuthCompleteSignup from "./components/OAuthCompleteSignup";
 import MyAccount from "./components/MyAccount";
 import NotFound from "./components/NotFound";
-import Achievements from "./components/Achievements";
+import ViewEvent from "./components/view/View_Event";
 
 // Admin
 import Dashboard from "./admin/Dashboard";
@@ -57,6 +64,7 @@ import StudentsApplications from "./students/StudentsApplications";
 // Layout
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import JobRecommendations from "./components/JobRecommendations";
 
 function App() {
   return (
@@ -64,6 +72,7 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <ScrollToTop />
+          <SmoothWheelScroll />
           <AppRouter />
         </AuthProvider>
       </ThemeProvider>
@@ -84,6 +93,12 @@ function AppRouter() {
   return (
     <>
       {!hideLayout && <Header />}
+      <ToastContainer
+        position="top-center"
+        hideProgressBar
+        pauseOnHover={false}
+        pauseOnFocusLoss={false}
+      />
 
       <Routes>
 {/* Public Routes */}
@@ -91,32 +106,18 @@ function AppRouter() {
         <Route path="/alumni" element={<AlumniList />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/jobs" element={<Careers />} />
+        <Route path="/mentorship" element={<Mentorship />} />
         <Route path="/forums" element={<Forum />} />
+        <Route path="/forum/view" element={<ViewTopic />} />
+        <Route path="/news" element={<News />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-<Route path="/achievements" element={<Achievements />} />
-
-        {/* Direct Messages */}
-        <Route
-          path="/messages"
-          element={
-            <PrivateRoute allow={["alumnus", "student", "admin"]}>
-              <Messages />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/messages/:userId"
-          element={
-            <PrivateRoute allow={["alumnus", "student", "admin"]}>
-              <DirectChat />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/oauth/complete-signup" element={<OAuthCompleteSignup />} />
+        <Route path="/events/view" element={<ViewEvent />} />
 
         {/* Admin Dashboard */}
         <Route
@@ -168,6 +169,15 @@ function AppRouter() {
           element={
             <PrivateRoute allow={["alumnus", "student"]}>
               <MyAccount />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/job-recommendations"
+          element={
+            <PrivateRoute allow={["admin", "alumnus", "student"]}>
+              <JobRecommendations />
             </PrivateRoute>
           }
         />

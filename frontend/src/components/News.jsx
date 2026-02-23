@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { FaNewspaper, FaCalendar, FaUser, FaTag } from 'react-icons/fa';
 import { useTheme } from '../ThemeContext';
 import { baseUrl } from '../utils/globalurl';
@@ -71,8 +71,7 @@ const News = () => {
 
     return (
         <div className={`page-section bg-${theme}`} id="news">
-            <ToastContainer hideProgressBar="true" position="top-center" pauseOnHover="false" pauseOnFocusLoss="false" />
-            <div className="container">
+<div className="container">
                 <div className="text-center mb-5">
                     <h2 className="section-heading text-uppercase">News & Announcements</h2>
                     <h3 className="section-subheading text-muted">Stay updated with the latest from our alumni community</h3>
@@ -179,3 +178,4 @@ const News = () => {
 };
 
 export default News;
+

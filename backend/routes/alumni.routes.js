@@ -1,5 +1,4 @@
 const express=require('express');
-const multer=require('multer');
 
 const {avatarUpload}=require('../utils/file-upload');
 const { authenticate, isAdmin } = require('../middlewares/auth.middleware');
