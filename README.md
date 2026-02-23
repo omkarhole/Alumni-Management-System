@@ -130,6 +130,7 @@ Alumni-Management-System/
 │   │   └── config.js          # Database configuration
 │   ├── 📂 controllers/        # Route controllers
 │   │   ├── auth.controller.js
+│   │   ├── oauth.controller.js
 │   │   ├── user.controller.js
 │   │   ├── alumni.controller.js
 │   │   ├── event.controller.js
@@ -242,10 +243,21 @@ JWT_EXPIRE=7d
 # Frontend URL (for CORS)
 FRONTEND_URL=http://localhost:5173
 
+# Optional: Cloud image storage (avatars + gallery)
+# If these are not set, uploads are stored locally under backend/public
+# CLOUDINARY_CLOUD_NAME=your-cloud-name
+# CLOUDINARY_API_KEY=your-api-key
+# CLOUDINARY_API_SECRET=your-api-secret
+# CLOUDINARY_FOLDER=alumni-management-system
+
 # Optional: Email Configuration (for future email features)
 # EMAIL_SERVICE=gmail
 # EMAIL_USER=your-email@gmail.com
 # EMAIL_PASS=your-app-password
+
+# Optional: Google Oauth
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
 ```
 
 **Important:** Replace `your_super_secret_jwt_key_change_this_in_production` with a strong, random string for JWT signing.

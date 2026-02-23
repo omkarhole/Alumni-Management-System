@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { toast } from 'react-toastify';
+import defaultavatar from '../assets/uploads/defaultavatar.jpg';
+import { toPublicUrl } from '../utils/globalurl';
 import { 
   Users, 
   Search, 
@@ -274,7 +276,7 @@ const Mentorship = () => {
                   <div className="p-6">
                     <div className="flex items-start gap-4 mb-4">
                       <img
-                        src={mentor.user?.alumnus_bio?.avatar ? `${API_URL}/${mentor.user.alumnus_bio.avatar}` : '/default-avatar.jpg'}
+                        src={toPublicUrl(mentor.user?.alumnus_bio?.avatar) || defaultavatar}
                         alt={mentor.user?.name}
                         className="w-16 h-16 rounded-full object-cover"
                       />

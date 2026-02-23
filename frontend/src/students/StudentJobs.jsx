@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import axios from 'axios';
 import { baseUrl } from '../utils/globalurl';
 import { FaBriefcase, FaMapMarkerAlt, FaUser } from 'react-icons/fa';
@@ -57,9 +57,7 @@ const StudentJobs = () => {
 
   return (
     <div className="container-fluid mt-4">
-      <ToastContainer position="top-center" />
-
-      <div className="row">
+<div className="row">
         <div className="col-lg-12">
           <h3 className="mb-4">
             <FaBriefcase className="me-2" />
