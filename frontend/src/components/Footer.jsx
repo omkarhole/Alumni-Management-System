@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React from 'react';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaLinkedin, FaTwitter, FaFacebook, FaInstagram } from 'react-icons/fa';
 import { useTheme } from '../ThemeContext';
@@ -7,211 +8,189 @@ import logo from "../assets/uploads/logo.png";
 
 const Footer = () => {
   const { theme } = useTheme();
-
   const isDark = theme === 'dark';
-  const textColor = isDark ? 'text-white' : 'text-dark';
-  const mutedTextColor = isDark ? 'text-gray-400' : 'text-muted';
-  const bgColor = isDark ? 'bg-dark' : 'bg-light';
-  const borderColor = isDark ? 'border-secondary' : 'border-gray-300';
-  const iconColor = isDark ? '#6c757d' : '#6c757d';
-  const linkHoverColor = isDark ? 'text-white' : 'text-primary';
-
+  
   const currentYear = new Date().getFullYear();
 
   const quickLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Alumni', path: '/alumni' },
-    { name: 'Gallery', path: '/gallery' },
-    { name: 'Jobs', path: '/jobs' },
-    { name: 'Forums', path: '/forums' },
-    { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
-{ name: 'Terms of Service', path: '/terms' },
-    { name: 'Privacy Policy', path: '/privacy' },
+    { name: 'Alumni Directory', path: '/alumni' },
+    { name: 'Photo Gallery', path: '/gallery' },
+    { name: 'Career Opportunities', path: '/jobs' },
+    { name: 'Community Forums', path: '/forums' },
+    { name: 'About Us', path: '/about' },
+    { name: 'Terms Of Service', path: '/terms'}
   ];
 
+  // Logic to split links into two columns
+  const half = Math.ceil(quickLinks.length / 2);
+  const leftColLinks = quickLinks.slice(0, half);
+  const rightColLinks = quickLinks.slice(half);
+
   const socialLinks = [
-    { icon: FaLinkedin, href: '#', label: 'LinkedIn' },
-    { icon: FaTwitter, href: '#', label: 'Twitter' },
-    { icon: FaFacebook, href: '#', label: 'Facebook' },
-    { icon: FaInstagram, href: '#', label: 'Instagram' },
+    { icon: FaLinkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
+    { icon: FaTwitter, href: 'https://twitter.com', label: 'Twitter' },
+    { icon: FaFacebook, href: 'https://facebook.com', label: 'Facebook' },
+    { icon: FaInstagram, href: 'https://instagram.com', label: 'Instagram' },
+  ];
+
+  const contactInfo = [
+    { 
+      icon: <FaPhone />, 
+      title: 'Phone', 
+      value: '(+91) 888-585-8585', 
+      link: 'tel:+918885858585' 
+    },
+    { 
+      icon: <FaEnvelope />, 
+      title: 'Email', 
+      value: 'contact@paranox.edu', 
+      link: 'mailto:contact@paranox.edu' 
+    },
+    { 
+      icon: <FaMapMarkerAlt />, 
+      title: 'Address', 
+      value: '123 University Ave, Tech City, TC 12345', 
+      link: '#' 
+    },
   ];
 
   return (
-    <footer className={`${bgColor} ${textColor} pt-5 pb-3`} style={{ borderTop: '1px solid rgba(0,0,0,0.1)' }}>
+    <footer className={`pt-5 pb-3 ${isDark ? 'bg-dark text-white' : 'bg-light text-dark'}`} 
+            style={{ borderTop: isDark ? '1px solid #343a40' : '1px solid #dee2e6' }}>
+      
+      <style>
+        {`
+          .footer-link {
+            transition: all 0.3s ease;
+            color: ${isDark ? '#adb5bd' : '#6c757d'} !important;
+          }
+          .footer-link:hover {
+            color: #03b3ff !important;
+            padding-left: 5px;
+            text-decoration: none;
+          }
+          .social-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'};
+            transition: all 0.3s ease;
+            color: ${isDark ? '#adb5bd' : '#6c757d'};
+          }
+          .social-icon:hover {
+            background: #007bff;
+            color: white !important;
+            transform: translateY(-3px);
+          }
+          .contact-circle {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            background: ${isDark ? 'rgba(3, 179, 255, 0.1)' : 'rgba(0, 123, 255, 0.1)'};
+            color: #007bff;
+          }
+        `}
+      </style>
+
       <div className="container">
-        {/* Main Footer Content */}
-        <div className="row mb-4">
-          {/* About Section */}
-          <div className="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
+        <div className="row gy-4">
+          {/* Brand Section */}
+          <div className="col-lg-4 col-md-12">
             <div className="d-flex align-items-center mb-3">
-              <img src={logo} alt="Logo" style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '12px' }} />
-              <h5 className="mb-0 font-weight-bold">CS PARANOX</h5>
+              <img src={logo} alt="CS Paranox Logo" className="rounded-circle me-3" style={{ width: '45px', height: '45px' }} />
+              <h5 className="mb-0 fw-bold letter-spacing-1">CS PARANOX</h5>
             </div>
-            <p className={`${mutedTextColor} mb-3`} style={{ fontSize: '0.95rem', lineHeight: '1.6' }}>
-              Connecting alumni, students, and faculty through a unified platform. 
-              Share experiences, find opportunities, and stay connected with your academic community.
+            <p className="small lh-lg mb-4 opacity-75" style={{ maxWidth: '350px' }}>
+              Empowering the academic community by bridging the gap between alumni, students, and faculty through a unified digital network.
             </p>
-            {/* Social Media Icons */}
-            <div className="d-flex gap-2">
-              {socialLinks.map((social, index) => (
-                <a
-                  key={index}
-                  href={social.href}
-                  className={`${mutedTextColor} ${linkHoverColor} transition-all`}
-                  style={{ 
-                    fontSize: '1.25rem', 
-                    marginRight: '12px',
-                    transition: 'color 0.3s ease, transform 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-3px)';
-                    e.currentTarget.style.color = isDark ? '#fff' : '#007bff';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.color = iconColor;
-                  }}
-                  aria-label={social.label}
-                >
-                  <social.icon />
+            <div className="d-flex gap-2 mb-4">
+              {socialLinks.map((social, idx) => (
+                <a key={idx} href={social.href} target="_blank" rel="noopener noreferrer" className="social-icon" aria-label={social.label}>
+                  <social.icon size={18} />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Quick Links Section */}
-          <div className="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
-            <h5 className="mb-3 font-weight-bold">Quick Links</h5>
-            <ul className="list-unstyled mb-0">
-              {quickLinks.map((link, index) => (
-                <li key={index} className="mb-2">
-                  <Link 
-                    to={link.path} 
-                    className={`${mutedTextColor} ${linkHoverColor} text-decoration-none`}
-                    style={{ 
-                      fontSize: '0.95rem',
-                      transition: 'color 0.3s ease, padding-left 0.3s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.paddingLeft = '5px';
-                      e.currentTarget.style.color = isDark ? '#fff' : '#007bff';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.paddingLeft = '0';
-                      e.currentTarget.style.color = isDark ? '#adb5bd' : '#6c757d';
-                    }}
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Quick Links Section - Now Split into 2 columns */}
+          <div className="col-lg-4 col-md-6">
+            <h6 className="fw-bold mb-4 text-uppercase small">Quick Navigation</h6>
+            <div className="row">
+              <div className="col-6">
+                <ul className="list-unstyled">
+                  {leftColLinks.map((link, idx) => (
+                    <li key={idx} className="mb-2">
+                      <Link to={link.path} className="footer-link small d-inline-block text-decoration-none">
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="col-6">
+                <ul className="list-unstyled">
+                  {rightColLinks.map((link, idx) => (
+                    <li key={idx} className="mb-2">
+                      <Link to={link.path} className="footer-link small d-inline-block text-decoration-none">
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
 
-          {/* Contact Section */}
-          <div className="col-12 col-md-12 col-lg-4">
-            <h5 className="mb-3 font-weight-bold">Contact Us</h5>
+          {/* Contact Details */}
+          <div className="col-lg-4 col-md-6">
+            <h6 className="fw-bold mb-4 text-uppercase small">Get In Touch</h6>
             <div className="d-flex flex-column gap-3">
-              {/* Phone */}
-              <div className="d-flex align-items-start">
-                <div 
-                  className="d-flex align-items-center justify-content-center rounded-circle mr-3"
-                  style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,123,255,0.1)',
-                    minWidth: '40px',
-                    marginRight: '12px'
-                  }}
-                >
-                  <FaPhone style={{ color: '#007bff', fontSize: '1rem' }} />
+              {contactInfo.map((info, idx) => (
+                <div key={idx} className="d-flex align-items-center">
+                  <div className="contact-circle rounded-circle d-flex align-items-center justify-content-center me-3">
+                    {info.icon}
+                  </div>
+                  <div>
+                    <p className="small fw-bold mb-0">{info.title}</p>
+                    {info.link !== '#' ? (
+                      <a href={info.link} className="small text-decoration-none opacity-75 hover-opacity-100 transition-all text-reset">
+                        {info.value}
+                      </a>
+                    ) : (
+                      <span className="small opacity-75">{info.value}</span>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <h6 className={`mb-1 ${textColor}`} style={{ fontSize: '0.9rem', fontWeight: '600' }}>Phone</h6>
-                  <a 
-                    href="tel:+918885858585" 
-                    className={`${mutedTextColor} text-decoration-none`}
-                    style={{ fontSize: '0.95rem' }}
-                  >
-                    (+91) 888-585-8585
-                  </a>
-                </div>
-              </div>
-
-              {/* Email */}
-              <div className="d-flex align-items-start">
-                <div 
-                  className="d-flex align-items-center justify-content-center rounded-circle mr-3"
-                  style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,123,255,0.1)',
-                    minWidth: '40px',
-                    marginRight: '12px'
-                  }}
-                >
-                  <FaEnvelope style={{ color: '#007bff', fontSize: '1rem' }} />
-                </div>
-                <div>
-                  <h6 className={`mb-1 ${textColor}`} style={{ fontSize: '0.9rem', fontWeight: '600' }}>Email</h6>
-                  <a 
-                    href="mailto:contact@paranox.edu" 
-                    className={`${mutedTextColor} text-decoration-none`}
-                    style={{ fontSize: '0.95rem' }}
-                  >
-                    contact@paranox.edu
-                  </a>
-                </div>
-              </div>
-
-              {/* Address */}
-              <div className="d-flex align-items-start">
-                <div 
-                  className="d-flex align-items-center justify-content-center rounded-circle mr-3"
-                  style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,123,255,0.1)',
-                    minWidth: '40px',
-                    marginRight: '12px'
-                  }}
-                >
-                  <FaMapMarkerAlt style={{ color: '#007bff', fontSize: '1rem' }} />
-                </div>
-                <div>
-                  <h6 className={`mb-1 ${textColor}`} style={{ fontSize: '0.9rem', fontWeight: '600' }}>Address</h6>
-                  <span className={`${mutedTextColor}`} style={{ fontSize: '0.95rem' }}>
-                    India
-                  </span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <hr className={`my-4 ${borderColor}`} style={{ opacity: 0.3 }} />
-
-        {/* Copyright Section */}
+        {/* Bottom Bar */}
+        <hr className="mt-5 mb-4 opacity-10" />
+        
         <div className="row align-items-center">
-          <div className="col-12 col-md-6 text-center text-md-left mb-2 mb-md-0">
-            <p className={`${mutedTextColor} mb-0`} style={{ fontSize: '0.875rem' }}>
-              Copyright © {currentYear} CS PARANOX. All rights reserved.
+          <div className="col-md-6 text-center text-md-start">
+            <p className="small opacity-50 mb-md-0">
+              © {currentYear} <span className="fw-bold">CS PARANOX</span>. All rights reserved.
             </p>
           </div>
-          <div className="col-12 col-md-6 text-center text-md-right">
-            <p className={`${mutedTextColor} mb-0`} style={{ fontSize: '0.875rem' }}>
-              Developed with {'</>'} by{' '}
+          <div className="col-md-6 text-center text-md-end">
+            <p className="small opacity-50 mb-0">
+              Crafted with <span className="text-danger">❤</span> by{' '}
               <a
                 href=""
                 target="_blank"
                 rel="noreferrer"
-                className="text-decoration-none font-weight-bold"
+                className="text-decoration-none fw-bold"
                 style={{ color: '#03b3ff' }}
               >
                 PARANOX
-                <GoVerified style={{ fontSize: '12px', marginLeft: '2px', color: '#03b3ff' }} />
+                <GoVerified className="ms-1" style={{ fontSize: '12px' }} />
               </a>
             </p>
           </div>

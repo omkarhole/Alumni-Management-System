@@ -1,32 +1,31 @@
-const multer=require('multer');
-const path=require('path');
+const multer = require('multer');
 
-const avatarUpload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      // __dirname isn't available in ESM, so build from process.cwd()
-      cb(null, path.join(process.cwd(), 'public', 'avatars'));
-    },
-    filename: (req, file, cb) => {
-      cb(
-        null,
-        file.fieldname +
-          '_' +
-          Date.now() +
-          path.extname(file.originalname)
-      );
-    },
-  }),
-}); 
+const allowedImageTypes = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+]);
 
+const imageFileFilter = (req, file, cb) => {
+  if (!allowedImageTypes.has(file.mimetype)) {
+    const error = new Error('Only image files (jpeg, png, webp, gif, svg) are allowed');
+    error.status = 400;
+    return cb(error);
+  }
+  return cb(null, true);
+};
 
-const galleryUpload = multer({
-  storage: multer.diskStorage({
-destination: (req, file, cb) => {
-      cb(null, path.join(process.cwd(), 'public', 'images'));
-    },    filename:   (req, file, cb) => cb(null, file.originalname)
-  })
-});
+const commonUploadConfig = {
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 8 * 1024 * 1024, // 8MB
+  },
+  fileFilter: imageFileFilter,
+};
 
+const avatarUpload = multer(commonUploadConfig);
+const galleryUpload = multer(commonUploadConfig);
 
 module.exports = { avatarUpload, galleryUpload };

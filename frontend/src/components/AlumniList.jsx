@@ -11,7 +11,7 @@ import {
 import { FaMessage } from "react-icons/fa6";
 import { ToastContainer, toast } from "react-toastify";
 import defaultavatar from "../assets/uploads/defaultavatar.jpg";
-import { baseUrl, skillsUrl } from "../utils/globalurl";
+import { baseUrl, toPublicUrl } from "../utils/globalurl";
 import SmartSearchBar from "./SmartSearchBar";
 import SmartFilterDropdown from "./SmartFilterDropdown";
 import { useAuth } from "../AuthContext";
@@ -324,25 +324,19 @@ const AlumniList = () => {
         <div className="container">
           {filteredAlumni.length > 0 ? (
             <div className="row justify-content-center g-5">
-              {filteredAlumni.slice(0, 8).map((a, index) => {
-                const endorsements = getSkillEndorsements(a._id);
-                return (
-                  <div
-                    className="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center"
-                    key={a._id || a.id || index}
-                  >
-                    <div className="card alumni-card border-0 shadow-sm">
-                      <div className="text-center pt-4">
-                        <img
-                          src={
-                            a.alumnus_bio?.avatar
-                              ? `${baseUrl}/${a.alumnus_bio.avatar}`
-                              : defaultavatar
-                          }
-                          alt="avatar"
-                          className="alumni-avatar"
-                        />
-                      </div>
+              {filteredAlumni.slice(0, 8).map((a, index) => (
+                <div
+                  className="col-12 col-sm-6 col-md-6 col-lg-3 d-flex justify-content-center"
+                  key={a._id || a.id || index}
+                >
+                  <div className="card alumni-card border-0 shadow-sm">
+                    <div className="text-center pt-4">
+                      <img
+                        src={toPublicUrl(a.alumnus_bio?.avatar) || defaultavatar}
+                        alt="avatar"
+                        className="alumni-avatar"
+                      />
+                    </div>
 
                       <div className="card-body text-center">
                         <h6 className="fw-semibold mb-2">{a.name || "Unnamed Alumni"}</h6>
@@ -419,8 +413,8 @@ const AlumniList = () => {
                       </div>
                     </div>
                   </div>
-                );
-              })}
+                ),
+              )})
             </div>
           ) : (
             <div className="text-center py-5">
@@ -431,7 +425,7 @@ const AlumniList = () => {
       </div>
 
       {/* ================= STYLING ================= */}
-      <style jsx>{`
+      <style>{`
         .alumni-card {
           width: 100%;
           max-width: 280px;
@@ -471,9 +465,7 @@ const AlumniList = () => {
         .alumni-hero {
           height: 60vh;
           min-height: 400px;
-          background:
-            linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
-            url("/your-background-image.jpg");
+          background: linear-gradient(135deg, #0b2a47 0%, #174b7f 52%, #1f65a9 100%);
           background-size: cover;
           background-position: center;
           display: flex;

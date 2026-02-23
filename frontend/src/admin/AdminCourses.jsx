@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { baseUrl } from '../utils/globalurl';
 
 const AdminCourses = () => {
@@ -87,8 +87,7 @@ const AdminCourses = () => {
 
   return (
     <div className="container-fluid">
-      <ToastContainer position="top-center" />
-      <div className="col-lg-12">
+<div className="col-lg-12">
         <div className="row">
           <div className="col-md-4">
             <form >
@@ -176,3 +175,4 @@ const AdminCourses = () => {
 }
 
 export default AdminCourses;
+

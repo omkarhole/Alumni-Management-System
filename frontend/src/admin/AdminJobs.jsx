@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaPlus } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 import ViewJobs from './view/ViewJobs';
 import { baseUrl } from '../utils/globalurl';
@@ -52,9 +52,7 @@ const AdminJobs = () => {
     }
     return (
         <>
-            <ToastContainer position="top-center" />
-
-            <div className="container-fluid">
+<div className="container-fluid">
                 <div className="col-lg-12">
                     <div className="row mb-4 mt-4">
                         <div className="col-md-12"></div>
@@ -118,3 +116,4 @@ const AdminJobs = () => {
 }
 
 export default AdminJobs;
+
