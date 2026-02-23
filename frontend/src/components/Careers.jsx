@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useMemo, useState } from 'react'
-import { FaBuilding, FaMapMarker, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaBuilding, FaMapMarker, FaPlus, FaSearch, FaStar, FaThumbsUp, FaUserPlus } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import ViewJobs from '../admin/view/ViewJobs';
 import ManageJobs from '../admin/save/ManageJobs';
@@ -45,11 +45,10 @@ const Careers = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [handleAdd, setHandleAdd] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [, setRecommendations] = useState([]);
     const [locationFilter, setLocationFilter] = useState('all');
     const [modeFilter, setModeFilter] = useState('all');
     const [sortBy, setSortBy] = useState('recent');
-const [referralJob, setReferralJob] = useState(null);
+    const [referralJob, setReferralJob] = useState(null);
     const [referralSuccess, setReferralSuccess] = useState(false);
     const [activeTab, setActiveTab] = useState('all');
     const [recommendations, setRecommendations] = useState([]);
