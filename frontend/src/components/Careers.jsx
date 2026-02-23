@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState, useMemo } from 'react'
-import { FaBuilding, FaMapMarker, FaPlus, FaSearch, FaUserPlus } from 'react-icons/fa';
+import { FaBuilding, FaMapMarker, FaPlus, FaSearch, FaUserPlus, FaStar, FaThumbsUp } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import ViewJobs from '../admin/view/ViewJobs';
 import ManageJobs from '../admin/save/ManageJobs';
@@ -47,8 +47,11 @@ const Careers = () => {
     const [locationFilter, setLocationFilter] = useState('all');
     const [modeFilter, setModeFilter] = useState('all');
     const [sortBy, setSortBy] = useState('recent');
-    const [referralJob, setReferralJob] = useState(null);
+const [referralJob, setReferralJob] = useState(null);
     const [referralSuccess, setReferralSuccess] = useState(false);
+    const [activeTab, setActiveTab] = useState('all');
+    const [recommendations, setRecommendations] = useState([]);
+    const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
     const openModal = (job) => {
         setSelectedJob(job);
@@ -110,14 +113,16 @@ const Careers = () => {
         };
     }, [isLoggedIn]);
 
-    // Fetch recommendations for logged in users
+// Fetch recommendations for logged in users
     useEffect(() => {
         if (isLoggedIn) {
+            setLoadingRecommendations(true);
             axios.get(`${baseUrl}/jobs/recommendations`, { withCredentials: true })
                 .then((res) => {
-                    setRecommendations(res.data.slice(0, 3)); // Show top 3 recommendations
+                    setRecommendations(res.data);
                 })
-                .catch((err) => console.log('Error fetching recommendations:', err));
+                .catch((err) => console.log('Error fetching recommendations:', err))
+                .finally(() => setLoadingRecommendations(false));
         }
     }, [isLoggedIn]);
 
@@ -261,7 +266,7 @@ const Careers = () => {
                         </div>
                     </div>
                 </div>
-            ) : handleAdd ?
+) : handleAdd ?
                 (<>
                     <div className="container mt-5  pt-2">
 
@@ -273,6 +278,41 @@ const Careers = () => {
                                     </div></div></div></div></div>
                 </>) : (<>
                     <div className="container-fluid mt-3 pt-2 jobs-list-shell">
+                        {/* Tabs for All Jobs vs Recommended */}
+                        <div className="card mb-4">
+                            <div className="card-body">
+                                <ul className="nav nav-tabs mb-3">
+                                    <li className="nav-item">
+                                        <button 
+                                            className={`nav-link ${activeTab === 'all' ? 'active' : ''}`}
+                                            onClick={() => setActiveTab('all')}
+                                        >
+                                            All Jobs
+                                        </button>
+                                    </li>
+                                    <li className="nav-item">
+                                        <button 
+                                            className={`nav-link ${activeTab === 'recommended' ? 'active' : ''}`}
+                                            onClick={() => setActiveTab('recommended')}
+                                        >
+                                            <FaStar className="me-1" />
+                                            Recommended for You
+                                            {recommendations.length > 0 && (
+                                                <span className="badge bg-warning text-dark ms-2">{recommendations.length}</span>
+                                            )}
+                                        </button>
+                                    </li>
+                                </ul>
+                                
+                                {activeTab === 'recommended' && (
+                                    <div className="alert alert-info mb-0">
+                                        <FaThumbsUp className="me-2" />
+                                        Jobs are ranked based on: Skills match (50%), Job Type (20%), Location (20%), Experience Level (10%)
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        
                         <div className="card mb-4 jobs-filter-card">
                             <div className="card-body">
                                 <SmartSearchBar
