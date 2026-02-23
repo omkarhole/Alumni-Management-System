@@ -63,6 +63,7 @@ import StudentsApplications from "./students/StudentsApplications";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import JobRecommendations from "./components/JobRecommendations";
+import Chatbot from "./components/Chatbot";
 
 function App() {
   return (
@@ -185,6 +186,7 @@ function AppRouter() {
       </Routes>
 
       {!hideLayout && <Footer />}
+      <Chatbot />
     </>
   );
 }
