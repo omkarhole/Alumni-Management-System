@@ -320,6 +320,9 @@ header.masthead>.container {
     .jobs-list-shell .jobs-filter-card,
     .jobs-list-shell .job-list {
         width: min(92vw, 1120px) !important;
+    }
+}
+
 .smart-search {
     width: 100%;
 }
