@@ -99,7 +99,7 @@ function AppRouter() {
       />
 
       <Routes>
-        {/* Public Routes */}
+{/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/alumni" element={<AlumniList />} />
         <Route path="/gallery" element={<Gallery />} />
