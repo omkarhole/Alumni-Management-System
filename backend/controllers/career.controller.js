@@ -1,4 +1,4 @@
-const {Career, User, JobSubscription, JobReferral}=require('../models/Index');
+const {Career, User, JobSubscription, JobPreference, JobReferral}=require('../models/Index');
 const sendEmail = require('../utils/mailer');
 
 
@@ -22,6 +22,83 @@ function calculateSkillMatch(userSkills, jobSkills) {
   
   // Calculate percentage based on job skills matched
   return Math.round((matchCount / normalizedJobSkills.length) * 100);
+}
+
+/**
+ * Calculate job match score using weighted algorithm:
+ * - Skills: 50%
+ * - Job Type: 20%
+ * - Location Preference: 20%
+ * - Experience Level: 10%
+ * 
+ * @param {Object} preferences - User's job preferences
+ * @param {Object} job - Job posting to score
+ * @returns {Object} - Match score details
+ */
+function calculateJobMatchScore(preferences, job) {
+  const userSkills = preferences?.preferredSkills || [];
+  const preferredJobTypes = preferences?.preferredJobTypes || [];
+  const preferredLocations = preferences?.preferredLocations || [];
+  const preferredExperienceLevels = preferences?.preferredExperienceLevels || [];
+  
+  // 1. Skills Match (50%)
+  let skillsScore = 0;
+  let matchedSkills = [];
+  if (userSkills.length > 0 && job.skills && job.skills.length > 0) {
+    const normalizedUserSkills = userSkills.map(s => s.toLowerCase().trim());
+    const normalizedJobSkills = job.skills.map(s => s.toLowerCase().trim());
+    
+    let matchCount = 0;
+    normalizedJobSkills.forEach(jobSkill => {
+      if (normalizedUserSkills.some(userSkill => 
+        userSkill.includes(jobSkill) || jobSkill.includes(userSkill)
+      )) {
+        matchCount++;
+        matchedSkills.push(jobSkill);
+      }
+    });
+    skillsScore = Math.round((matchCount / normalizedJobSkills.length) * 100);
+  }
+  
+  // 2. Job Type Match (20%)
+  let jobTypeScore = 0;
+  if (preferredJobTypes.length > 0 && job.job_type) {
+    jobTypeScore = preferredJobTypes.includes(job.job_type) ? 100 : 0;
+  }
+  
+  // 3. Location Match (20%)
+  let locationScore = 0;
+  if (preferredLocations.length > 0 && job.location) {
+    const jobLocation = job.location.toLowerCase();
+    // Check if any preferred location is in the job location
+    const locationMatch = preferredLocations.some(prefLoc => 
+      jobLocation.includes(prefLoc.toLowerCase()) || prefLoc.toLowerCase().includes(jobLocation)
+    );
+    locationScore = locationMatch ? 100 : 0;
+  }
+  
+  // 4. Experience Level Match (10%)
+  let experienceScore = 0;
+  if (preferredExperienceLevels.length > 0 && job.experience_level) {
+    experienceScore = preferredExperienceLevels.includes(job.experience_level) ? 100 : 0;
+  }
+  
+  // Calculate weighted total score
+  const totalScore = Math.round(
+    (skillsScore * 0.5) + 
+    (jobTypeScore * 0.2) + 
+    (locationScore * 0.2) + 
+    (experienceScore * 0.1)
+  );
+  
+  return {
+    totalScore,
+    skillsScore,
+    jobTypeScore,
+    locationScore,
+    experienceScore,
+    matchedSkills
+  };
 }
 
 // print all careers
@@ -211,7 +288,7 @@ async function getMyApplications(req, res, next) {
     }
 }
 
-// Get job recommendations based on user skills and preferences
+// Get job recommendations based on user skills and preferences using weighted algorithm
 async function getJobRecommendations(req, res, next) {
     try {
         const userId = req.user.id;
@@ -228,46 +305,60 @@ async function getJobRecommendations(req, res, next) {
             userSkills = user.alumnus_bio.skills;
         }
         
-        // Get user's subscription preferences
-        const subscription = await JobSubscription.findOne({ user: userId, isActive: true });
+        // Try to get JobPreference first, then fall back to JobSubscription
+        let preferences = await JobPreference.findOne({ user: userId });
         
-        // Build query for matching jobs
-        const query = {};
-        
-        if (subscription) {
-            // If user has subscription, use their preferences
-            if (subscription.preferredSkills && subscription.preferredSkills.length > 0) {
-                query.skills = { $in: subscription.preferredSkills };
+        if (!preferences) {
+            // Fall back to subscription preferences if no JobPreference exists
+            const subscription = await JobSubscription.findOne({ user: userId, isActive: true });
+            if (subscription) {
+                preferences = {
+                    preferredSkills: subscription.preferredSkills || userSkills,
+                    preferredJobTypes: subscription.preferredJobTypes || ['full-time', 'part-time'],
+                    preferredLocations: subscription.preferredLocations || [],
+                    preferredExperienceLevels: subscription.preferredExperienceLevels || ['entry', 'mid', 'senior']
+                };
+            } else {
+                // Use user's profile skills as default
+                preferences = {
+                    preferredSkills: userSkills,
+                    preferredJobTypes: ['full-time', 'part-time'],
+                    preferredLocations: [],
+                    preferredExperienceLevels: ['entry', 'mid', 'senior']
+                };
             }
-            if (subscription.preferredJobTypes && subscription.preferredJobTypes.length > 0) {
-                query.job_type = { $in: subscription.preferredJobTypes };
-            }
-            if (subscription.preferredExperienceLevels && subscription.preferredExperienceLevels.length > 0) {
-                query.experience_level = { $in: subscription.preferredExperienceLevels };
-            }
-        } else if (userSkills.length > 0) {
-            // If no subscription, use user's skills for matching
-            query.skills = { $in: userSkills };
         }
         
-        // Get all matching jobs
-        const jobs = await Career.find(query)
+        // Build query for matching jobs (use preferences to filter)
+        const query = {};
+        
+        if (preferences.preferredSkills && preferences.preferredSkills.length > 0) {
+            query.skills = { $in: preferences.preferredSkills };
+        }
+        if (preferences.preferredJobTypes && preferences.preferredJobTypes.length > 0) {
+            query.job_type = { $in: preferences.preferredJobTypes };
+        }
+        if (preferences.preferredExperienceLevels && preferences.preferredExperienceLevels.length > 0) {
+            query.experience_level = { $in: preferences.preferredExperienceLevels };
+        }
+        
+        // Get all matching jobs (or all jobs if no specific filters)
+        const jobs = await Career.find(Object.keys(query).length > 0 ? query : {})
             .populate('user', 'name')
             .sort({ createdAt: -1 })
-            .limit(50);
+            .limit(100);
         
-        // Calculate match percentage for each job
+        // Calculate match score using weighted algorithm for each job
         const recommendations = jobs.map(job => {
-            const matchPercentage = calculateSkillMatch(userSkills, job.skills);
+            const matchScore = calculateJobMatchScore(preferences, job);
             return {
                 ...job.toObject(),
-                matchPercentage,
-                matchedSkills: job.skills.filter(skill => 
-                    userSkills.some(userSkill => 
-                        userSkill.toLowerCase().includes(skill.toLowerCase()) || 
-                        skill.toLowerCase().includes(userSkill.toLowerCase())
-                    )
-                )
+                matchPercentage: matchScore.totalScore,
+                skillsScore: matchScore.skillsScore,
+                jobTypeScore: matchScore.jobTypeScore,
+                locationScore: matchScore.locationScore,
+                experienceScore: matchScore.experienceScore,
+                matchedSkills: matchScore.matchedSkills
             };
         });
         
