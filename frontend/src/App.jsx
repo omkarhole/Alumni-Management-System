@@ -12,6 +12,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import Home from "./components/Home";
 import AlumniList from "./components/AlumniList";
 import Gallery from "./components/Gallery";
+import Messages from "./components/Messages";
+import DirectChat from "./components/DirectChat";
 import Careers from "./components/Careers";
 import Mentorship from "./components/Mentorship";
 import Forum from "./components/Forum";

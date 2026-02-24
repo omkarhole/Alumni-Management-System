@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser');
 const errorHandler = require('./middlewares/error.middleware');
 const { authenticate } = require('./middlewares/auth.middleware');
 const contactRouter = require('./routes/contact.routes'); // contact routes
+const directMessageRouter = require('./routes/directMessage.routes');
 
 dotenv.config();
 const app = express();
@@ -93,6 +94,7 @@ app.use('/api/oauth', oauthRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/student', authenticate, studentRouter);
 app.use('/api/contact', contactRouter);
+app.use('/api/dm', directMessageRouter);
 
 /* =========================
    TEST ROUTE
