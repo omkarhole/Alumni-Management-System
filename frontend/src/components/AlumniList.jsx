@@ -11,7 +11,7 @@ import {
 import { FaMessage } from "react-icons/fa6";
 import { ToastContainer, toast } from "react-toastify";
 import defaultavatar from "../assets/uploads/defaultavatar.jpg";
-import { baseUrl, toPublicUrl } from "../utils/globalurl";
+import { baseUrl, toPublicUrl, skillsUrl } from "../utils/globalurl";
 import SmartSearchBar from "./SmartSearchBar";
 import SmartFilterDropdown from "./SmartFilterDropdown";
 import { useAuth } from "../AuthContext";

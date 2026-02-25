@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { baseUrl } from '../utils/globalurl';
+import { baseUrl, skillsUrl } from '../utils/globalurl';
 import { useAuth } from '../AuthContext';
 const MyAccount = () => {
     const { isAlumnus } = useAuth();
