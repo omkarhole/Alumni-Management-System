@@ -25,6 +25,7 @@ import TermsOfService from "./components/TermsOfService";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import ForgotPassword from "./components/ForgotPassword";
 import OAuthCompleteSignup from "./components/OAuthCompleteSignup";
 import MyAccount from "./components/MyAccount";
 import NotFound from "./components/NotFound";
@@ -102,7 +103,7 @@ function AppRouter() {
       />
 
       <Routes>
-{/* Public Routes */}
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/alumni" element={<AlumniList />} />
         <Route path="/gallery" element={<Gallery />} />
@@ -117,6 +118,7 @@ function AppRouter() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/oauth/complete-signup" element={<OAuthCompleteSignup />} />
         <Route path="/events/view" element={<ViewEvent />} />
 
