@@ -1,27 +1,11 @@
 const {Career, User, JobSubscription, JobPreference, JobReferral}=require('../models/Index');
 const sendEmail = require('../utils/mailer');
+const { calculateSkillsMatchPercentage } = require('../utils/skillMatcher');
 
 
-// Helper function to calculate skill match percentage
+// Helper function to calculate skill match percentage (uses shared utility)
 function calculateSkillMatch(userSkills, jobSkills) {
-  if (!userSkills || userSkills.length === 0 || !jobSkills || jobSkills.length === 0) {
-    return 0;
-  }
-  
-  const normalizedUserSkills = userSkills.map(s => s.toLowerCase().trim());
-  const normalizedJobSkills = jobSkills.map(s => s.toLowerCase().trim());
-  
-  let matchCount = 0;
-  normalizedJobSkills.forEach(jobSkill => {
-    if (normalizedUserSkills.some(userSkill => 
-      userSkill.includes(jobSkill) || jobSkill.includes(userSkill)
-    )) {
-      matchCount++;
-    }
-  });
-  
-  // Calculate percentage based on job skills matched
-  return Math.round((matchCount / normalizedJobSkills.length) * 100);
+  return calculateSkillsMatchPercentage(userSkills, jobSkills);
 }
 
 /**
@@ -41,23 +25,24 @@ function calculateJobMatchScore(preferences, job) {
   const preferredLocations = preferences?.preferredLocations || [];
   const preferredExperienceLevels = preferences?.preferredExperienceLevels || [];
   
-  // 1. Skills Match (50%)
+// 1. Skills Match (50%)
   let skillsScore = 0;
   let matchedSkills = [];
   if (userSkills.length > 0 && job.skills && job.skills.length > 0) {
+    // Get matched skills for tracking
     const normalizedUserSkills = userSkills.map(s => s.toLowerCase().trim());
     const normalizedJobSkills = job.skills.map(s => s.toLowerCase().trim());
     
-    let matchCount = 0;
     normalizedJobSkills.forEach(jobSkill => {
       if (normalizedUserSkills.some(userSkill => 
         userSkill.includes(jobSkill) || jobSkill.includes(userSkill)
       )) {
-        matchCount++;
         matchedSkills.push(jobSkill);
       }
     });
-    skillsScore = Math.round((matchCount / normalizedJobSkills.length) * 100);
+    
+    // Use the shared utility for calculating the score
+    skillsScore = calculateSkillsMatchPercentage(userSkills, job.skills);
   }
   
   // 2. Job Type Match (20%)
