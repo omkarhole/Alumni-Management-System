@@ -8,63 +8,25 @@ import ScrollToTop from "./components/ScrollToTop";
 import SmoothWheelScroll from "./components/SmoothWheelScroll";
 import PrivateRoute from "./components/PrivateRoute";
 
-// Pages
-import Home from "./components/Home";
-import AlumniList from "./components/AlumniList";
-import Gallery from "./components/Gallery";
-import Messages from "./components/Messages";
-import DirectChat from "./components/DirectChat";
-import Careers from "./components/Careers";
-import Mentorship from "./components/Mentorship";
-import Forum from "./components/Forum";
-import ViewTopic from "./components/view/View_Forum";
-import News from "./components/News";
-import About from "./components/About";
-import Contact from "./components/Contact";
-import TermsOfService from "./components/TermsOfService";
-import PrivacyPolicy from "./components/PrivacyPolicy";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
-import OAuthCompleteSignup from "./components/OAuthCompleteSignup";
-import MyAccount from "./components/MyAccount";
-import NotFound from "./components/NotFound";
-import ViewEvent from "./components/view/View_Event";
+// Route Group Components
+import PublicRoutes from "./components/routes/PublicRoutes";
+import AdminRoutes from "./components/routes/AdminRoutes";
+import StudentRoutes from "./components/routes/StudentRoutes";
 
-// Admin
+// Dashboard Layouts
 import Dashboard from "./admin/Dashboard";
-import AdminHome from "./admin/AdminHome";
-import AdminCourses from "./admin/AdminCourses";
-import AdminUsers from "./admin/AdminUsers";
-import AdminGallery from "./admin/AdminGallery";
-import AdminSettings from "./admin/AdminSettings";
-import AdminEvents from "./admin/AdminEvents";
-import AdminForum from "./admin/AdminForum";
-import AdminAlumni from "./admin/AdminAlumni";
-import AdminJobs from "./admin/AdminJobs";
-import AdminJobApplications from "./admin/AdminJobApplications";
-import AdminNews from "./admin/AdminNews";
-import AdminMentorship from "./admin/AdminMentorship";
-import AdminReferrals from "./admin/AdminReferrals";
-
-import ManageJobs from "./admin/save/ManageJobs";
-import ManageEvents from "./admin/save/ManageEvents";
-import ManageForum from "./admin/save/ManageForum";
-import ManageUser from "./admin/save/ManageUser";
-import ViewAlumni from "./admin/view/ViewAlumni";
-
-// Students
 import StudentDashboard from "./students/StudentDashboard";
-import StudentHome from "./students/StudentHome";
-import StudentJobs from "./students/StudentJobs";
-import StudentEvents from "./students/StudentEvents";
-import StudentForum from "./students/StudentForum";
-import StudentProfile from "./students/StudentProfile";
-import StudentsApplications from "./students/StudentsApplications";
 
-// Layout
+// Layout Components
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+
+// Private Route Components
+import MyAccount from "./components/MyAccount";
 import JobRecommendations from "./components/JobRecommendations";
+
+// Not Found
+import NotFound from "./components/NotFound";
 
 function App() {
   return (
@@ -101,25 +63,10 @@ function AppRouter() {
       />
 
       <Routes>
-{/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/alumni" element={<AlumniList />} />
-        <Route path="/gallery" element={<Gallery />} />
-        <Route path="/jobs" element={<Careers />} />
-        <Route path="/mentorship" element={<Mentorship />} />
-        <Route path="/forums" element={<Forum />} />
-        <Route path="/forum/view" element={<ViewTopic />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/terms" element={<TermsOfService />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/oauth/complete-signup" element={<OAuthCompleteSignup />} />
-        <Route path="/events/view" element={<ViewEvent />} />
+        {/* Public Routes */}
+        <Route path="/*" element={<PublicRoutes />} />
 
-        {/* Admin Dashboard */}
+        {/* Admin Dashboard with Nested Routes */}
         <Route
           path="/dashboard"
           element={
@@ -128,25 +75,10 @@ function AppRouter() {
             </PrivateRoute>
           }
         >
-          <Route index element={<AdminHome />} />
-          <Route path="courses" element={<AdminCourses />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="gallery" element={<AdminGallery />} />
-          <Route path="settings" element={<AdminSettings />} />
-          <Route path="events" element={<AdminEvents />} />
-          <Route path="forum" element={<AdminForum />} />
-          <Route path="alumnilist" element={<AdminAlumni />} />
-          <Route path="jobs" element={<AdminJobs />} />
-          <Route path="job-applications" element={<AdminJobApplications />} />
-          <Route path="referrals" element={<AdminReferrals />} />
-          <Route path="jobs/manage" element={<ManageJobs />} />
-          <Route path="events/manage" element={<ManageEvents />} />
-          <Route path="forum/manage" element={<ManageForum />} />
-          <Route path="users/manage" element={<ManageUser />} />
-          <Route path="alumni/view" element={<ViewAlumni />} />
+          <Route path="*" element={<AdminRoutes />} />
         </Route>
 
-        {/* Student Dashboard */}
+        {/* Student Dashboard with Nested Routes */}
         <Route
           path="/student-dashboard"
           element={
@@ -155,12 +87,7 @@ function AppRouter() {
             </PrivateRoute>
           }
         >
-          <Route index element={<StudentHome />} />
-          <Route path="jobs" element={<StudentJobs />} />
-          <Route path="applications" element={<StudentsApplications />} />
-          <Route path="events" element={<StudentEvents />} />
-          <Route path="forum" element={<StudentForum />} />
-          <Route path="profile" element={<StudentProfile />} />
+          <Route path="*" element={<StudentRoutes />} />
         </Route>
 
         {/* Account (Student + Alumnus) */}
