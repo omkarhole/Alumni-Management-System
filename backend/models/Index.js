@@ -14,6 +14,7 @@ const MentorshipSession = require('./MentorshipSession.model');
 const MentorshipMessage = require('./MentorshipMessage.model');
 const JobReferral = require('./JobReferral.model');
 const JobSubscription = require('./JobSubscription.model');
+const Otp = require('./Otp.model');
 
 module.exports = {
   User,
@@ -30,5 +31,6 @@ module.exports = {
   MentorshipSession,
   MentorshipMessage,
   JobReferral,
-  JobSubscription
+  JobSubscription,
+  Otp
 };
