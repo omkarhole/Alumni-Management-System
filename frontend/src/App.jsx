@@ -8,10 +8,28 @@ import ScrollToTop from "./components/ScrollToTop";
 import SmoothWheelScroll from "./components/SmoothWheelScroll";
 import PrivateRoute from "./components/PrivateRoute";
 
-// Route Group Components
-import PublicRoutes from "./components/routes/PublicRoutes";
-import AdminRoutes from "./components/routes/AdminRoutes";
-import StudentRoutes from "./components/routes/StudentRoutes";
+// Pages
+import Home from "./components/Home";
+import AlumniList from "./components/AlumniList";
+import Gallery from "./components/Gallery";
+import Messages from "./components/Messages";
+import DirectChat from "./components/DirectChat";
+import Careers from "./components/Careers";
+import Mentorship from "./components/Mentorship";
+import Forum from "./components/Forum";
+import ViewTopic from "./components/view/View_Forum";
+import News from "./components/News";
+import About from "./components/About";
+import Contact from "./components/Contact";
+import TermsOfService from "./components/TermsOfService";
+import PrivacyPolicy from "./components/PrivacyPolicy";
+import Login from "./components/Login";
+import Signup from "./components/Signup";
+import ForgotPassword from "./components/ForgotPassword";
+import OAuthCompleteSignup from "./components/OAuthCompleteSignup";
+import MyAccount from "./components/MyAccount";
+import NotFound from "./components/NotFound";
+import ViewEvent from "./components/view/View_Event";
 
 // Dashboard Layouts
 import Dashboard from "./admin/Dashboard";
@@ -24,8 +42,7 @@ import Footer from "./components/Footer";
 // Private Route Components
 import MyAccount from "./components/MyAccount";
 import JobRecommendations from "./components/JobRecommendations";
-import RegisterBusiness from "./components/RegisterBusiness";
-import MyBusiness from "./components/MyBusiness";
+import Chatbot from "./components/Chatbot";
 
 // Not Found
 import NotFound from "./components/NotFound";
@@ -66,9 +83,25 @@ function AppRouter() {
 
       <Routes>
         {/* Public Routes */}
-        <Route path="/*" element={<PublicRoutes />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/alumni" element={<AlumniList />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/jobs" element={<Careers />} />
+        <Route path="/mentorship" element={<Mentorship />} />
+        <Route path="/forums" element={<Forum />} />
+        <Route path="/forum/view" element={<ViewTopic />} />
+        <Route path="/news" element={<News />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/oauth/complete-signup" element={<OAuthCompleteSignup />} />
+        <Route path="/events/view" element={<ViewEvent />} />
 
-        {/* Admin Dashboard with Nested Routes */}
+        {/* Admin Dashboard */}
         <Route
           path="/dashboard"
           element={
@@ -136,6 +169,7 @@ function AppRouter() {
       </Routes>
 
       {!hideLayout && <Footer />}
+      <Chatbot />
     </>
   );
 }

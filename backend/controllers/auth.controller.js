@@ -1,7 +1,8 @@
 const bycrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const { User } = require('../models/Index');
+const { User, Otp } = require('../models/Index');
+const sendEmail = require('../utils/mailer');
 
 const isProd = process.env.NODE_ENV === 'production';
 const cookieOptions = {
@@ -25,7 +26,7 @@ async function login(req, res, next) {
         }
         const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1d' });
         res.cookie('token', token, cookieOptions);
-        
+
         // response object for admin
         const response = {
             loginStatus: true,
@@ -155,5 +156,77 @@ function logout(req, res) {
     res.json({ message: 'Logout Successful' });
 }
 
+// Request password reset (Forgot Password)
+async function requestPasswordReset(req, res, next) {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
 
-module.exports = { login, signup, logout, session };
+        if (!user) {
+            return res.json({ success: false, message: 'User with this email does not exist' });
+        }
+
+        // Generate a 6 digit OTP
+        const otpGenerator = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Save OTP to the database, first delete any existing OTP for this user to avoid conflicts
+        await Otp.deleteMany({ email });
+        await Otp.create({ email, otp: otpGenerator });
+
+        // Send OTP via email
+        const html = `
+            <h2>Password Reset</h2>
+            <p>Your OTP for password reset is: <strong>${otpGenerator}</strong></p>
+            <p>This OTP is valid for 5 minutes. Please do not share this with anyone.</p>
+        `;
+        await sendEmail(email, "Password Reset OTP", html);
+
+        return res.json({ success: true, message: 'OTP sent successfully to your email' });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Verify OTP
+async function verifyOtp(req, res, next) {
+    try {
+        const { email, otp } = req.body;
+
+        const existingOtp = await Otp.findOne({ email, otp });
+        if (!existingOtp) {
+            return res.json({ success: false, message: 'Invalid or expired OTP' });
+        }
+
+        return res.json({ success: true, message: 'OTP verified successfully' });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Reset Password
+async function resetPassword(req, res, next) {
+    try {
+        const { email, otp, newPassword } = req.body;
+
+        // Final verification of OTP
+        const existingOtp = await Otp.findOne({ email, otp });
+        if (!existingOtp) {
+            return res.json({ success: false, message: 'Invalid or expired OTP' });
+        }
+
+        // Hash new password
+        const hashedPassword = await bycrypt.hash(newPassword, 10);
+
+        // Update user password
+        await User.findOneAndUpdate({ email }, { password: hashedPassword });
+
+        // Delete the used OTP
+        await Otp.deleteMany({ email });
+
+        return res.json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { login, signup, logout, session, requestPasswordReset, verifyOtp, resetPassword };
