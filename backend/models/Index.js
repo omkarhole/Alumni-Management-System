@@ -15,6 +15,8 @@ const MentorshipMessage = require('./MentorshipMessage.model');
 const JobReferral = require('./JobReferral.model');
 const JobSubscription = require('./JobSubscription.model');
 const JobInteraction = require('./JobInteraction.model');
+const Business = require('./Business.model');
+const BusinessReview = require('./BusinessReview.model');
 
 module.exports = {
   User,
@@ -32,5 +34,7 @@ module.exports = {
   MentorshipMessage,
   JobReferral,
   JobSubscription,
-  JobInteraction
+  JobInteraction,
+  Business,
+  BusinessReview
 };

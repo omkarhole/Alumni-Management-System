@@ -24,6 +24,8 @@ import Footer from "./components/Footer";
 // Private Route Components
 import MyAccount from "./components/MyAccount";
 import JobRecommendations from "./components/JobRecommendations";
+import RegisterBusiness from "./components/RegisterBusiness";
+import MyBusiness from "./components/MyBusiness";
 
 // Not Found
 import NotFound from "./components/NotFound";
@@ -105,6 +107,26 @@ function AppRouter() {
           element={
             <PrivateRoute allow={["admin", "alumnus", "student"]}>
               <JobRecommendations />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Register Business (Alumnus only) */}
+        <Route
+          path="/register-business"
+          element={
+            <PrivateRoute allow={["alumnus"]}>
+              <RegisterBusiness />
+            </PrivateRoute>
+          }
+        />
+
+        {/* My Business (Alumnus only) */}
+        <Route
+          path="/my-business"
+          element={
+            <PrivateRoute allow={["alumnus"]}>
+              <MyBusiness />
             </PrivateRoute>
           }
         />
