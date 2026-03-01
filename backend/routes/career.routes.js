@@ -18,7 +18,13 @@ const {
     getAllReferrals,
     getJobReferrals,
     updateReferralStatus,
-    deleteReferral
+    deleteReferral,
+    // trackJobInteraction,
+    // getSimilarAlumniCareerPaths,
+    // getSkillGapAnalysis,
+    // getEnhancedJobRecommendations,
+    // submitRecommendationFeedback,
+    // getRecommendationAnalytics
 }=require('../controllers/career.controller');
 
 const { authenticate, canPostJobs, isStudent, isAdmin } = require('../middlewares/auth.middleware');
@@ -62,5 +68,13 @@ router.put('/referrals/:id/status', authenticate, updateReferralStatus);
 
 // Delete a referral
 router.delete('/referrals/:id', authenticate, deleteReferral);
+
+// AI-Powered Job Recommendation Routes (commented out for testing)
+// router.post('/interactions', authenticate, trackJobInteraction);
+// router.get('/similar-alumni', authenticate, getSimilarAlumniCareerPaths);
+// router.get('/:jobId/skill-gap', authenticate, getSkillGapAnalysis);
+// router.get('/recommendations/enhanced', authenticate, getEnhancedJobRecommendations);
+// router.post('/recommendations/feedback', authenticate, submitRecommendationFeedback);
+// router.get('/analytics', authenticate, getRecommendationAnalytics);
 
 module.exports=router;
