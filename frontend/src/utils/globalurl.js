@@ -47,3 +47,6 @@ export const achievementsUrl = `${apiUrl}/api/admin/achievements`;
 
 // Direct Messages API endpoint
 export const messagesUrl = `${apiUrl}/api/dm`;
+
+// Business API endpoint
+export const businessUrl = `${apiUrl}/api/business`;

@@ -144,6 +144,26 @@ function AppRouter() {
           }
         />
 
+        {/* Register Business (Alumnus only) */}
+        <Route
+          path="/register-business"
+          element={
+            <PrivateRoute allow={["alumnus"]}>
+              <RegisterBusiness />
+            </PrivateRoute>
+          }
+        />
+
+        {/* My Business (Alumnus only) */}
+        <Route
+          path="/my-business"
+          element={
+            <PrivateRoute allow={["alumnus"]}>
+              <MyBusiness />
+            </PrivateRoute>
+          }
+        />
+
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>

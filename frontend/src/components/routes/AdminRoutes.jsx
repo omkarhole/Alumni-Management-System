@@ -15,6 +15,7 @@ import AdminJobApplications from '../../admin/AdminJobApplications';
 import AdminNews from '../../admin/AdminNews';
 import AdminMentorship from '../../admin/AdminMentorship';
 import AdminReferrals from '../../admin/AdminReferrals';
+import AdminBusinesses from '../../admin/AdminBusinesses';
 import ManageJobs from '../../admin/save/ManageJobs';
 import ManageEvents from '../../admin/save/ManageEvents';
 import ManageForum from '../../admin/save/ManageForum';
@@ -36,6 +37,7 @@ const componentMap = {
   AdminNews,
   AdminMentorship,
   AdminReferrals,
+  AdminBusinesses,
   ManageJobs,
   ManageEvents,
   ManageForum,
@@ -60,6 +62,7 @@ const AdminRoutes = () => {
     { path: "jobs", component: "AdminJobs" },
     { path: "job-applications", component: "AdminJobApplications" },
     { path: "referrals", component: "AdminReferrals" },
+    { path: "businesses", component: "AdminBusinesses" },
     { path: "jobs/manage", component: "ManageJobs" },
     { path: "events/manage", component: "ManageEvents" },
     { path: "forum/manage", component: "ManageForum" },

@@ -22,6 +22,8 @@ export const publicRoutes = [
   { path: "/signup", component: "Signup", exact: true },
   { path: "/oauth/complete-signup", component: "OAuthCompleteSignup", exact: true },
   { path: "/events/view", component: "ViewEvent", exact: true },
+  { path: "/businesses", component: "BusinessDirectory", exact: true },
+  { path: "/business/:businessId", component: "BusinessDetails", exact: true },
 ];
 
 // Admin Routes - nested under /dashboard
@@ -37,6 +39,7 @@ export const adminRoutes = [
   { path: "jobs", component: "AdminJobs" },
   { path: "job-applications", component: "AdminJobApplications" },
   { path: "referrals", component: "AdminReferrals" },
+  { path: "businesses", component: "AdminBusinesses" },
   { path: "jobs/manage", component: "ManageJobs" },
   { path: "events/manage", component: "ManageEvents" },
   { path: "forum/manage", component: "ManageForum" },
@@ -66,6 +69,16 @@ export const privateRoutes = [
     component: "JobRecommendations", 
     roles: ["admin", "alumnus", "student"] 
   },
+  { 
+    path: "/register-business", 
+    component: "RegisterBusiness", 
+    roles: ["alumnus"] 
+  },
+  { 
+    path: "/my-business", 
+    component: "MyBusiness", 
+    roles: ["alumnus"] 
+  },
 ];
 
 // Route Groups for easy import
@@ -73,5 +86,5 @@ export const routeGroups = {
   public: publicRoutes,
   admin: adminRoutes,
   student: studentRoutes,
-  private: privateRoutes,
+  private: privateRoutes
 };
