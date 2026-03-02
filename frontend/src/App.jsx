@@ -40,12 +40,16 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 // Private Route Components
-import MyAccount from "./components/MyAccount";
 import JobRecommendations from "./components/JobRecommendations";
 import Chatbot from "./components/Chatbot";
 
+// Missing Imports
+import RegisterBusiness from "./components/RegisterBusiness";
+import MyBusiness from "./components/MyBusiness";
+import AdminRoutes from "./components/routes/AdminRoutes";
+import StudentRoutes from "./components/routes/StudentRoutes";
+
 // Not Found
-import NotFound from "./components/NotFound";
 
 function App() {
   return (

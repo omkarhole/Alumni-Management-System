@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import {  studentUrl } from '../utils/globalurl';
+import { studentUrl } from '../utils/globalurl';
 import { FaUser, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
 const StudentProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -37,7 +37,7 @@ const StudentProfile = () => {
           enrollment_year: res.data.student_bio?.enrollment_year || '',
           current_year: res.data.student_bio?.current_year || '',
           roll_number: res.data.student_bio?.roll_number || '',
-          course: res.data.student_bio?.course?.id || ''
+          course: res.data.student_bio?.course?._id || res.data.student_bio?.course || ''
         }
       });
       setLoading(false);
@@ -99,7 +99,7 @@ const StudentProfile = () => {
         enrollment_year: profile.student_bio?.enrollment_year || '',
         current_year: profile.student_bio?.current_year || '',
         roll_number: profile.student_bio?.roll_number || '',
-        course: profile.student_bio?.course?.id || ''
+        course: profile.student_bio?.course?._id || profile.student_bio?.course || ''
       }
     });
   };
@@ -110,7 +110,7 @@ const StudentProfile = () => {
 
   return (
     <div className="container-fluid mt-4">
-<div className="row">
+      <div className="row">
         <div className="col-lg-12">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h3>
