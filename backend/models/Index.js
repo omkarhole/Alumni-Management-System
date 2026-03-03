@@ -17,6 +17,9 @@ const JobSubscription = require('./JobSubscription.model');
 const JobInteraction = require('./JobInteraction.model');
 const Business = require('./Business.model');
 const BusinessReview = require('./BusinessReview.model');
+const Badge = require('./Badge.model');
+const UserBadge = require('./UserBadge.model');
+const VerificationRequest = require('./VerificationRequest.model');
 
 module.exports = {
   User,
@@ -36,5 +39,8 @@ module.exports = {
   JobSubscription,
   JobInteraction,
   Business,
-  BusinessReview
+  BusinessReview,
+  Badge,
+  UserBadge,
+  VerificationRequest
 };
