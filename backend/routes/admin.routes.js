@@ -13,6 +13,7 @@ const newsRouter=require('./news.routes.js');
 const skillRouter=require('./skill.routes.js');
 const achievementRouter=require('./achievement.routes.js');
 const businessRouter=require('./business.routes.js');
+const badgeRouter=require('./badge.routes.js');
 
 const router=express.Router();
 
@@ -32,6 +33,7 @@ router.use('/news', newsRouter);
 router.use('/skills', skillRouter);
 router.use('/achievements', achievementRouter);
 router.use('/businesses', businessRouter);
+router.use('/badges', badgeRouter);
 
 
 module.exports=router;

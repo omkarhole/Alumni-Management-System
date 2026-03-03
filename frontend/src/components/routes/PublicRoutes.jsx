@@ -20,6 +20,9 @@ import OAuthCompleteSignup from '../OAuthCompleteSignup';
 import ViewEvent from '../view/View_Event';
 import BusinessDirectory from '../BusinessDirectory';
 import BusinessDetails from '../BusinessDetails';
+import VerificationRequest from '../VerificationRequest';
+import Leaderboard from '../Leaderboard';
+
 
 // Component mapping
 const componentMap = {
@@ -41,6 +44,8 @@ const componentMap = {
   ViewEvent,
   BusinessDirectory,
   BusinessDetails,
+  VerificationRequest,
+  Leaderboard,
 };
 
 /**
@@ -67,6 +72,8 @@ const PublicRoutes = () => {
     { path: "/events/view", component: "ViewEvent", exact: true },
     { path: "/businesses", component: "BusinessDirectory", exact: true },
     { path: "/business/:businessId", component: "BusinessDetails", exact: true },
+    { path: "/verification-request", component: "VerificationRequest", exact: true },
+    { path: "/leaderboard", component: "Leaderboard", exact: true },
   ];
 
   return (

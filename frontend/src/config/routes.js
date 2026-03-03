@@ -24,6 +24,8 @@ export const publicRoutes = [
   { path: "/events/view", component: "ViewEvent", exact: true },
   { path: "/businesses", component: "BusinessDirectory", exact: true },
   { path: "/business/:businessId", component: "BusinessDetails", exact: true },
+  { path: "/verification-request", component: "VerificationRequest", exact: true },
+  { path: "/leaderboard", component: "Leaderboard", exact: true },
 ];
 
 // Admin Routes - nested under /dashboard
@@ -40,6 +42,8 @@ export const adminRoutes = [
   { path: "job-applications", component: "AdminJobApplications" },
   { path: "referrals", component: "AdminReferrals" },
   { path: "businesses", component: "AdminBusinesses" },
+  { path: "badges", component: "AdminBadges" },
+  { path: "verifications", component: "AdminVerifications" },
   { path: "jobs/manage", component: "ManageJobs" },
   { path: "events/manage", component: "ManageEvents" },
   { path: "forum/manage", component: "ManageForum" },
