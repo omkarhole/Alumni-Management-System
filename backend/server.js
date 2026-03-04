@@ -101,11 +101,13 @@ app.use('/api/business', businessRouter);
 app.use('/api', badgeRouter);
 
 /* =========================
-   TEST ROUTE
+   DEVELOPMENT TEST ROUTE (remove in production)
  ========================= */
-app.post('/direct-test', (req, res) => {
-    res.send("DIRECT POST WORKING");
-});
+if (process.env.NODE_ENV === 'development') {
+    app.post('/test-route', (req, res) => {
+        res.send("Test endpoint");
+    });
+}
 
 /* =========================
    404 HANDLER
