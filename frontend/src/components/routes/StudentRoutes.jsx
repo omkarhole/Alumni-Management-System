@@ -1,6 +1,9 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+// Import from centralized config
+import { studentRoutes } from '../../config/routes';
+
 // Student Page Components
 import StudentHome from '../../students/StudentHome';
 import StudentJobs from '../../students/StudentJobs';
@@ -22,17 +25,9 @@ const componentMap = {
 /**
  * StudentRoutes Component
  * Renders student dashboard nested routes (for use within StudentDashboard parent via Outlet)
+ * Routes are imported from centralized config/routes.js
  */
 const StudentRoutes = () => {
-  const studentRoutes = [
-    { path: "", component: "StudentHome", index: true },
-    { path: "jobs", component: "StudentJobs" },
-    { path: "applications", component: "StudentsApplications" },
-    { path: "events", component: "StudentEvents" },
-    { path: "forum", component: "StudentForum" },
-    { path: "profile", component: "StudentProfile" },
-  ];
-
   return (
     <Routes>
       {studentRoutes.map((route, index) => {

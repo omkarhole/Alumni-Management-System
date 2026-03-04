@@ -8,6 +8,9 @@ import ScrollToTop from "./components/ScrollToTop";
 import SmoothWheelScroll from "./components/SmoothWheelScroll";
 import PrivateRoute from "./components/PrivateRoute";
 
+// Import from centralized config
+import { privateRoutes } from "./config/routes";
+
 // Route Group Components
 import PublicRoutes from "./components/routes/PublicRoutes";
 import AdminRoutes from "./components/routes/AdminRoutes";
@@ -29,6 +32,14 @@ import MyBusiness from "./components/MyBusiness";
 
 // Not Found
 import NotFound from "./components/NotFound";
+
+// Private routes component mapping
+const privateComponentMap = {
+  MyAccount,
+  JobRecommendations,
+  RegisterBusiness,
+  MyBusiness,
+};
 
 function App() {
   return (
@@ -92,44 +103,21 @@ function AppRouter() {
           <Route path="*" element={<StudentRoutes />} />
         </Route>
 
-        {/* Account (Student + Alumnus) */}
-        <Route
-          path="/account"
-          element={
-            <PrivateRoute allow={["alumnus", "student"]}>
-              <MyAccount />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/job-recommendations"
-          element={
-            <PrivateRoute allow={["admin", "alumnus", "student"]}>
-              <JobRecommendations />
-            </PrivateRoute>
-          }
-        />
-
-        {/* Register Business (Alumnus only) */}
-        <Route
-          path="/register-business"
-          element={
-            <PrivateRoute allow={["alumnus"]}>
-              <RegisterBusiness />
-            </PrivateRoute>
-          }
-        />
-
-        {/* My Business (Alumnus only) */}
-        <Route
-          path="/my-business"
-          element={
-            <PrivateRoute allow={["alumnus"]}>
-              <MyBusiness />
-            </PrivateRoute>
-          }
-        />
+        {/* Private Routes - imported from centralized config */}
+        {privateRoutes.map((route, index) => {
+          const Component = privateComponentMap[route.component];
+          return (
+            <Route
+              key={index}
+              path={route.path}
+              element={
+                <PrivateRoute allow={route.roles}>
+                  <Component />
+                </PrivateRoute>
+              }
+            />
+          );
+        })}
 
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />

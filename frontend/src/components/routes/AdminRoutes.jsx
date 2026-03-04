@@ -1,6 +1,9 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+// Import from centralized config
+import { adminRoutes } from '../../config/routes';
+
 // Admin Page Components
 import AdminHome from '../../admin/AdminHome';
 import AdminCourses from '../../admin/AdminCourses';
@@ -40,6 +43,8 @@ const componentMap = {
   AdminMentorship,
   AdminReferrals,
   AdminBusinesses,
+  AdminBadges,
+  AdminVerifications,
   ManageJobs,
   ManageEvents,
   ManageForum,
@@ -50,28 +55,9 @@ const componentMap = {
 /**
  * AdminRoutes Component
  * Renders admin dashboard nested routes (for use within Dashboard parent via Outlet)
+ * Routes are imported from centralized config/routes.js
  */
 const AdminRoutes = () => {
-  const adminRoutes = [
-    { path: "", component: "AdminHome", index: true },
-    { path: "courses", component: "AdminCourses" },
-    { path: "users", component: "AdminUsers" },
-    { path: "gallery", component: "AdminGallery" },
-    { path: "settings", component: "AdminSettings" },
-    { path: "events", component: "AdminEvents" },
-    { path: "forum", component: "AdminForum" },
-    { path: "alumnilist", component: "AdminAlumni" },
-    { path: "jobs", component: "AdminJobs" },
-    { path: "job-applications", component: "AdminJobApplications" },
-    { path: "referrals", component: "AdminReferrals" },
-    { path: "businesses", component: "AdminBusinesses" },
-    { path: "jobs/manage", component: "ManageJobs" },
-    { path: "events/manage", component: "ManageEvents" },
-    { path: "forum/manage", component: "ManageForum" },
-    { path: "users/manage", component: "ManageUser" },
-    { path: "alumni/view", component: "ViewAlumni" },
-  ];
-
   return (
     <Routes>
       {adminRoutes.map((route, index) => {

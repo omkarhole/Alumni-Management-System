@@ -1,6 +1,9 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 
+// Import from centralized config
+import { publicRoutes } from '../../config/routes';
+
 // Page Components
 import Home from '../Home';
 import AlumniList from '../AlumniList';
@@ -51,31 +54,9 @@ const componentMap = {
 /**
  * PublicRoutes Component
  * Renders all public routes that are accessible to everyone
+ * Routes are imported from centralized config/routes.js
  */
 const PublicRoutes = () => {
-  const publicRoutes = [
-    { path: "/", component: "Home", exact: true },
-    { path: "/alumni", component: "AlumniList", exact: true },
-    { path: "/gallery", component: "Gallery", exact: true },
-    { path: "/jobs", component: "Careers", exact: true },
-    { path: "/mentorship", component: "Mentorship", exact: true },
-    { path: "/forums", component: "Forum", exact: true },
-    { path: "/forum/view", component: "ViewTopic", exact: true },
-    { path: "/news", component: "News", exact: true },
-    { path: "/about", component: "About", exact: true },
-    { path: "/contact", component: "Contact", exact: true },
-    { path: "/terms", component: "TermsOfService", exact: true },
-    { path: "/privacy", component: "PrivacyPolicy", exact: true },
-    { path: "/login", component: "Login", exact: true },
-    { path: "/signup", component: "Signup", exact: true },
-    { path: "/oauth/complete-signup", component: "OAuthCompleteSignup", exact: true },
-    { path: "/events/view", component: "ViewEvent", exact: true },
-    { path: "/businesses", component: "BusinessDirectory", exact: true },
-    { path: "/business/:businessId", component: "BusinessDetails", exact: true },
-    { path: "/verification-request", component: "VerificationRequest", exact: true },
-    { path: "/leaderboard", component: "Leaderboard", exact: true },
-  ];
-
   return (
     <>
       {publicRoutes.map((route, index) => {
