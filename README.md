@@ -18,7 +18,7 @@ A comprehensive web application to manage alumni connections, events, job postin
 - [Contributing](#-contributing)
 - [Troubleshooting](#-troubleshooting)
 - [Contributors](#-contributors)
-
+ 
 ## 📖 About
 
 The Alumni Management System is a full-stack web application designed to help educational institutions maintain strong relationships with their graduates. It bridges the gap between alumni and their alma mater by providing a centralized platform for networking, career development, and community engagement.
