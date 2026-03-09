@@ -1,6 +1,7 @@
 // MongoDB Models Index
 const User = require('./User.model');
 const Course = require('./Course.model');
+const Enrollment = require('./Enrollment.model');
 const Career = require('./Career.model');
 const Event = require('./Event.model');
 const ForumTopic = require('./ForumTopic.model');
@@ -24,6 +25,7 @@ const VerificationRequest = require('./VerificationRequest.model');
 module.exports = {
   User,
   Course,
+  Enrollment,
   Career,
   Event,
   ForumTopic,
