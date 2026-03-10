@@ -42,35 +42,39 @@ const alumnusBioSchema = new mongoose.Schema({
 }, { _id: false });
 
 // Sub-schema for student bio
-const studentBioSchema=new mongoose.Schema({
-  gender:{
-    type:String,
-    enum:['male', 'female', 'other'],
+const studentBioSchema = new mongoose.Schema({
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'other'],
     required: true
   },
-  enrollment_year:{
-    type:Number,
-    required:true
+  enrollment_year: {
+    type: Number,
+    required: true
   },
-  current_year:{
-    type:Number,
+  current_year: {
+    type: Number,
     min: 1,
     max: 6
   },
-  course:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'Course',
-    required:true
+  course: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
+    required: true
   },
-  roll_number:{
-    type:String,
+  roll_number: {
+    type: String,
     trim: true,
     default: undefined
   },
-  //  avatar: {
-  //   type: String,
-  //   default: ''
-  // }
+  avatar: {
+    type: String,
+    default: ''
+  },
+  avatar_public_id: {
+    type: String,
+    default: ''
+  }
 
 })
 
@@ -93,7 +97,7 @@ const userSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['admin', 'alumnus','student'],
+    enum: ['admin', 'alumnus', 'student'],
     default: 'alumnus'
   },
   auto_generated_pass: {

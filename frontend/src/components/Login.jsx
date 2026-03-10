@@ -117,10 +117,15 @@ const Login = () => {
                         </span>
                       </div>
                       <div className="text-danger mt-2">{errors && errors}</div>
-                      <small className="mt-2 text-muted ">
-                        Don't have an account?{" "}
-                        <Link to="/signup">Sign up here</Link>
-                      </small>
+                      <div className="d-flex justify-content-between mt-2">
+                        <small className="text-muted">
+                          <Link to="/forgot-password">Forgot Password?</Link>
+                        </small>
+                        <small className="text-muted">
+                          Don't have an account?{" "}
+                          <Link to="/signup">Sign up here</Link>
+                        </small>
+                      </div>
                     </div>
                     <hr className="divider" />
                     <div className="row justify-content-center">
