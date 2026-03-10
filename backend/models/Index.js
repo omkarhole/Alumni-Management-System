@@ -4,6 +4,7 @@ const Course = require('./Course.model');
 const Enrollment = require('./Enrollment.model');
 const Career = require('./Career.model');
 const Event = require('./Event.model');
+const EventCalendar = require('./EventCalendar.model');
 const ForumTopic = require('./ForumTopic.model');
 const Gallery = require('./Gallery.model');
 const SystemSetting = require('./SystemSetting.model');
@@ -23,6 +24,7 @@ module.exports = {
   Enrollment,
   Career,
   Event,
+  EventCalendar,
   ForumTopic,
   Gallery,
   SystemSetting,
