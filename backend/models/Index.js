@@ -22,6 +22,9 @@ const BusinessReview = require('./BusinessReview.model');
 const Badge = require('./Badge.model');
 const UserBadge = require('./UserBadge.model');
 const VerificationRequest = require('./VerificationRequest.model');
+const Reunion = require('./Reunion.model');
+const ReunionMemory = require('./ReunionMemory.model');
+const ReunionContribution = require('./ReunionContribution.model');
 
 module.exports = {
   User,
@@ -46,5 +49,8 @@ module.exports = {
   BusinessReview,
   Badge,
   UserBadge,
-  VerificationRequest
+  VerificationRequest,
+  Reunion,
+  ReunionMemory,
+  ReunionContribution
 };
