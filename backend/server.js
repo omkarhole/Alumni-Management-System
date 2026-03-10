@@ -14,6 +14,9 @@ const contactRouter = require('./routes/contact.routes'); // contact routes
 const directMessageRouter = require('./routes/directMessage.routes');
 const businessRouter = require('./routes/business.routes');
 const badgeRouter = require('./routes/badge.routes');
+const courseRouter = require('./routes/course.routes');
+const eventCalendarRouter = require('./routes/eventCalendar.routes');
+const reunionRouter = require('./routes/reunion.routes');
 
 dotenv.config();
 const app = express();
@@ -98,6 +101,9 @@ app.use('/api/student', authenticate, studentRouter);
 app.use('/api/contact', contactRouter);
 app.use('/api/dm', directMessageRouter);
 app.use('/api/business', businessRouter);
+app.use('/api/courses', courseRouter);
+app.use('/api/event-calendar', eventCalendarRouter);
+app.use('/api/reunions', reunionRouter);
 app.use('/api', badgeRouter);
 
 /* =========================

@@ -51,6 +51,14 @@ import StudentRoutes from "./components/routes/StudentRoutes";
 
 // Not Found
 
+// Private routes component mapping
+const privateComponentMap = {
+  MyAccount,
+  JobRecommendations,
+  RegisterBusiness,
+  MyBusiness,
+};
+
 function App() {
   return (
     <BrowserRouter>
@@ -129,44 +137,21 @@ function AppRouter() {
           <Route path="*" element={<StudentRoutes />} />
         </Route>
 
-        {/* Account (Student + Alumnus) */}
-        <Route
-          path="/account"
-          element={
-            <PrivateRoute allow={["alumnus", "student"]}>
-              <MyAccount />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/job-recommendations"
-          element={
-            <PrivateRoute allow={["admin", "alumnus", "student"]}>
-              <JobRecommendations />
-            </PrivateRoute>
-          }
-        />
-
-        {/* Register Business (Alumnus only) */}
-        <Route
-          path="/register-business"
-          element={
-            <PrivateRoute allow={["alumnus"]}>
-              <RegisterBusiness />
-            </PrivateRoute>
-          }
-        />
-
-        {/* My Business (Alumnus only) */}
-        <Route
-          path="/my-business"
-          element={
-            <PrivateRoute allow={["alumnus"]}>
-              <MyBusiness />
-            </PrivateRoute>
-          }
-        />
+        {/* Private Routes - imported from centralized config */}
+        {privateRoutes.map((route, index) => {
+          const Component = privateComponentMap[route.component];
+          return (
+            <Route
+              key={index}
+              path={route.path}
+              element={
+                <PrivateRoute allow={route.roles}>
+                  <Component />
+                </PrivateRoute>
+              }
+            />
+          );
+        })}
 
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
