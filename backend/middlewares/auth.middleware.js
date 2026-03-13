@@ -17,56 +17,41 @@ function authenticate(req,res,next){
     }
 };
 
-// Middleware to check if user is admin
-async function isAdmin(req, res, next) {
-    try {
-        const user = await User.findById(req.user.id);
-        if (!user || user.type !== 'admin') {
-            return res.status(403).json({ error: 'Access denied. Admin only.' });
+// Factory that returns a middleware checking the required role(s).
+// The fetched user is cached on req.userData so subsequent middleware in the
+// same request chain never hits the database a second time.
+function checkUserRole(requiredRole) {
+    return async (req, res, next) => {
+        try {
+            if (!req.userData) {
+                const user = await User.findById(req.user.id);
+                if (!user) {
+                    return res.status(404).json({ error: 'User not found' });
+                }
+                req.userData = user;
+            }
+
+            const allowed = Array.isArray(requiredRole)
+                ? requiredRole.includes(req.userData.type)
+                : requiredRole === 'any' || req.userData.type === requiredRole;
+
+            if (!allowed) {
+                const roleLabel = Array.isArray(requiredRole)
+                    ? requiredRole.join(' or ')
+                    : requiredRole;
+                return res.status(403).json({ error: `Access denied. ${roleLabel} only.` });
+            }
+
+            next();
+        } catch (err) {
+            return res.status(500).json({ error: 'Server error' });
         }
-        next();
-    } catch (err) {
-        return res.status(500).json({ error: 'Server error' });
-    }
+    };
 }
 
-// Middleware to check if user is alumnus
-async function isAlumnus(req, res, next) {
-    try {
-        const user = await User.findById(req.user.id);
-        if (!user || user.type !== 'alumnus') {
-            return res.status(403).json({ error: 'Access denied. Alumni only.' });
-        }
-        next();
-    } catch (err) {
-        return res.status(500).json({ error: 'Server error' });
-    }
-}
-
-// Middleware to check if user is student
-async function isStudent(req, res, next) {
-    try {
-        const user = await User.findById(req.user.id);
-        if (!user || user.type !== 'student') {
-            return res.status(403).json({ error: 'Access denied. Students only.' });
-        }
-        next();
-    } catch (err) {
-        return res.status(500).json({ error: 'Server error' });
-    }
-}
-
-// Middleware to check if user can post jobs (admin or alumnus)
-async function canPostJobs(req, res, next) {
-    try {
-        const user = await User.findById(req.user.id);
-        if (!user || (user.type !== 'admin' && user.type !== 'alumnus')) {
-            return res.status(403).json({ error: 'Access denied. Only admin and alumni can post jobs.' });
-        }
-        next();
-    } catch (err) {
-        return res.status(500).json({ error: 'Server error' });
-    }
-}
+const isAdmin = checkUserRole('admin');
+const isAlumnus = checkUserRole('alumnus');
+const isStudent = checkUserRole('student');
+const canPostJobs = checkUserRole(['admin', 'alumnus']);
 
 module.exports = { authenticate, isAdmin, isAlumnus, isStudent, canPostJobs };
