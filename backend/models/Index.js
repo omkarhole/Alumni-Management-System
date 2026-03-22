@@ -16,16 +16,7 @@ const MentorshipSession = require('./MentorshipSession.model');
 const MentorshipMessage = require('./MentorshipMessage.model');
 const JobReferral = require('./JobReferral.model');
 const JobSubscription = require('./JobSubscription.model');
-const JobInteraction = require('./JobInteraction.model');
-const Business = require('./Business.model');
-const BusinessReview = require('./BusinessReview.model');
-const Badge = require('./Badge.model');
-const UserBadge = require('./UserBadge.model');
-const VerificationRequest = require('./VerificationRequest.model');
-const Reunion = require('./Reunion.model');
-const ReunionMemory = require('./ReunionMemory.model');
-const ReunionContribution = require('./ReunionContribution.model');
-const BlacklistedToken = require('./BlacklistedToken.model');
+const Otp = require('./Otp.model');
 
 module.exports = {
   User,
@@ -45,14 +36,5 @@ module.exports = {
   MentorshipMessage,
   JobReferral,
   JobSubscription,
-  JobInteraction,
-  Business,
-  BusinessReview,
-  Badge,
-  UserBadge,
-  VerificationRequest,
-  Reunion,
-  ReunionMemory,
-  ReunionContribution,
-  BlacklistedToken
+  Otp
 };
