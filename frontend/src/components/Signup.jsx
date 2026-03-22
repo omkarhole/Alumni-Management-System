@@ -27,7 +27,6 @@ const Signup = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(values);
     axios
       .post(`${authUrl}/signup`, values)
       .then((res) => {
@@ -43,7 +42,7 @@ const Signup = () => {
           toast.error("An error occurred");
         }
       })
-      .catch((err) => console.log(err));
+      .catch(() => toast.error("Unable to create account right now."));
   };
 
   const handleGoogleAuth = (e) => {
@@ -57,7 +56,7 @@ const Signup = () => {
       .then((res) => {
         setCourses(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch(() => toast.error("Unable to load courses."));
   }, []);
 
   return (

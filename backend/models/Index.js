@@ -25,6 +25,7 @@ const VerificationRequest = require('./VerificationRequest.model');
 const Reunion = require('./Reunion.model');
 const ReunionMemory = require('./ReunionMemory.model');
 const ReunionContribution = require('./ReunionContribution.model');
+const BlacklistedToken = require('./BlacklistedToken.model');
 
 module.exports = {
   User,
@@ -52,5 +53,6 @@ module.exports = {
   VerificationRequest,
   Reunion,
   ReunionMemory,
-  ReunionContribution
+  ReunionContribution,
+  BlacklistedToken
 };

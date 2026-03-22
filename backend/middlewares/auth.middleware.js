@@ -1,13 +1,18 @@
 const jwt=require('jsonwebtoken');
-const { User } = require('../models/Index');
+const { User, BlacklistedToken } = require('../models/Index');
 
-function authenticate(req,res,next){
+async function authenticate(req,res,next){
     const token=req.cookies.token;
     if(!token){
         return res.status(401).json({error:'Unauthorized'});
 
     }
     try{
+        const blockedToken = await BlacklistedToken.findOne({ token }).select('_id');
+        if (blockedToken) {
+            return res.status(401).json({ error: 'Invalid Token' });
+        }
+
         const decoded=jwt.verify(token,process.env.JWT_SECRET);
         req.user=decoded;
         next();
@@ -53,5 +58,6 @@ const isAdmin = checkUserRole('admin');
 const isAlumnus = checkUserRole('alumnus');
 const isStudent = checkUserRole('student');
 const canPostJobs = checkUserRole(['admin', 'alumnus']);
+const protectRoute = authenticate;
 
-module.exports = { authenticate, isAdmin, isAlumnus, isStudent, canPostJobs };
+module.exports = { authenticate, protectRoute, isAdmin, isAlumnus, isStudent, canPostJobs };

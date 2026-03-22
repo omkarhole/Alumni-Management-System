@@ -47,7 +47,7 @@ const Login = () => {
           setErrors(res.data.Error);
         }
       })
-      .catch((err) => console.log(err));
+      .catch(() => setErrors("Unable to login right now. Please try again."));
   };
 
   return (

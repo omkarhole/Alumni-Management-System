@@ -31,9 +31,8 @@ const AdminNews = () => {
 
     const fetchNews = async () => {
         try {
-            const token = localStorage.getItem('token');
             const response = await axios.get(`${baseUrl}/api/admin/news`, {
-                headers: { Authorization: `Bearer ${token}` }
+                withCredentials: true
             });
             setNews(response.data);
         } catch (error) {
@@ -46,9 +45,8 @@ const AdminNews = () => {
 
     const fetchSubscribers = async () => {
         try {
-            const token = localStorage.getItem('token');
             const response = await axios.get(`${baseUrl}/api/admin/news/newsletter/subscribers`, {
-                headers: { Authorization: `Bearer ${token}` }
+                withCredentials: true
             });
             setSubscribers(response.data);
         } catch (error) {
@@ -59,7 +57,6 @@ const AdminNews = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token');
             const userId = localStorage.getItem('user_id');
             
             const payload = {
@@ -69,12 +66,12 @@ const AdminNews = () => {
 
             if (editingNews) {
                 await axios.put(`${baseUrl}/api/admin/news/${editingNews._id}`, payload, {
-                    headers: { Authorization: `Bearer ${token}` }
+                    withCredentials: true
                 });
                 toast.success('News updated successfully');
             } else {
                 await axios.post(`${baseUrl}/api/admin/news`, payload, {
-                    headers: { Authorization: `Bearer ${token}` }
+                    withCredentials: true
                 });
                 toast.success('News created successfully');
             }
@@ -111,9 +108,8 @@ const AdminNews = () => {
         if (!window.confirm('Are you sure you want to delete this news item?')) return;
 
         try {
-            const token = localStorage.getItem('token');
             await axios.delete(`${baseUrl}/api/admin/news/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                withCredentials: true
             });
             toast.success('News deleted successfully');
             fetchNews();

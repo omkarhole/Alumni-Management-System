@@ -3,10 +3,8 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import { FaTrophy, FaTimes } from 'react-icons/fa';
 import { baseUrl } from '../utils/globalurl';
-import { useAuth } from '../AuthContext';
 
 const PostAchievement = ({ onSuccess, onCancel }) => {
-    const { token } = useAuth();
     const [formData, setFormData] = useState({
         type: 'promotion',
         title: '',
@@ -49,9 +47,9 @@ const PostAchievement = ({ onSuccess, onCancel }) => {
                 formData,
                 {
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true
                 }
             );
             

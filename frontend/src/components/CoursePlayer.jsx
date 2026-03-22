@@ -38,7 +38,7 @@ export default function CoursePlayer() {
       try {
         setLoading(true);
         const response = await axios.get(`${baseUrl}/enrollments/${enrollmentId}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          withCredentials: true
         });
         setEnrollment(response.data.data);
 
@@ -69,7 +69,7 @@ export default function CoursePlayer() {
       await axios.post(
         `${baseUrl}/courses/enrollment/${enrollmentId}/lesson/${currentLesson._id}/complete`,
         { score: 0 },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        { withCredentials: true }
       );
 
       const newCompleted = new Set(completedLessons);
@@ -92,7 +92,7 @@ export default function CoursePlayer() {
       const response = await axios.post(
         `${baseUrl}/courses/enrollment/${enrollmentId}/quiz/${currentLesson.quiz._id}/submit`,
         { answers },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        { withCredentials: true }
       );
 
       toast.success(response.data.message);

@@ -34,7 +34,7 @@ export default function MyLearning() {
         setLoading(true);
         const response = await axios.get(
           `${baseUrl}/courses/my-learning/list?status=${filter}&page=${page}`,
-          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+          { withCredentials: true }
         );
         setEnrollments(response.data.data);
         setPagination(response.data.pagination);
@@ -54,7 +54,7 @@ export default function MyLearning() {
     const fetchStats = async () => {
       try {
         const response = await axios.get(`${baseUrl}/courses/my-learning/stats`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          withCredentials: true
         });
         setStats(response.data.data);
       } catch (err) {
