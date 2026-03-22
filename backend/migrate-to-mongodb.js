@@ -23,13 +23,17 @@ const ForumTopic = require('./models/ForumTopic.model');
 const Gallery = require('./models/Gallery.model');
 const SystemSetting = require('./models/SystemSetting.model');
 
-// MySQL connection (old database)
+// MySQL connection (old database) - read credentials from environment variables
 const mysqlConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: 'user123',
-  database: 'alumni_db'
+  host: process.env.MYSQL_HOST || 'localhost',
+  user: process.env.MYSQL_USER || 'root',
+  password: process.env.MYSQL_PASSWORD || '',
+  database: process.env.MYSQL_DATABASE || 'alumni_db',
 };
+
+if (!mysqlConfig.password) {
+  console.warn('Warning: MYSQL_PASSWORD is not set. Ensure your MySQL credentials are provided via environment variables.');
+}
 
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/alumni_db';
