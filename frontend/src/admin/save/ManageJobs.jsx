@@ -77,12 +77,9 @@ const ManageJobs = ({ setHandleAdd }) => {
     toastId.current = toast.loading("Submitting job...", { position: "top-center" });
 
     try {
-      // Include auth token if required
-      const token = localStorage.getItem("auth_token");
       const config = {
         headers: {
-          'Content-Type': 'application/json',
-          ...(token && { Authorization: `Bearer ${token}` })
+          'Content-Type': 'application/json'
         },
         withCredentials: true
       };

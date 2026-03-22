@@ -58,7 +58,7 @@ export default function CourseDetails() {
     try {
       setEnrolling(true);
       await axios.post(`${baseUrl}/courses/${courseId}/enroll`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        withCredentials: true
       });
       setIsEnrolled(true);
       toast.success('Successfully enrolled in course!');

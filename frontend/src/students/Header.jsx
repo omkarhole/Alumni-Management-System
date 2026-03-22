@@ -21,8 +21,7 @@ const Header = ({ toggleSidebar }) => {
                 navigate("/", { state: { action: "homelogout" } })
                 localStorage.clear();
                 logout();
-            })
-            .catch((err) => console.log(err));
+            });
     };
 
     useEffect(() => {

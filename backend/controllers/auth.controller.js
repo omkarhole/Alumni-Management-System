@@ -147,13 +147,31 @@ async function signup(req, res, next) {
     }
 }
 //logout controller
-function logout(req, res) {
-    res.clearCookie('token', {
-        httpOnly: true,
-        secure: cookieOptions.secure,
-        sameSite: cookieOptions.sameSite
-    });
-    res.json({ message: 'Logout Successful' });
+async function logout(req, res, next) {
+    try {
+        const token = req.cookies?.token;
+        if (token) {
+            const decoded = jwt.decode(token);
+            const expiryDate = decoded?.exp
+                ? new Date(decoded.exp * 1000)
+                : new Date(Date.now() + cookieOptions.maxAge);
+
+            await BlacklistedToken.updateOne(
+                { token },
+                { $set: { token, expiresAt: expiryDate } },
+                { upsert: true }
+            );
+        }
+
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: cookieOptions.secure,
+            sameSite: cookieOptions.sameSite
+        });
+        res.json({ message: 'Logout Successful' });
+    } catch (err) {
+        next(err);
+    }
 }
 
 // Request password reset (Forgot Password)

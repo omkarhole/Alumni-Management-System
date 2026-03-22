@@ -24,7 +24,6 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
-        console.log(isMenuOpen);
     };
 
     const isActive = (path) => {
@@ -50,7 +49,7 @@ useEffect(() => {
                 setUnreadMessages(response.data.unreadCount);
             }
         } catch (error) {
-            console.log('Error fetching unread count:', error);
+            setUnreadMessages(0);
         }
     };
 
@@ -73,8 +72,7 @@ useEffect(() => {
                 navigate("/", { state: { action: "homelogout" } })
                 localStorage.clear();
                 logout();
-            })
-            .catch((err) => console.log(err));
+            });
     };
 
     return (

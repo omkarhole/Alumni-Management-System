@@ -1,3 +1,10 @@
 # Dependencies
 node_modules/
 **/node_modules/
+
+# Environment files (prevent accidental commits of secrets)
+.env
+.env.*
+**/.env
+backend/.env
+frontend/.env

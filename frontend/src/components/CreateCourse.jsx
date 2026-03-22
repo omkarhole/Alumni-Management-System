@@ -192,14 +192,13 @@ export default function CreateCourse() {
     try {
       setSaving(true);
       const response = await axios.post(`${baseUrl}/courses`, course, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        withCredentials: true
       });
 
       toast.success('Course created successfully!');
       navigate(`/instructor/my-courses`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to save course');
-      console.error(err);
     } finally {
       setSaving(false);
     }

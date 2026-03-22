@@ -129,3 +129,14 @@ Before creating a new issue, please **check if the issue already exists**. If no
 3. **Expected vs. Actual Behavior:** What did you expect to happen, and what actually happened?
 4. **Screenshots:** Include screenshots or screen recordings if applicable.
 5. **Environment Details:** Provide relevant context, such as your Operating System, Node.js version, browser, etc.
+
+---
+
+## Secrets and Credentials
+
+- **Never commit secrets** (API keys, private keys, passwords, tokens) to the repository. Use environment variables, secret managers, or your hosting provider's secret storage.
+- Ensure `.env` and similar files are present in `.gitignore` (this repository already ignores `.env` patterns).
+- If you discover a committed secret, rotate it immediately (revoke and recreate) and remove it from Git history. See `scripts/remove-sensitive-history.md` for recommended commands.
+- For local development, provide a `.env.example` with placeholder values but do not include real secrets.
+
+If you're unsure how to store or rotate secrets for your deployment environment, ask a maintainer before committing.
