@@ -175,7 +175,7 @@ const Signup = () => {
                                 course_id: e.target.value,
                               })
                             }
-                            className="form-control select2"
+                            className="form-control"
                             name="course_id"
                             required
                             value={values.course_id}
@@ -238,7 +238,7 @@ const Signup = () => {
                                 course_id: e.target.value,
                               })
                             }
-                            className="form-control select2"
+                            className="form-control"
                             name="course_id"
                             required
                             value={values.course_id}

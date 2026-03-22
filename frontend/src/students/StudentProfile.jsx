@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import {  studentUrl } from '../utils/globalurl';
+import { studentUrl } from '../utils/globalurl';
 import { FaUser, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
 const StudentProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -11,6 +11,7 @@ const StudentProfile = () => {
     name: '',
     email: '',
     password: '',
+    avatar: null,
     student_bio: {
       gender: '',
       enrollment_year: '',
@@ -37,7 +38,7 @@ const StudentProfile = () => {
           enrollment_year: res.data.student_bio?.enrollment_year || '',
           current_year: res.data.student_bio?.current_year || '',
           roll_number: res.data.student_bio?.roll_number || '',
-          course: res.data.student_bio?.course?.id || ''
+          course: res.data.student_bio?.course?._id || res.data.student_bio?.course || ''
         }
       });
       setLoading(false);
@@ -46,6 +47,10 @@ const StudentProfile = () => {
       toast.error('Failed to load profile');
       setLoading(false);
     }
+  };
+
+  const handleFileChange = (e) => {
+    setFormData(prev => ({ ...prev, avatar: e.target.files[0] }));
   };
 
   const handleChange = (e) => {
@@ -67,16 +72,21 @@ const StudentProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updateData = {
-        name: formData.name,
-        email: formData.email,
-        student_bio: formData.student_bio
-      };
+      const submitData = new FormData();
+      submitData.append('name', formData.name);
+      submitData.append('email', formData.email);
+      submitData.append('student_bio', JSON.stringify(formData.student_bio));
       if (formData.password) {
-        updateData.password = formData.password;
+        submitData.append('password', formData.password);
+      }
+      if (formData.avatar) {
+        submitData.append('avatar', formData.avatar);
       }
 
-      const res = await axios.put(`${studentUrl}/profile`, updateData, { withCredentials: true });
+      const res = await axios.put(`${studentUrl}/profile`, submitData, {
+        withCredentials: true,
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setProfile(res.data);
       setEditMode(false);
       toast.success('Profile updated successfully!');
@@ -94,12 +104,13 @@ const StudentProfile = () => {
       name: profile.name,
       email: profile.email,
       password: '',
+      avatar: null,
       student_bio: {
         gender: profile.student_bio?.gender || '',
         enrollment_year: profile.student_bio?.enrollment_year || '',
         current_year: profile.student_bio?.current_year || '',
         roll_number: profile.student_bio?.roll_number || '',
-        course: profile.student_bio?.course?.id || ''
+        course: profile.student_bio?.course?._id || profile.student_bio?.course || ''
       }
     });
   };
@@ -110,7 +121,7 @@ const StudentProfile = () => {
 
   return (
     <div className="container-fluid mt-4">
-<div className="row">
+      <div className="row">
         <div className="col-lg-12">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h3>
@@ -133,6 +144,25 @@ const StudentProfile = () => {
               {!editMode ? (
                 // View Mode
                 <div>
+                  <div className="row mb-4 align-items-center">
+                    <div className="col-12 text-center mb-3">
+                      {profile?.student_bio?.avatar ? (
+                        <img
+                          src={profile.student_bio.avatar}
+                          alt="Profile Avatar"
+                          className="rounded-circle img-thumbnail"
+                          style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div
+                          className="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto text-white"
+                          style={{ width: '150px', height: '150px', fontSize: '64px' }}
+                        >
+                          <FaUser />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                   <div className="row mb-3">
                     <div className="col-md-4"><strong>Name:</strong></div>
                     <div className="col-md-8">{profile?.name}</div>
@@ -165,6 +195,16 @@ const StudentProfile = () => {
               ) : (
                 // Edit Mode
                 <form onSubmit={handleSubmit}>
+                  <div className="mb-3">
+                    <label className="form-label">Profile Avatar</label>
+                    <input
+                      type="file"
+                      name="avatar"
+                      className="form-control"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </div>
                   <div className="mb-3">
                     <label className="form-label">Name</label>
                     <input
