@@ -7,6 +7,7 @@ import { ThemeProvider } from "./ThemeContext";
 import ScrollToTop from "./components/ScrollToTop";
 import SmoothWheelScroll from "./components/SmoothWheelScroll";
 import PrivateRoute from "./components/PrivateRoute";
+import { privateRoutes } from "./config/routes";
 
 // Pages
 import Home from "./components/Home";
