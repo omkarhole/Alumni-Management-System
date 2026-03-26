@@ -2,7 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const http = require('http');
+const socketIO = require('socket.io');
 const { connectDB } = require('./utils/db');
+const { initializeSocket } = require('./utils/socket');
 const authRouter = require('./routes/auth.routes');
 const oauthRouter = require('./routes/oauth.routes');
 const adminRouter = require('./routes/admin.routes');
@@ -135,6 +138,23 @@ app.use(errorHandler);
  ========================= */
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+// Create HTTP server
+const server = http.createServer(app);
+
+// Initialize Socket.IO with CORS configuration
+const io = socketIO(server, {
+  cors: {
+    origin: CLIENT_ORIGINS,
+    methods: ['GET', 'POST'],
+    credentials: true
+  },
+  transports: ['websocket', 'polling']
+});
+
+// Initialize socket event handlers
+initializeSocket(io);
+
+server.listen(PORT, () => {
     console.log(`Server is running on port: ${PORT}`);
+    console.log(`WebSocket enabled via Socket.IO`);
 });
