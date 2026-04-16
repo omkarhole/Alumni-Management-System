@@ -52,4 +52,4 @@ export const messagesUrl = `${apiUrl}/api/dm`;
 export const businessUrl = `${apiUrl}/api/business`;
 
 // Badges & Verification API endpoint
-export const badgeUrl = `${apiUrl}/api/admin/badges`;
+export const badgeUrl = `${apiUrl}/api`;
