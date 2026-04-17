@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaTrophy, FaMedal, FaCrown, FaUsers } from 'react-icons/fa';
 import { useTheme } from '../ThemeContext';
-import { badgeUrl } from '../utils/globalurl';
+import { baseUrl } from '../utils/globalurl';
 
 const Leaderboard = () => {
     const { theme } = useTheme();
