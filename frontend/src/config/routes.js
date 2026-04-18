@@ -8,6 +8,7 @@
 export const publicRoutes = [
   { path: "/", component: "Home", exact: true },
   { path: "/alumni", component: "AlumniList", exact: true },
+  { path: "/alumni-directory", component: "AlumniDirectory", exact: true },
   { path: "/gallery", component: "Gallery", exact: true },
   { path: "/jobs", component: "Careers", exact: true },
   { path: "/mentorship", component: "Mentorship", exact: true },

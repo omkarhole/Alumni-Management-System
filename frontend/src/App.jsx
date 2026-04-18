@@ -12,6 +12,7 @@ import { privateRoutes } from "./config/routes";
 // Pages
 import Home from "./components/Home";
 import AlumniList from "./components/AlumniList";
+import AlumniDirectory from "./components/AlumniDirectory";
 import Gallery from "./components/Gallery";
 import Messages from "./components/Messages";
 import DirectChat from "./components/DirectChat";
@@ -98,7 +99,10 @@ function AppRouter() {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/alumni" element={<AlumniList />} />
+        <Route path="/alumni-directory" element={<AlumniDirectory />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/messages" element={<Messages />} />
+        <Route path="/messages/:userId" element={<DirectChat />} />
         <Route path="/jobs" element={<Careers />} />
         <Route path="/mentorship" element={<Mentorship />} />
         <Route path="/forums" element={<Forum />} />
