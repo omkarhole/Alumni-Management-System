@@ -38,6 +38,56 @@ const alumnusBioSchema = new mongoose.Schema({
   skills: {
     type: [String],
     default: []
+  },
+  // Advanced directory fields
+  location: {
+    type: String,
+    default: '',
+    trim: true,
+    index: true,
+    description: 'Current location (city, country)'
+  },
+  company: {
+    type: String,
+    default: '',
+    trim: true,
+    index: true,
+    description: 'Current company name'
+  },
+  job_title: {
+    type: String,
+    default: '',
+    trim: true,
+    description: 'Current job title'
+  },
+  industry: {
+    type: String,
+    default: '',
+    trim: true,
+    index: true,
+    description: 'Industry sector'
+  },
+  interests: {
+    type: [String],
+    default: [],
+    description: 'Areas of interest for networking'
+  },
+  endorsementCount: {
+    type: Number,
+    default: 0,
+    description: 'Denormalized count of endorsements received'
+  },
+  bio: {
+    type: String,
+    default: '',
+    trim: true,
+    maxlength: 500,
+    description: 'Brief professional bio'
+  },
+  isSearchable: {
+    type: Boolean,
+    default: true,
+    description: 'Whether profile appears in directory searches'
   }
 }, { _id: false });
 
@@ -122,5 +172,25 @@ userSchema.index(
     }
   }
 );
+
+// Advanced directory search indexes
+userSchema.index({ 'alumnus_bio.location': 1 });
+userSchema.index({ 'alumnus_bio.company': 1 });
+userSchema.index({ 'alumnus_bio.industry': 1 });
+userSchema.index({ 'alumnus_bio.batch': 1 });
+userSchema.index({ 'alumnus_bio.skills': 1 });
+userSchema.index({ 'alumnus_bio.endorsementCount': -1 });
+userSchema.index({ 'alumnus_bio.isSearchable': 1 });
+
+// Full-text search index for name, email, bio, location, company, job_title
+userSchema.index({
+  name: 'text',
+  email: 'text',
+  'alumnus_bio.bio': 'text',
+  'alumnus_bio.location': 'text',
+  'alumnus_bio.company': 'text',
+  'alumnus_bio.job_title': 'text',
+  'alumnus_bio.interests': 'text'
+});
 
 module.exports = mongoose.model('User', userSchema);
