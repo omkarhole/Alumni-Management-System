@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models/Index');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+const logger = require('../utils/logger');
 
 const isProd = process.env.NODE_ENV === 'production';
 const cookieOptions = {
@@ -95,7 +96,11 @@ async function googleAuthCallback(req, res, next) {
             return res.redirect(completeSignupUrl.toString());
         }
     } catch (err) {
-        console.error("Google Auth Error:", err);
+        logger.logError(err, {
+            operation: 'google-oauth-authentication',
+            userId: req.user?.id,
+            endpoint: req.path
+        });
         const frontendUrl = getFrontendUrl();
         res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
     }

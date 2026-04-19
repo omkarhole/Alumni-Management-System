@@ -1,5 +1,6 @@
 const { Donation, DonationCampaign, User, Badge, UserBadge } = require('../models/Index');
 const { uploadImage, deleteImage } = require('../utils/image-storage');
+const logger = require('../utils/logger');
 
 /**
  * ==================== DONATION CAMPAIGN OPERATIONS ====================
@@ -209,7 +210,11 @@ async function updateCampaign(req, res, next) {
         try {
           await deleteImage(campaign.image, campaign.image_public_id);
         } catch (err) {
-          console.error('Error deleting old image:', err.message);
+          logger.logError(err, {
+            operation: 'delete-old-campaign-image',
+            campaignId: campaign._id,
+            image: campaign.image
+          });
         }
       }
 
@@ -481,7 +486,12 @@ async function awardDonorBadge(userId, amount) {
       }
     }
   } catch (err) {
-    console.error('Error awarding badge:', err.message);
+    logger.logError(err, {
+      operation: 'award-donation-badge',
+      userId: userId,
+      donationAmount: donation?.amount,
+      endpoint: 'award-badge'
+    });
   }
 }
 

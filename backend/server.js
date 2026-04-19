@@ -4,8 +4,10 @@ const dotenv = require('dotenv');
 const path = require('path');
 const http = require('http');
 const socketIO = require('socket.io');
+const morgan = require('morgan');
 const { connectDB } = require('./utils/db');
 const { initializeSocket } = require('./utils/socket');
+const logger = require('./utils/logger');
 const authRouter = require('./routes/auth.routes');
 const oauthRouter = require('./routes/oauth.routes');
 const adminRouter = require('./routes/admin.routes');
@@ -56,6 +58,7 @@ const CLIENT_ORIGINS = [...new Set(
 )];
 
 console.log('Allowed CORS origins:', CLIENT_ORIGINS);
+logger.logInfo('Server initialized with logging system enabled');
 
 const corsOptions = {
     origin: (origin, callback) => {
@@ -80,6 +83,18 @@ app.options(/.*/, cors(corsOptions));
 /* =========================
    MIDDLEWARES
 ========================= */
+
+// HTTP request logging with Morgan
+const morganFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
+app.use(morgan(morganFormat, {
+    stream: {
+        write: (message) => logger.logInfo(message.trim()),
+    },
+    skip: (req, res) => {
+        // Skip logging 404s and health check requests
+        return res.statusCode === 404 || req.path === '/';
+    },
+}));
 
 app.use(express.json());
 app.use(cookieParser());
@@ -155,6 +170,9 @@ const io = socketIO(server, {
 initializeSocket(io);
 
 server.listen(PORT, () => {
-    console.log(`Server is running on port: ${PORT}`);
-    console.log(`WebSocket enabled via Socket.IO`);
+    logger.logInfo(`Server is running on port: ${PORT}`, { 
+        environment: process.env.NODE_ENV,
+        websocket: 'enabled'
+    });
+    logger.logInfo('WebSocket enabled via Socket.IO', { transports: ['websocket', 'polling'] });
 });

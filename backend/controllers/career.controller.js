@@ -1,6 +1,7 @@
 const {Career, User, JobSubscription, JobPreference, JobReferral}=require('../models/Index');
 const sendEmail = require('../utils/mailer');
 const { calculateSkillsMatchPercentage } = require('../utils/skillMatcher');
+const logger = require('../utils/logger');
 
 
 // Helper function to calculate skill match percentage (uses shared utility)
@@ -127,7 +128,13 @@ async function addCareer(req,res,next){
         const career=await Career.create(careerData);
         
         // Notify subscribed users about new job
-        notifyUsersForNewJob(career).catch(err => console.error('Error notifying users:', err));
+        notifyUsersForNewJob(career).catch(err => {
+            logger.logError(err, {
+                operation: 'notify-users-for-new-job',
+                careerId: career._id,
+                company: career.company
+            });
+        });
         
         res.status(201).json(career);
     }
@@ -512,13 +519,22 @@ async function notifyUsersForNewJob(career) {
                         subscription.lastNotificationSent = new Date();
                         await subscription.save();
                     } catch (emailErr) {
-                        console.error(`Failed to send email to ${user.email}:`, emailErr);
+                        logger.logError(emailErr, {
+                            operation: 'send-job-notification-email',
+                            userId: user._id,
+                            userEmail: user.email,
+                            jobId: career._id
+                        });
                     }
                 }
             }
         }
     } catch (err) {
-        console.error('Error notifying users for new job:', err);
+        logger.logError(err, {
+            operation: 'notify-users-for-new-job',
+            careerId: career?._id,
+            jobTitle: career?.job_title
+        });
     }
 }
 
