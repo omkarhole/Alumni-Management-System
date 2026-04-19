@@ -491,6 +491,11 @@ This project is licensed under the ISC License.
 
 ---
 
+## Open Source Events Navigation
+
+[![Nexus Spring of Code- Contributor Guide](https://img.shields.io/badge/Nexus%20Spring%20Of%20Code-Contributor%20Guide-1D4ED8?style=for-the-badge)](Open-Source-Event-Guidelines.md)
+
+
 Made with ❤️ by the Alumni Management System Team
 
 **Happy Coding! 🚀**
