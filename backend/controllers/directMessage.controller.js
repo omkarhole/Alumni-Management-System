@@ -1,5 +1,6 @@
 const DirectMessage = require('../models/DirectMessage.model');
 const User = require('../models/User.model');
+const logger = require('../utils/logger');
 
 // Send a direct message
 const sendMessage = async (req, res) => {
@@ -44,7 +45,12 @@ const sendMessage = async (req, res) => {
       data: message 
     });
   } catch (error) {
-    console.error('Error sending message:', error);
+    logger.logError(error, {
+      operation: 'send-direct-message',
+      senderId: req.user?.id,
+      receiverId: req.body?.receiverId,
+      endpoint: req.path
+    });
     res.status(500).json({ error: 'Failed to send message' });
   }
 };
@@ -93,7 +99,12 @@ const getMessages = async (req, res) => {
       pages: Math.ceil(total / parseInt(limit))
     });
   } catch (error) {
-    console.error('Error getting messages:', error);
+    logger.logError(error, {
+      operation: 'get-messages',
+      userId: req.user?.id,
+      conversationWith: req.params?.userId,
+      endpoint: req.path
+    });
     res.status(500).json({ error: 'Failed to get messages' });
   }
 };
@@ -168,7 +179,11 @@ const getConversations = async (req, res) => {
 
     res.json({ conversations: validConversations });
   } catch (error) {
-    console.error('Error getting conversations:', error);
+    logger.logError(error, {
+      operation: 'get-conversations',
+      userId: req.user?.id,
+      endpoint: req.path
+    });
     res.status(500).json({ error: 'Failed to get conversations' });
   }
 };
@@ -186,7 +201,12 @@ const markAsRead = async (req, res) => {
 
     res.json({ message: 'Messages marked as read' });
   } catch (error) {
-    console.error('Error marking messages as read:', error);
+    logger.logError(error, {
+      operation: 'mark-messages-as-read',
+      userId: req.user?.id,
+      conversationWith: req.body?.conversationWith,
+      endpoint: req.path
+    });
     res.status(500).json({ error: 'Failed to mark messages as read' });
   }
 };
@@ -204,7 +224,11 @@ const getUnreadCount = async (req, res) => {
 
     res.json({ unreadCount: count });
   } catch (error) {
-    console.error('Error getting unread count:', error);
+    logger.logError(error, {
+      operation: 'get-unread-count',
+      userId: req.user?.id,
+      endpoint: req.path
+    });
     res.status(500).json({ error: 'Failed to get unread count' });
   }
 };
@@ -234,7 +258,12 @@ const deleteMessage = async (req, res) => {
 
     res.json({ message: 'Message deleted successfully' });
   } catch (error) {
-    console.error('Error deleting message:', error);
+    logger.logError(error, {
+      operation: 'delete-message',
+      userId: req.user?.id,
+      messageId: req.params?.messageId,
+      endpoint: req.path
+    });
     res.status(500).json({ error: 'Failed to delete message' });
   }
 };

@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User, Career, Course, Endorsement, DirectMessage } = require('../models/Index');
 const { uploadImage, deleteImage } = require('../utils/image-storage');
+const logger = require('../utils/logger');
 
 
 // print alumnilist
@@ -49,7 +50,11 @@ async function deleteAlumnus(req, res, next) {
             try {
                 await deleteImage(user.alumnus_bio.avatar, user.alumnus_bio.avatar_public_id);
             } catch (cleanupError) {
-                console.error('Failed to delete alumnus avatar:', cleanupError.message);
+                logger.logError(cleanupError, {
+                    userId: user._id,
+                    operation: 'delete-alumni-avatar',
+                    avatar: user.alumnus_bio.avatar
+                });
             }
         }
         await User.findByIdAndDelete(req.params.id);
@@ -114,7 +119,11 @@ async function updateAccount(req, res, next) {
                     currentUser.alumnus_bio.avatar_public_id
                 );
             } catch (cleanupError) {
-                console.error('Failed to delete previous avatar:', cleanupError.message);
+                logger.logError(cleanupError, {
+                    userId: userId,
+                    operation: 'delete-previous-avatar',
+                    avatar: currentUser.alumnus_bio.avatar
+                });
             }
         }
 
@@ -715,3 +724,4 @@ module.exports={
     initiateConnection,
     updateAlumniProfileInfo,
     updateEndorsementCount
+};

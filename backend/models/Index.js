@@ -19,6 +19,11 @@ const JobSubscription = require('./JobSubscription.model');
 const Otp = require('./Otp.model');
 const Endorsement = require('./Endorsement.model');
 const DirectMessage = require('./DirectMessage.model');
+const Badge = require('./Badge.model');
+const UserBadge = require('./UserBadge.model');
+const Achievement = require('./Achievement.model');
+const Donation = require('./Donation.model');
+const DonationCampaign = require('./DonationCampaign.model');
 
 module.exports = {
   User,
@@ -40,5 +45,10 @@ module.exports = {
   JobSubscription,
   Otp,
   Endorsement,
-  DirectMessage
+  DirectMessage,
+  Badge,
+  UserBadge,
+  Achievement,
+  Donation,
+  DonationCampaign
 };

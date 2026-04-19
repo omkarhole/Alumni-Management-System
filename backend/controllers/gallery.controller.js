@@ -1,5 +1,6 @@
 const { Gallery } = require('../models/Index');
 const { uploadImage, deleteImage } = require('../utils/image-storage');
+const logger = require('../utils/logger');
 
 function normalizeGalleryPath(storedPath = '') {
     const normalized = String(storedPath || '').replace(/\\/g, '/');
@@ -56,7 +57,11 @@ async function deleteGallery(req, res, next) {
             try {
                 await deleteImage(img.image_path, img.image_public_id);
             } catch (cleanupError) {
-                console.error('Failed to delete gallery image file:', cleanupError.message);
+                logger.logError(cleanupError, {
+                    operation: 'delete-gallery-image-file',
+                    galleryId: img._id,
+                    imagePath: img.image_path
+                });
             }
         }
         await Gallery.findByIdAndDelete(req.params.id);
