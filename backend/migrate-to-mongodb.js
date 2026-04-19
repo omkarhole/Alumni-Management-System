@@ -1,8 +1,18 @@
 /**
  * Migration Script: MySQL to MongoDB
  * 
- * This script migrates data from MySQL to MongoDB.
- * Make sure MongoDB is running before executing this script.
+ * ⚠️ HISTORICAL REFERENCE - No longer used in production
+ * 
+ * This script migrated data from MySQL to MongoDB during the database migration.
+ * The migration is now complete and the system runs entirely on MongoDB.
+ * 
+ * Keep this file for reference only. Do not use unless you have legacy MySQL data
+ * that needs to be migrated.
+ * 
+ * If you need to use this:
+ * 1. Re-install mysql2: npm install mysql2
+ * 2. Configure MySQL credentials in .env
+ * 3. Run: node migrate-to-mongodb.js
  * 
  * Usage: node migrate-to-mongodb.js
  */

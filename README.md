@@ -290,9 +290,6 @@ npm install
 # On Windows: net start MongoDB
 # On macOS/Linux: sudo systemctl start mongod
 
-# Run database migration (if migrating from MySQL or setting up initial data)
-npm run migrate
-
 # Start the development server
 npm run dev
 # Or for production: npm start
