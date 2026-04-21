@@ -11,7 +11,7 @@
 
 ## Reporting a Vulnerability
 
-The Parampara handles financial and credit-related data.
+The Alumni-Management-System handles manage alumni connections, events, job postings, and foster community engagement.
 We take security vulnerabilities seriously.
 
 **Please do NOT open a public GitHub issue for security vulnerabilities.**
@@ -49,7 +49,7 @@ Instead, report privately via:
 🔄 Nodemon - Development auto-restart
 🔍 ESLint - Code linting
 📝 Prettier - Code formatting, etc.) are periodically reviewed
-- Contributors must follow our [Code of Conduct](docs/CODEOFCONDUCT.md)
+- Contributors must follow our [Code of Conduct](CODEOFCONDUCT.md)
 
 ---
 
