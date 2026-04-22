@@ -1,6 +1,7 @@
-const {Event}=require('../models/Index')
+const { Event } = require('../models/Index');
+const AppError = require('../utils/AppError');
 
-//all events details
+// all events details
 async function listEvents(req, res, next) {
     try {
         const events = await Event.find()
@@ -30,28 +31,35 @@ async function updateEvent(req, res, next) {
         delete updateData._id;
         delete updateData.id;
         
-        await Event.findByIdAndUpdate(req.params.id, updateData, { new: true });
-        res.json({ message: 'Updated' });
+        const updated = await Event.findByIdAndUpdate(req.params.id, updateData, { new: true });
+        if (!updated) {
+            throw AppError.notFound('Event');
+        }
+        res.json({ message: 'Updated', event: updated });
     } catch (err) {
         next(err);
     }
 }
+
 // delete event
-async function deleteEvent(req,res,next){
-    try{
-        await Event.findByIdAndDelete(req.params.id);
+async function deleteEvent(req, res, next) {
+    try {
+        const deleted = await Event.findByIdAndDelete(req.params.id);
+        if (!deleted) {
+            throw AppError.notFound('Event');
+        }
         res.json({ message: 'Deleted' });
-    }
-    catch(err){
+    } catch (err) {
         next(err);
     }
 }
+
 // participate event
 async function participateEvent(req, res, next) {
     try {
         const event = await Event.findById(req.body.event_id);
         if (!event) {
-            return res.status(404).json({ message: 'Event not found' });
+            throw AppError.notFound('Event');
         }
         event.commits.push({ user: req.body.user_id });
         await event.save();
@@ -60,25 +68,33 @@ async function participateEvent(req, res, next) {
         next(err);
     }
 }
+
 // check participation
 async function checkParticipation(req, res, next) {
     try {
         const event = await Event.findById(req.body.event_id);
-        const participated = event && event.commits.some(
+        if (!event) {
+            throw AppError.notFound('Event');
+        }
+        const participated = event.commits.some(
             commit => commit.user.toString() === req.body.user_id
         );
         res.json({ participated: !!participated });
-    } catch (err) { next(err); }
+    } catch (err) {
+        next(err);
+    }
 }
 
 // upcomming events
 async function upcomingEvents(req, res, next) {
     try {
-        res.json(await Event.find({
+        const events = await Event.find({
             schedule: { $gte: new Date() }
-        }).sort({ schedule: 1 }));
+        }).sort({ schedule: 1 });
+        res.json(events);
     } catch (err) {
         next(err);
     }
 }
-module.exports={listEvents,addEvent,updateEvent,deleteEvent,participateEvent,checkParticipation,upcomingEvents};
+
+module.exports = { listEvents, addEvent, updateEvent, deleteEvent, participateEvent, checkParticipation, upcomingEvents };
