@@ -1,12 +1,11 @@
-import axios from 'axios';
+import apiClient from '../api/client';
 import React, { useEffect, useState } from 'react';
-import { baseUrl } from '../utils/globalurl';
 
 const AdminSettings = () => {
   const [system, setSystem] = useState({});
 
   useEffect(() => {
-    axios.get(`${baseUrl}/settings`, { withCredentials: true })
+    apiClient.get('/admin/settings')
       .then((res) => {
         setSystem(res.data);
       })

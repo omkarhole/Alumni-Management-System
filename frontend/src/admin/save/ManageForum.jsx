@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import apiClient from '../../api/client';
 import { toast } from 'react-toastify'
 import ReactQuill from 'react-quill'
-import { baseUrl } from '../../utils/globalurl'
 
 const ManageForum = ({ setHandleAdd }) => {
   const location = useLocation()
@@ -35,7 +34,7 @@ const ManageForum = ({ setHandleAdd }) => {
   }, [location.pathname, navigate, setHandleAdd])
 
   const callApi = (url, method, data) =>
-    axios({ url: baseUrl + url, method, data, withCredentials: true })
+    apiClient[method.toLowerCase()](url, data)
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -54,10 +53,10 @@ const ManageForum = ({ setHandleAdd }) => {
       }
 
       if (isEdit && forumId) {
-        await callApi(`/forums/${forumId}`, 'put', payload)
+        await callApi(`/admin/forums/${forumId}`, 'put', payload)
         toast.success('Forum updated')
       } else {
-        await callApi('/forums', 'post', payload)
+        await callApi('/admin/forums', 'post', payload)
         toast.success('Forum created')
       }
 

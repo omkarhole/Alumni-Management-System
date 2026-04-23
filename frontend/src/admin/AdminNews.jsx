@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from "axios";
+import apiClient from '../api/client';
 import { toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaNewspaper, FaEnvelope, FaUsers } from 'react-icons/fa';
 import { useTheme } from '../ThemeContext';
-import { baseUrl } from '../utils/globalurl';
 import ReactQuill from 'react-quill';
 
 const AdminNews = () => {
@@ -31,9 +30,7 @@ const AdminNews = () => {
 
     const fetchNews = async () => {
         try {
-            const response = await axios.get(`${baseUrl}/api/admin/news`, {
-                withCredentials: true
-            });
+            const response = await apiClient.get('/admin/news');
             setNews(response.data);
         } catch (error) {
             console.error('Error fetching news:', error);
@@ -45,9 +42,7 @@ const AdminNews = () => {
 
     const fetchSubscribers = async () => {
         try {
-            const response = await axios.get(`${baseUrl}/api/admin/news/newsletter/subscribers`, {
-                withCredentials: true
-            });
+            const response = await apiClient.get('/admin/news/newsletter/subscribers');
             setSubscribers(response.data);
         } catch (error) {
             console.error('Error fetching subscribers:', error);
@@ -65,14 +60,10 @@ const AdminNews = () => {
             };
 
             if (editingNews) {
-                await axios.put(`${baseUrl}/api/admin/news/${editingNews._id}`, payload, {
-                    withCredentials: true
-                });
+                await apiClient.put(`/admin/news/${editingNews._id}`, payload);
                 toast.success('News updated successfully');
             } else {
-                await axios.post(`${baseUrl}/api/admin/news`, payload, {
-                    withCredentials: true
-                });
+                await apiClient.post('/admin/news', payload);
                 toast.success('News created successfully');
             }
 
@@ -108,9 +99,7 @@ const AdminNews = () => {
         if (!window.confirm('Are you sure you want to delete this news item?')) return;
 
         try {
-            await axios.delete(`${baseUrl}/api/admin/news/${id}`, {
-                withCredentials: true
-            });
+            await apiClient.delete(`/admin/news/${id}`);
             toast.success('News deleted successfully');
             fetchNews();
         } catch (error) {

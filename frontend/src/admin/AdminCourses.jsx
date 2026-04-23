@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../api/client';
 import { toast } from 'react-toastify';
-import { baseUrl } from '../utils/globalurl';
 
 const AdminCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -11,7 +10,7 @@ const AdminCourses = () => {
   });
 
   useEffect(() => {
-    axios.get(`${baseUrl}/courses`, { withCredentials: true })
+    apiClient.get('/admin/courses')
       .then((res) => {
         setCourses(res.data);
       })
@@ -32,7 +31,7 @@ const AdminCourses = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`${baseUrl}/courses/${id}`, { withCredentials: true });
+      const response = await apiClient.delete(`/admin/courses/${id}`);
       toast.warning(response.data.message);
       setCourses(courses.filter(c => (c._id || c.id) !== id));
     } catch (error) {

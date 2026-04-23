@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../api/client';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaCheck, FaTimes, FaClock, FaUserGraduate, FaSearch } from 'react-icons/fa';
-import { badgeUrl } from '../utils/globalurl';
 
 const AdminVerifications = () => {
     const [requests, setRequests] = useState([]);
@@ -19,9 +18,7 @@ const AdminVerifications = () => {
     const fetchRequests = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${badgeUrl}/verification/requests?status=${filter}`, {
-                withCredentials: true
-            });
+            const response = await apiClient.get(`/badges/verification/requests?status=${filter}`);
             setRequests(response.data.requests || []);
         } catch (error) {
             console.error('Error fetching verification requests:', error);
@@ -39,9 +36,7 @@ const AdminVerifications = () => {
                 rejectionReason: status === 'rejected' ? rejectionReason : ''
             };
             
-            await axios.put(`${badgeUrl}/verification/requests/${requestId}/review`, data, {
-                withCredentials: true
-            });
+            await apiClient.put(`/badges/verification/requests/${requestId}/review`, data);
             
             toast.success(`Verification ${status} successfully`);
             setSelectedRequest(null);

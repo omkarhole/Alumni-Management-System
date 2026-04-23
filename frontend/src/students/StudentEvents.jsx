@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import axios from 'axios';
+import apiClient from '../api/client';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { baseUrl } from '../utils/globalurl';
 
 const StudentEvents = () => {
   const [events, setEvents] = useState([]);
@@ -17,7 +16,7 @@ const StudentEvents = () => {
 
   const fetchEvents = async () => {
     try {
-      const res = await axios.get(`${baseUrl}/events`, { withCredentials: true });
+      const res = await apiClient.get('/admin/events');
       setEvents(res.data);
       // Check participation from the commits array in each event
       const participated = new Set();
@@ -39,10 +38,9 @@ const StudentEvents = () => {
 
   const handleParticipate = async (eventId) => {
     try {
-      await axios.post(
-        `${baseUrl}/api/events/participate`,
-        { event_id: eventId, user_id: userId },
-        { withCredentials: true }
+      await apiClient.post(
+        '/admin/events/participate',
+        { event_id: eventId, user_id: userId }
       );
       toast.success('Successfully joined the event!');
       setParticipatedEvents(prev => new Set([...prev, eventId]));

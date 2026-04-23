@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaPlus } from "react-icons/fa";
-import axios from 'axios';
+import apiClient from '../api/client';
 import { toast } from 'react-toastify';
 import defaultavatar from "../assets/uploads/defaultavatar.jpg"
-import { baseUrl, toPublicUrl } from '../utils/globalurl';
+import { toPublicUrl } from '../utils/globalurl';
 
 
 const AdminAlumni = () => {
   const [alumni, setAlumni] = useState([]);
 
   useEffect(() => {
-    axios.get(`${baseUrl}/alumni`, { withCredentials: true })
+    apiClient.get('/admin/alumni')
       .then((res) => {
         const safeAlumni = Array.isArray(res.data)
           ? res.data.filter((item) => item && typeof item === 'object')
@@ -25,7 +25,7 @@ const AdminAlumni = () => {
   const navigate = useNavigate();
 
   const delAlumni = (id) => {
-    axios.delete(`${baseUrl}/alumni/${id}`, { withCredentials: true })
+    apiClient.delete(`/admin/alumni/${id}`)
       .then((res) => {
         toast.success(res.data.message);
         setAlumni(alumni.filter((e) => e.id !== id))

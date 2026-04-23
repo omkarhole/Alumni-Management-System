@@ -1,12 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import apiClient from '../../api/client';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Bounce, toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-import { baseUrl } from '../../utils/globalurl';
 import { useAuth } from '../../AuthContext';
 
 const ManageJobs = ({ setHandleAdd }) => {

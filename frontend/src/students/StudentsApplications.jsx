@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import axios from 'axios';
-import { studentUrl } from '../utils/globalurl';
+import apiClient from '../api/client';
 import { FaBriefcase, FaBuilding, FaCheckCircle, FaClock, FaTimesCircle } from 'react-icons/fa';
 
 const StudentsApplications = () => {
@@ -14,7 +13,7 @@ const StudentsApplications = () => {
 
   const fetchApplications = async () => {
     try {
-      const res = await axios.get(`${studentUrl}/my-applications`, { withCredentials: true });
+      const res = await apiClient.get('/student/my-applications');
       setApplications(res.data);
       setLoading(false);
     } catch (err) {

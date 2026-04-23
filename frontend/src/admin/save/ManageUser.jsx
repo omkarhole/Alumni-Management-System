@@ -1,8 +1,7 @@
-import axios from 'axios';
+import apiClient from '../../api/client';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { baseUrl } from '../../utils/globalurl';
 
 
 const ManageUser = () => {
@@ -29,7 +28,7 @@ const ManageUser = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const userId = users._id || users.id;
-        axios.put(`${baseUrl}/users/${userId}`, users, { withCredentials: true })
+        apiClient.put(`/admin/users/${userId}`, users)
             .then((res) => toast.success(res.data.message))
             .catch((err) => console.log(err))
         setUsers({

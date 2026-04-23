@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from './api/client';
 import { authUrl, baseUrl, studentUrl } from './utils/globalurl';
 
 const AuthContext = createContext();
@@ -54,11 +54,16 @@ export const AuthProvider = ({ children }) => {
       const probeUrl = probeUrlMap[userType];
       if (!probeUrl) return false;
 
-      await axios.get(probeUrl, { withCredentials: true });
-      return true;
+      try {
+        await apiClient.get(probeUrl);
+        return true;
+      } catch {
+        return false;
+      }
     };
 
-    axios.get(`${authUrl}/session`, { withCredentials: true })
+    // Check session status using centralized client
+    apiClient.get(`${authUrl}/session`)
       .then((res) => {
         if (!active) return;
         const { userId, userType, userName } = res.data || {};
@@ -101,8 +106,19 @@ export const AuthProvider = ({ children }) => {
         setIsAuthReady(true);
       });
 
+    // Listen for auth errors from the API client interceptor
+    const handleAuthError = () => {
+      if (active) {
+        clearStoredUser();
+        applyRoleState('');
+      }
+    };
+
+    window.addEventListener('auth-error', handleAuthError);
+
     return () => {
       active = false;
+      window.removeEventListener('auth-error', handleAuthError);
     };
   }, []);
 

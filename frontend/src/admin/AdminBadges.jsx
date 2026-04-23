@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../api/client';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaMedal, FaTrophy } from 'react-icons/fa';
-import { badgeUrl, baseUrl } from '../utils/globalurl';
 
 const AdminBadges = () => {
     const [badges, setBadges] = useState([]);
@@ -25,9 +24,7 @@ const AdminBadges = () => {
 
     const fetchBadges = async () => {
         try {
-            const response = await axios.get(`${badgeUrl}/badges`, {
-                withCredentials: true
-            });
+            const response = await apiClient.get('/badges/badges');
             setBadges(response.data);
         } catch (error) {
             console.error('Error fetching badges:', error);
@@ -45,14 +42,10 @@ const AdminBadges = () => {
         e.preventDefault();
         try {
             if (editingBadge) {
-                await axios.put(`${badgeUrl}/badges/${editingBadge._id}`, formData, {
-                    withCredentials: true
-                });
+                await apiClient.put(`/badges/badges/${editingBadge._id}`, formData);
                 toast.success('Badge updated successfully');
             } else {
-                await axios.post(`${badgeUrl}/badges`, formData, {
-                    withCredentials: true
-                });
+                await apiClient.post('/badges/badges', formData);
                 toast.success('Badge created successfully');
             }
             fetchBadges();

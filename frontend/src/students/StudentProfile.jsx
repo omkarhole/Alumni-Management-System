@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import axios from 'axios';
-import { studentUrl } from '../utils/globalurl';
+import apiClient from '../api/client';
 import { FaUser, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
 const StudentProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -27,7 +26,7 @@ const StudentProfile = () => {
 
   const fetchProfile = async () => {
     try {
-      const res = await axios.get(`${studentUrl}/profile`, { withCredentials: true });
+      const res = await apiClient.get('/student/profile');
       setProfile(res.data);
       setFormData({
         name: res.data.name,

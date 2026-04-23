@@ -1,15 +1,14 @@
-import axios from 'axios';
+import apiClient from '../api/client';
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { baseUrl } from '../utils/globalurl';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    axios.get(`${baseUrl}/users`, { withCredentials: true })
+    apiClient.get('/admin/users')
       .then((res) => {
         const safeUsers = Array.isArray(res.data)
           ? res.data.filter((user) => user && typeof user === 'object')
@@ -20,7 +19,7 @@ const AdminUsers = () => {
   }, []);
 
   const delUser = (id) => {
-    axios.delete(`${baseUrl}/users/${id}`, { withCredentials: true })
+    apiClient.delete(`/admin/users/${id}`)
       .then((res) => {
         toast.info(res.data.message);
         setUsers(users.filter((e) => (e._id || e.id) !== id))

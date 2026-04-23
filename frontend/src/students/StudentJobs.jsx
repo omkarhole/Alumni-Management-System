@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import axios from 'axios';
-import { baseUrl } from '../utils/globalurl';
+import apiClient from '../api/client';
 import { FaBriefcase, FaMapMarkerAlt, FaUser } from 'react-icons/fa';
 
 const StudentJobs = () => {
@@ -17,7 +16,7 @@ const StudentJobs = () => {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get(`${baseUrl}/jobs`, { withCredentials: true });
+      const res = await apiClient.get('/admin/jobs');
       setJobs(res.data);
       setLoading(false);
     } catch (err) {
@@ -29,7 +28,7 @@ const StudentJobs = () => {
 
   const fetchMyApplications = async () => {
     try {
-      const res = await axios.get(`${baseUrl}/jobs/my-applications`, { withCredentials: true });
+      const res = await apiClient.get('/admin/jobs/my-applications');
       const appliedJobIds = new Set(res.data.map(app => app._id));
       setAppliedJobs(appliedJobIds);
     } catch (err) {
@@ -39,9 +38,8 @@ const StudentJobs = () => {
 
   const handleApply = async (jobId) => {
     try {
-      await axios.post(`${baseUrl}/jobs/${jobId}/apply`, 
-        { user_id: userId }, 
-        { withCredentials: true }
+      await apiClient.post(`/admin/jobs/${jobId}/apply`, 
+        { user_id: userId }
       );
       toast.success('Application submitted successfully!');
       setAppliedJobs(prev => new Set([...prev, jobId]));
