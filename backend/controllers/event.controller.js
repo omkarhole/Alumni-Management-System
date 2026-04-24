@@ -1,12 +1,17 @@
-const { Event } = require('../models/Index');
-const AppError = require('../utils/AppError');
+const {
+    listEvents: listEventsService,
+    addEvent: addEventService,
+    updateEvent: updateEventService,
+    deleteEvent: deleteEventService,
+    participateEvent: participateEventService,
+    checkParticipation: checkParticipationService,
+    upcomingEvents: upcomingEventsService,
+} = require('../services/eventService');
 
 // all events details
 async function listEvents(req, res, next) {
     try {
-        const events = await Event.find()
-            .populate('commits.user', 'name')
-            .sort({ schedule: -1 });
+        const events = await listEventsService();
         res.json(events);
     } catch (err) {
         next(err);
@@ -16,7 +21,7 @@ async function listEvents(req, res, next) {
 // add event
 async function addEvent(req, res, next) {
     try {
-        const event = await Event.create(req.body);
+        const event = await addEventService(req.body);
         res.status(201).json({ message: 'Created', event });
     } catch (err) {
         next(err);
@@ -26,15 +31,7 @@ async function addEvent(req, res, next) {
 // update event
 async function updateEvent(req, res, next) {
     try {
-        const updateData = { ...req.body };
-        // Remove fields that shouldn't be updated
-        delete updateData._id;
-        delete updateData.id;
-        
-        const updated = await Event.findByIdAndUpdate(req.params.id, updateData, { new: true });
-        if (!updated) {
-            throw AppError.notFound('Event');
-        }
+        const updated = await updateEventService(req.params.id, req.body);
         res.json({ message: 'Updated', event: updated });
     } catch (err) {
         next(err);
@@ -44,10 +41,7 @@ async function updateEvent(req, res, next) {
 // delete event
 async function deleteEvent(req, res, next) {
     try {
-        const deleted = await Event.findByIdAndDelete(req.params.id);
-        if (!deleted) {
-            throw AppError.notFound('Event');
-        }
+        await deleteEventService(req.params.id);
         res.json({ message: 'Deleted' });
     } catch (err) {
         next(err);
@@ -57,12 +51,7 @@ async function deleteEvent(req, res, next) {
 // participate event
 async function participateEvent(req, res, next) {
     try {
-        const event = await Event.findById(req.body.event_id);
-        if (!event) {
-            throw AppError.notFound('Event');
-        }
-        event.commits.push({ user: req.body.user_id });
-        await event.save();
+        await participateEventService({ eventId: req.body.event_id, userId: req.body.user_id });
         res.json({ message: 'Participated' });
     } catch (err) {
         next(err);
@@ -72,13 +61,10 @@ async function participateEvent(req, res, next) {
 // check participation
 async function checkParticipation(req, res, next) {
     try {
-        const event = await Event.findById(req.body.event_id);
-        if (!event) {
-            throw AppError.notFound('Event');
-        }
-        const participated = event.commits.some(
-            commit => commit.user.toString() === req.body.user_id
-        );
+        const { participated } = await checkParticipationService({
+            eventId: req.body.event_id,
+            userId: req.body.user_id,
+        });
         res.json({ participated: !!participated });
     } catch (err) {
         next(err);
@@ -88,9 +74,7 @@ async function checkParticipation(req, res, next) {
 // upcomming events
 async function upcomingEvents(req, res, next) {
     try {
-        const events = await Event.find({
-            schedule: { $gte: new Date() }
-        }).sort({ schedule: 1 });
+        const events = await upcomingEventsService();
         res.json(events);
     } catch (err) {
         next(err);

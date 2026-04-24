@@ -1,10 +1,9 @@
-const bcrypt = require('bcrypt');
-const { User } = require('../models/Index');
+const { listUsers: listUsersService, updateUser: updateUserService, deleteUser: deleteUserService } = require('../services/userService');
 
 // List all users
 async function listUsers(req, res, next) {
     try {
-        const users = await User.find().sort({ name: 1 }).populate('alumnus_bio.course');
+        const users = await listUsersService();
         res.json(users);
     } catch (err) { next(err); }
 }
@@ -12,12 +11,7 @@ async function listUsers(req, res, next) {
 // Update user details
 async function updateUser(req, res, next) {
     try {
-        const { name, email, type, password } = req.body;
-        const updates = { name, email, type };
-        if (password) {
-            updates.password = await bcrypt.hash(password, 10);
-        }
-        await User.findByIdAndUpdate(req.params.id, updates);
+        await updateUserService(req.params.id, req.body);
         res.json({ message: 'User updated' });
     } catch (err) { next(err); }
 }
@@ -25,9 +19,7 @@ async function updateUser(req, res, next) {
 // Delete a user
 async function deleteUser(req, res, next) {
     try {
-        const id = req.params.id;
-        // MongoDB will automatically delete embedded alumnus_bio with the user
-        await User.findByIdAndDelete(id);
+        await deleteUserService(req.params.id);
         res.json({ message: 'User deleted' });
     }
     catch (err) {
