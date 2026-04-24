@@ -1,33 +1,12 @@
-import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import apiClient from '../api/client';
 import { FaBriefcase, FaUser, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
+import useJobs from '../hooks/useJobs';
 
 const AdminJobApplications = () => {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedJob, setSelectedJob] = useState(null);
+  const { data: jobs = [], loading, refetch } = useJobs();
 
-  useEffect(() => {
-    fetchJobsWithApplications();
-  }, []);
-
-  const fetchJobsWithApplications = async () => {
-    try {
-      const res = await apiClient.get('/admin/jobs');
-      // Filter only jobs that have applicants
-      const safeJobs = Array.isArray(res.data)
-        ? res.data.filter((job) => job && typeof job === 'object')
-        : [];
-      const jobsWithApplicants = safeJobs.filter((job) => job.applicants && job.applicants.length > 0);
-      setJobs(jobsWithApplicants);
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to load job applications');
-      setLoading(false);
-    }
-  };
+  const jobsWithApplicants = jobs.filter((job) => job.applicants && job.applicants.length > 0);
 
   const handleStatusUpdate = async (jobId, userId, newStatus) => {
     try {
@@ -36,7 +15,7 @@ const AdminJobApplications = () => {
         { status: newStatus }
       );
       toast.success(`Application ${newStatus} successfully!`);
-      fetchJobsWithApplications(); // Refresh data
+      await refetch();
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || 'Failed to update status');
@@ -61,11 +40,11 @@ const AdminJobApplications = () => {
   };
 
   const getTotalApplicationsCount = () => {
-    return jobs.reduce((total, job) => total + (job.applicants?.length || 0), 0);
+    return jobsWithApplicants.reduce((total, job) => total + (job.applicants?.length || 0), 0);
   };
 
   const getPendingApplicationsCount = () => {
-    return jobs.reduce((total, job) => {
+    return jobsWithApplicants.reduce((total, job) => {
       const pending = job.applicants?.filter(app => app.status === 'pending').length || 0;
       return total + pending;
     }, 0);
@@ -117,7 +96,7 @@ const AdminJobApplications = () => {
       {/* Jobs List with Applications */}
       <div className="row">
         <div className="col-lg-12">
-          {jobs.length === 0 ? (
+          {jobsWithApplicants.length === 0 ? (
             <div className="card">
               <div className="card-body">
                 <div className="text-center py-5">
@@ -127,7 +106,7 @@ const AdminJobApplications = () => {
               </div>
             </div>
           ) : (
-            jobs.map((job) => (
+            jobsWithApplicants.map((job) => (
               <div key={job._id} className="card mb-4">
                 <div className="card-header bg-light">
                   <div className="d-flex justify-content-between align-items-center">

@@ -80,8 +80,3 @@ export const adminUrl = `${apiUrl}/api/admin`;
 // Student API endpoint (deprecated)
 export const oldStudentUrl = `${apiUrl}/api/student`;
 
-// Business API endpoint
-export const businessUrl = `${apiUrl}/api/business`;
-
-// Badges & Verification API endpoint
-export const badgeUrl = `${apiUrl}/api`;

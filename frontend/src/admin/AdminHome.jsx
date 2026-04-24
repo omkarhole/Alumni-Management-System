@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
 import { FaUsers , FaBriefcase} from "react-icons/fa";
 import { IoCalendar } from "react-icons/io5";
 import { RiSuitcaseFill } from "react-icons/ri";
 import { MdForum } from "react-icons/md";
-import apiClient from '../api/client';
+import PropTypes from 'prop-types';
+import useDashboard from '../hooks/useDashboard';
 
 const InfoCard = ({ title, count, Icon, className }) => (
   <div className="col-xxl-4 col-xl-6">
@@ -23,30 +23,15 @@ const InfoCard = ({ title, count, Icon, className }) => (
   </div>
 );
 
-const AdminHome = () => {
-  const [counts, setCounts] = useState({
-    alumni: 0,
-    forums: 0,
-    jobs: 0,
-    upevents: 0,
-    events: 0,
-    students:0
-  });
+InfoCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  count: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  Icon: PropTypes.elementType.isRequired,
+  className: PropTypes.string.isRequired,
+};
 
-  useEffect(() => {
-    apiClient.get('/admin/dashboard/counts')
-      .then((res) => {
-        console.log("Counts data:", res.data);
-        setCounts(res.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching counts:", err);
-        // Don't show alert for 401 errors (just not authenticated)
-        if (err.response?.status !== 401) {
-          console.error('Failed to fetch counts');
-        }
-      });
-  }, []);
+const AdminHome = () => {
+  const { counts } = useDashboard('admin');
 
   return (
     <>

@@ -17,6 +17,7 @@
     "framer-motion": "^11.18.2",
     "hamburger-react": "^2.5.0",
     "lucide-react": "^0.574.0",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
