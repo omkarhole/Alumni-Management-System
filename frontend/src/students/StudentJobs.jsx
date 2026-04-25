@@ -1,30 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import apiClient from '../api/client';
 import { FaBriefcase, FaMapMarkerAlt, FaUser } from 'react-icons/fa';
+import useJobs from '../hooks/useJobs';
 
 const StudentJobs = () => {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: jobs = [], loading: jobsLoading } = useJobs();
+  const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [appliedJobs, setAppliedJobs] = useState(new Set());
   const userId = localStorage.getItem('user_id');
 
   useEffect(() => {
-    fetchJobs();
     fetchMyApplications();
-  }, []);
-
-  const fetchJobs = async () => {
-    try {
-      const res = await apiClient.get('/admin/jobs');
-      setJobs(res.data);
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to load jobs');
-      setLoading(false);
-    }
-  };
+  }, [userId]);
 
   const fetchMyApplications = async () => {
     try {
@@ -34,6 +22,7 @@ const StudentJobs = () => {
     } catch (err) {
       console.error(err);
     }
+    setApplicationsLoading(false);
   };
 
   const handleApply = async (jobId) => {
@@ -49,7 +38,7 @@ const StudentJobs = () => {
     }
   };
 
-  if (loading) {
+  if (jobsLoading || applicationsLoading) {
     return <div className="text-center mt-5">Loading jobs...</div>;
   }
 

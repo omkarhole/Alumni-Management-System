@@ -1,25 +1,19 @@
-import React, { useState, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import apiClient from '../api/client';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import useEvents from '../hooks/useEvents';
 
 const AdminEvents = () => {
-  const [events, setEvents] = useState([]);
+  const { data: events = [], loading, setData: setEvents } = useEvents();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    apiClient.get('/admin/events')
-      .then((res) => setEvents(res.data))
-      .catch((err) => console.log(err));
-  }, []);
 
   const delEvent = (id) => {
     apiClient.delete(`/admin/events/${id}`)
       .then((res) => {
         console.log(res.data.message)
         toast.success(res.data.message);
-        setEvents(events.filter((e) => (e._id || e.id) !== id))
+        setEvents((currentEvents) => currentEvents.filter((e) => (e._id || e.id) !== id))
       })
       .catch((err) => console.log(err))
   }
@@ -61,6 +55,9 @@ const AdminEvents = () => {
                 </span>
               </div>
               <div className="card-body">
+                {loading ? (
+                  <div className="text-center py-4">Loading events...</div>
+                ) : (
                 <div className="table-responsive">
                   <table className="table table-condensed table-bordered table-hover">
                     <thead>
@@ -96,6 +93,7 @@ const AdminEvents = () => {
                     </tbody>
                   </table>
                 </div>
+                )}
               </div>
             </div>
           </div>

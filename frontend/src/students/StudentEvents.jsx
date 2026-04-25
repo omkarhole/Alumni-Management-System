@@ -1,40 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { FaPlus } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
 import apiClient from '../api/client';
-import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import useEvents from '../hooks/useEvents';
 
 const StudentEvents = () => {
-  const [events, setEvents] = useState([]);
   const [participatedEvents, setParticipatedEvents] = useState(new Set());
-  const navigate = useNavigate();
   const userId = localStorage.getItem('user_id');
+  const { data: events = [], loading, refetch } = useEvents();
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    const participated = new Set();
+    events.forEach((event) => {
+      const isParticipated = event.commits?.some(
+        (commit) => commit.user === userId || commit.user?._id === userId,
+      );
 
-  const fetchEvents = async () => {
-    try {
-      const res = await apiClient.get('/admin/events');
-      setEvents(res.data);
-      // Check participation from the commits array in each event
-      const participated = new Set();
-      res.data.forEach(event => {
-        // Check if current user is in the commits array
-        const isParticipated = event.commits?.some(
-          commit => commit.user === userId || commit.user?._id === userId
-        );
-        if (isParticipated) {
-          participated.add(event._id);
-        }
-      });
-      setParticipatedEvents(participated);
-    } catch (err) {
-      console.log(err);
-      toast.error('Failed to load events');
-    }
-  };
+      if (isParticipated) {
+        participated.add(event._id || event.id);
+      }
+    });
+
+    setParticipatedEvents(participated);
+  }, [events, userId]);
 
   const handleParticipate = async (eventId) => {
     try {
@@ -44,8 +31,7 @@ const StudentEvents = () => {
       );
       toast.success('Successfully joined the event!');
       setParticipatedEvents(prev => new Set([...prev, eventId]));
-      // Refresh events to get updated commits count
-      fetchEvents();
+      await refetch();
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || 'Failed to join event');
@@ -67,6 +53,10 @@ const StudentEvents = () => {
     }
     return strippedContent;
   };
+
+  if (loading) {
+    return <div className="text-center mt-5">Loading events...</div>;
+  }
 
   return (
     <div className="container-fluid">

@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import apiClient from '../api/client';
 import { FaPlus } from "react-icons/fa";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 import ViewJobs from './view/ViewJobs';
+import useJobs from '../hooks/useJobs';
 
 const AdminJobs = () => {
-    const [jobs, setJobs] = useState([]);
+    const { data: jobs = [], loading, setData: setJobs } = useJobs();
     const [selectedJob, setSelectedJob] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -20,19 +21,6 @@ const AdminJobs = () => {
         setSelectedJob(null);
         setIsModalOpen(false);
     };
-    // const location = useLocation();
-
-    useEffect(() => {
-        apiClient.get('/admin/jobs')
-            .then((res) => {
-                const safeJobs = Array.isArray(res.data)
-                    ? res.data.filter((job) => job && typeof job === 'object')
-                    : [];
-                setJobs(safeJobs);
-            })
-            .catch((err) => console.log(err));
-    }, []);
-
     // useEffect(() => {
     //   if (location.state && location.state.showToast) {
     //     toast(location.state.message);
@@ -68,6 +56,9 @@ const AdminJobs = () => {
                                     </span>
                                 </div>
                                 <div className="card-body">
+                                    {loading ? (
+                                        <div className="text-center py-4">Loading jobs...</div>
+                                    ) : (
                                     <div className="table-responsive">
                                         <table className="table table-bordered table-condensed table-hover">
                                             <thead>
@@ -101,6 +92,7 @@ const AdminJobs = () => {
                                             </tbody>
                                         </table>
                                     </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
