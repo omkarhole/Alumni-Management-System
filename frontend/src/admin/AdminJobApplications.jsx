@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import axios from 'axios';
-import { baseUrl } from '../utils/globalurl';
+import apiClient from '../api/client';
 import { FaBriefcase, FaUser, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
 
 const AdminJobApplications = () => {
@@ -15,7 +14,7 @@ const AdminJobApplications = () => {
 
   const fetchJobsWithApplications = async () => {
     try {
-      const res = await axios.get(`${baseUrl}/jobs`, { withCredentials: true });
+      const res = await apiClient.get('/admin/jobs');
       // Filter only jobs that have applicants
       const safeJobs = Array.isArray(res.data)
         ? res.data.filter((job) => job && typeof job === 'object')
@@ -32,10 +31,9 @@ const AdminJobApplications = () => {
 
   const handleStatusUpdate = async (jobId, userId, newStatus) => {
     try {
-      await axios.patch(
-        `${baseUrl}/jobs/${jobId}/applicants/${userId}`,
-        { status: newStatus },
-        { withCredentials: true }
+      await apiClient.patch(
+        `/admin/jobs/${jobId}/applicants/${userId}`,
+        { status: newStatus }
       );
       toast.success(`Application ${newStatus} successfully!`);
       fetchJobsWithApplications(); // Refresh data

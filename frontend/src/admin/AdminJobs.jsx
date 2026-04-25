@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api/client';
 import { FaPlus } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import { toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 import ViewJobs from './view/ViewJobs';
-import { baseUrl } from '../utils/globalurl';
 
 const AdminJobs = () => {
     const [jobs, setJobs] = useState([]);
@@ -24,7 +23,7 @@ const AdminJobs = () => {
     // const location = useLocation();
 
     useEffect(() => {
-        axios.get(`${baseUrl}/jobs`, { withCredentials: true })
+        apiClient.get('/admin/jobs')
             .then((res) => {
                 const safeJobs = Array.isArray(res.data)
                     ? res.data.filter((job) => job && typeof job === 'object')
@@ -42,7 +41,7 @@ const AdminJobs = () => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await axios.delete(`${baseUrl}/jobs/${id}`, { withCredentials: true });
+            const response = await apiClient.delete(`/admin/jobs/${id}`);
             toast.warning(response.data.message);
             setJobs(jobs.filter(job => (job._id || job.id) !== id));
         } catch (error) {

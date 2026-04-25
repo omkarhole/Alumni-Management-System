@@ -116,7 +116,26 @@ app.get('/', (req, res) => {
     res.send('Server is running fine');
 });
 
+/* =========================
+   API V1 ROUTES (VERSIONED)
+========================= */
+
+// Auth routes (no version prefix for auth)
 app.use('/auth', authRouter);
+
+// Versioned API routes
+app.use('/api/v1/oauth', oauthRouter);
+app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/student', authenticate, studentRouter);
+app.use('/api/v1/contact', contactRouter);
+app.use('/api/v1/dm', directMessageRouter);
+app.use('/api/v1/business', businessRouter);
+app.use('/api/v1/courses', courseRouter);
+app.use('/api/v1/event-calendar', eventCalendarRouter);
+app.use('/api/v1/reunions', reunionRouter);
+app.use('/api/v1', badgeRouter);
+
+/* Backward compatibility for old routes (deprecated) */
 app.use('/api/oauth', oauthRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/student', authenticate, studentRouter);

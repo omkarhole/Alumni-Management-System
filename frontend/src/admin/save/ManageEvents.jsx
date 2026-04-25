@@ -1,11 +1,10 @@
 
-import axios from 'axios';
+import apiClient from '../../api/client';
 import React, { useEffect, useState } from 'react';
 import { FaTimes } from "react-icons/fa";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
-import { baseUrl } from '../../utils/globalurl';
 
 const ManageEvents = () => {
     const [eventData, setEventData] = useState({
@@ -43,11 +42,11 @@ const ManageEvents = () => {
         try {
             if (eventId) {
                 // Perform update operation
-                await axios.put(`${baseUrl}/events/${eventId}`, eventData, { withCredentials: true })
+                await apiClient.put(`/admin/events/${eventId}`, eventData)
                     .then((res) => toast.success(res.data.message))
             } else {
                 // Perform insert operation
-                await axios.post(`${baseUrl}/events`, eventData, { withCredentials: true })
+                await apiClient.post(`/admin/events`, eventData)
                     .then((res) => toast.success(res.data.message))
             }
             setEventId(null);

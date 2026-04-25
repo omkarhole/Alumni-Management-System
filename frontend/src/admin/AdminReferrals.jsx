@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { baseUrl } from '../utils/globalurl';
+import apiClient from '../api/client';
 import { useAuth } from '../AuthContext';
 
 const statusColors = {
@@ -29,7 +28,7 @@ const AdminReferrals = () => {
     const fetchReferrals = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`${baseUrl}/jobs/all-referrals`, { withCredentials: true });
+            const res = await apiClient.get('/admin/jobs/all-referrals');
             setReferrals(res.data);
         } catch (err) {
             setError('Failed to load referrals');
@@ -41,10 +40,9 @@ const AdminReferrals = () => {
 
     const handleStatusUpdate = async (referralId, newStatus) => {
         try {
-            await axios.put(
-                `${baseUrl}/jobs/referrals/${referralId}/status`,
-                { status: newStatus },
-                { withCredentials: true }
+            await apiClient.put(
+                `/admin/jobs/referrals/${referralId}/status`,
+                { status: newStatus }
             );
             fetchReferrals();
         } catch (err) {

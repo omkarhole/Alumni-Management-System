@@ -5,9 +5,8 @@ import { IoMdLogOut } from 'react-icons/io'
 import { Link, useNavigate } from 'react-router-dom'
 import logo from "../assets/uploads/logo.png";
 import { useAuth } from '../AuthContext'
-import axios from 'axios'
+import apiClient from '../api/client';
 import { useState, useEffect } from 'react'
-import { authUrl } from '../utils/globalurl';
 
 const Header = ({ toggleSidebar }) => {
 
@@ -16,7 +15,7 @@ const Header = ({ toggleSidebar }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        axios.post(`${authUrl}/logout`, {}, { withCredentials: true })
+        apiClient.post('/auth/logout', {})
             .then((res) => {
                 navigate("/", { state: { action: "homelogout" } })
                 localStorage.clear();

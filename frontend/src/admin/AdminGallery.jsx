@@ -1,7 +1,7 @@
-import axios from 'axios';
+import apiClient from '../api/client';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { baseUrl, toPublicUrl } from '../utils/globalurl';
+import { toPublicUrl } from '../utils/globalurl';
 
 const AdminGallery = () => {
   const [gallery, setGallery] = useState([]);
@@ -10,7 +10,7 @@ const AdminGallery = () => {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    axios.get(`${baseUrl}/gallery`, { withCredentials: true })
+    apiClient.get('/admin/gallery')
       .then((res) => {
         const safeGallery = Array.isArray(res.data)
           ? res.data.filter((item) => item && typeof item === 'object')
@@ -41,9 +41,7 @@ const AdminGallery = () => {
       formData.append('image', file);
       formData.append('about', about);
 
-      const response = await axios.post(`${baseUrl}/gallery`, formData, {
-        withCredentials: true
-      });
+      const response = await apiClient.post('/admin/gallery', formData);
 
       toast.success(response.data.message || 'Image uploaded successfully');
       setGallery((prev) => [response.data, ...prev]);
@@ -60,7 +58,7 @@ const AdminGallery = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`${baseUrl}/gallery/${id}`, { withCredentials: true });
+      const response = await apiClient.delete(`/admin/gallery/${id}`);
       setGallery((prev) => prev.filter(item => (item._id || item.id) !== id));
       toast.success(response.data.message)
     } catch (error) {

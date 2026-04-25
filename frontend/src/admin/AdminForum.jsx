@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus } from "react-icons/fa";
-import axios from 'axios';
+import apiClient from '../api/client';
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
-import { baseUrl } from '../utils/globalurl';
 
 
 
@@ -15,7 +14,7 @@ const AdminForum = () => {
 
 
   useEffect(() => {
-    axios.get(`${baseUrl}/forums`, { withCredentials: true })
+    apiClient.get('/admin/forums')
       .then((res) => {
         console.log(res.data)
         setForum(res.data);
@@ -24,7 +23,7 @@ const AdminForum = () => {
   }, []);
 
   const delForum = (id) => {
-    axios.delete(`${baseUrl}/forums/${id}`, { withCredentials: true })
+    apiClient.delete(`/admin/forums/${id}`)
       .then((res) => {
         // console.log(res.data.message)
         toast.info(res.data.message);

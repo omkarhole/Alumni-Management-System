@@ -1,10 +1,9 @@
-import axios from 'axios';
+import apiClient from '../../api/client';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import defaultavatar from "../../assets/uploads/defaultavatar.jpg";
-import { baseUrl, toPublicUrl } from '../../utils/globalurl';
-// import { baseUrl } from '../../utils/globalurl';
+import { toPublicUrl } from '../../utils/globalurl';
 
 
 const ViewAlumni = () => {
@@ -25,7 +24,7 @@ const ViewAlumni = () => {
 
     const handleStatus = (num) => {
         console.log(num);
-        axios.put(`${baseUrl}/alumni/status`, { status: num, id: alumni._id }, { withCredentials: true })
+        apiClient.put(`/admin/alumni/status`, { status: num, id: alumni._id })
             .then((res) => {
                 setAccStatus(num);
                 if (num == 1) {

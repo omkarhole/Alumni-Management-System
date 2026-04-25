@@ -24,29 +24,61 @@ export const toPublicUrl = (assetPath = "") => {
   return `${apiUrl}/${normalized.replace(/^\/+/, "")}`;
 };
 
-// Admin API endpoint
-export const baseUrl = `${apiUrl}/api/admin`;
+/* =========================
+   VERSIONED API ENDPOINTS (v1)
+========================= */
 
-// Auth endpoint
+// Base API v1 endpoint
+export const apiV1Url = `${apiUrl}/api/v1`;
+
+// Admin API endpoint (v1)
+export const baseUrl = `${apiV1Url}/admin`;
+
+// Auth endpoint (no versioning for backward compatibility)
 export const authUrl = `${apiUrl}/auth`;
 
-// Admin API endpoint
-export const oauthUrl = `${apiUrl}/api/oauth`;
+// OAuth endpoint (v1)
+export const oauthUrl = `${apiV1Url}/oauth`;
 
-// Student API endpoint
-export const studentUrl = `${apiUrl}/api/student`;
+// Student API endpoint (v1)
+export const studentUrl = `${apiV1Url}/student`;
 
-// Contact endpoint (optional but recommended for clarity)
-export const contactUrl = `${apiUrl}/api/contact`;
+// Contact endpoint (v1)
+export const contactUrl = `${apiV1Url}/contact`;
 
-// Skills API endpoint
-export const skillsUrl = `${apiUrl}/api/admin/skills`;
+// Skills API endpoint (v1)
+export const skillsUrl = `${apiV1Url}/admin/skills`;
 
-// Achievements API endpoint
-export const achievementsUrl = `${apiUrl}/api/admin/achievements`;
+// Achievements API endpoint (v1)
+export const achievementsUrl = `${apiV1Url}/admin/achievements`;
 
-// Direct Messages API endpoint
-export const messagesUrl = `${apiUrl}/api/dm`;
+// Direct Messages API endpoint (v1)
+export const messagesUrl = `${apiV1Url}/dm`;
+
+// Business API endpoint (v1)
+export const businessUrl = `${apiV1Url}/business`;
+
+// Badge API endpoint (v1)
+export const badgeUrl = `${apiV1Url}/badges`;
+
+// Courses API endpoint (v1)
+export const coursesUrl = `${apiV1Url}/courses`;
+
+// Event Calendar API endpoint (v1)
+export const eventCalendarUrl = `${apiV1Url}/event-calendar`;
+
+// Reunions API endpoint (v1)
+export const reunionsUrl = `${apiV1Url}/reunions`;
+
+/* =========================
+   BACKWARD COMPATIBILITY (deprecated - use v1 endpoints above)
+========================= */
+
+// Admin API endpoint (deprecated)
+export const adminUrl = `${apiUrl}/api/admin`;
+
+// Student API endpoint (deprecated)
+export const oldStudentUrl = `${apiUrl}/api/student`;
 
 // Business API endpoint
 export const businessUrl = `${apiUrl}/api/business`;

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import axios from 'axios';
-import { baseUrl } from '../utils/globalurl';
+import apiClient from '../api/client';
 import { FaComments, FaPlus, FaUser, FaClock } from 'react-icons/fa';
 
 const StudentForum = () => {
@@ -16,7 +15,7 @@ const StudentForum = () => {
 
   const fetchForums = async () => {
     try {
-      const res = await axios.get(`${baseUrl}/forums`, { withCredentials: true });
+      const res = await apiClient.get('/admin/forums');
       setForums(res.data);
       setLoading(false);
     } catch (err) {
@@ -29,7 +28,7 @@ const StudentForum = () => {
   const handleCreateTopic = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${baseUrl}/forums`, newTopic, { withCredentials: true });
+      await apiClient.post('/admin/forums', newTopic);
       toast.success('Topic created successfully!');
       setNewTopic({ title: '', content: '' });
       setShowCreateModal(false);

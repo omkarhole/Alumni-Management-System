@@ -7,8 +7,7 @@ import { FaBars } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
 import logo from "../assets/uploads/logo.png";
 import { useAuth } from '../AuthContext';
-import axios from 'axios';
-import { authUrl } from '../utils/globalurl';
+import apiClient from '../api/client';
 
 const Header = ({ toggleSidebar }) => {
     const { logout, isLoggedIn, isAdmin } = useAuth();
@@ -16,7 +15,7 @@ const Header = ({ toggleSidebar }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        axios.post(`${authUrl}/logout`, {}, { withCredentials: true })
+        apiClient.post('/auth/logout', {})
             .then((res) => {
                 navigate("/", { state: { action: "homelogout" } })
                 localStorage.clear();

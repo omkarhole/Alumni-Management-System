@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import axios from 'axios';
+import apiClient from '../api/client';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { baseUrl } from '../utils/globalurl';
 
 const AdminEvents = () => {
   const [events, setEvents] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${baseUrl}/events`, { withCredentials: true })
+    apiClient.get('/admin/events')
       .then((res) => setEvents(res.data))
       .catch((err) => console.log(err));
   }, []);
 
   const delEvent = (id) => {
-    axios.delete(`${baseUrl}/events/${id}`, { withCredentials: true })
+    apiClient.delete(`/admin/events/${id}`)
       .then((res) => {
         console.log(res.data.message)
         toast.success(res.data.message);
