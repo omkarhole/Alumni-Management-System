@@ -17,6 +17,7 @@ const MentorshipMessage = require('./MentorshipMessage.model');
 const JobReferral = require('./JobReferral.model');
 const JobSubscription = require('./JobSubscription.model');
 const Otp = require('./Otp.model');
+const BlacklistedToken = require('./BlacklistedToken.model');
 const Endorsement = require('./Endorsement.model');
 const DirectMessage = require('./DirectMessage.model');
 const Badge = require('./Badge.model');
@@ -44,6 +45,7 @@ module.exports = {
   JobReferral,
   JobSubscription,
   Otp,
+  BlacklistedToken,
   Endorsement,
   DirectMessage,
   Badge,

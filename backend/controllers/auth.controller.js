@@ -1,7 +1,7 @@
 const bycrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const { User, Otp } = require('../models/Index');
+const { User, Otp, BlacklistedToken } = require('../models/Index');
 const sendEmail = require('../utils/mailer');
 
 const isProd = process.env.NODE_ENV === 'production';
