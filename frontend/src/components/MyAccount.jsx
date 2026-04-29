@@ -91,7 +91,6 @@ if (alumnusDetailsRes.data) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         const alumnus_id = localStorage.getItem("alumnus_id");
-        const user_id = localStorage.getItem("user_id");
         const pswrd = document.getElementById("pswrd")?.value || "";
 
         try {
@@ -105,7 +104,6 @@ if (alumnusDetailsRes.data) {
             formData.append('password', pswrd);
             formData.append('batch', acc.batch);
             formData.append('alumnus_id', alumnus_id);
-            formData.append('user_id', user_id);
 
             const response = await axios.put(`${baseUrl}/alumni/account`, formData, { withCredentials: true });
             toast.success(response.data.message);
