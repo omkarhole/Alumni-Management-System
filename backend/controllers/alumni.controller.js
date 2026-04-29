@@ -68,9 +68,10 @@ async function deleteAlumnus(req, res, next) {
 // update account with avatar upload
 async function updateAccount(req, res, next) {
     try {
-        const userId = req.body.user_id;
-        if (!userId) {
-            return res.status(400).json({ message: 'User id is required' });
+        const userId = req.user.id;
+
+        if (req.body.user_id && String(req.body.user_id) !== String(userId)) {
+            return res.status(403).json({ message: 'You can only update your own account' });
         }
 
         const currentUser = await User.findById(userId).select(
