@@ -35,6 +35,10 @@ const businessReviewSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  helpfulBy: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    default: []
+  },
   isReported: {
     type: Boolean,
     default: false

@@ -394,13 +394,23 @@ async function getBusinessReviews(req, res, next) {
 async function markReviewHelpful(req, res, next) {
   try {
     const { reviewId } = req.params;
+    const userId = req.user.id;
 
     const review = await BusinessReview.findById(reviewId);
     if (!review) {
       return res.status(404).json({ error: 'Review not found' });
     }
 
+    const hasAlreadyVoted = (review.helpfulBy || []).some(
+      (voterId) => voterId.toString() === String(userId)
+    );
+
+    if (hasAlreadyVoted) {
+      return res.status(409).json({ error: 'You already marked this review as helpful' });
+    }
+
     review.isHelpful += 1;
+    review.helpfulBy = [...(review.helpfulBy || []), userId];
     await review.save();
 
     res.json({

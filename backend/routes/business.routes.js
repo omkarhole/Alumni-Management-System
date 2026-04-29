@@ -21,7 +21,7 @@ router.patch('/my-business/status', authenticate, businessController.toggleMyBus
 router.post('/:businessId/reviews', authenticate, businessController.addReview);
 router.put('/reviews/:reviewId', authenticate, businessController.updateMyReview);
 router.delete('/reviews/:reviewId', authenticate, businessController.deleteMyReview);
-router.patch('/reviews/:reviewId/helpful', businessController.markReviewHelpful);
+router.patch('/reviews/:reviewId/helpful', authenticate, businessController.markReviewHelpful);
 
 // Admin routes
 router.get('/admin/all', authenticate, businessController.getAllBusinessesAdmin);
