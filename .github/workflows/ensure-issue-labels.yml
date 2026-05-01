@@ -24,7 +24,8 @@ jobs:
               { name: "bug", color: "d73a4a", description: "Something is not working" },
               { name: "feature", color: "0e8a16", description: "New feature request" },
               { name: "blank", color: "cfd3d7", description: "Uncategorized issue template" },
-              { name: "enhancement", color: "a2eeef", description: "Improvement to existing functionality" }
+              { name: "enhancement", color: "a2eeef", description: "Improvement to existing functionality" },
+              { name: "NSOC'26", color: "f9d0c4", description: "Issues for the NSOC 2026 program" }
             ];
 
             const { owner, repo } = context.repo;
