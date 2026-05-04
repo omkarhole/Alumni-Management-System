@@ -1019,6 +1019,424 @@ header.masthead>.container {
     padding: 1.5rem;
 }
 
+/* ==================== DARK MODE STYLES ==================== */
+
+/* Dark mode base colors and visibility */
+html.dark {
+    --text-dark: #e8e8e8;
+    --bg-dark-primary: #1a1a1a;
+    --bg-dark-secondary: #2d2d2d;
+    --bg-dark-tertiary: #3a3a3a;
+    --border-dark: #444444;
+}
+
+html.dark {
+    background-color: var(--bg-dark-primary);
+    color: var(--text-dark);
+}
+
+html.dark body {
+    background-color: var(--bg-dark-primary);
+    color: var(--text-dark);
+}
+
+/* Dark mode text visibility */
+html.dark a {
+    color: #6db5ff;
+}
+
+html.dark a:hover {
+    color: #8dc9ff;
+}
+
+html.dark button,
+html.dark .btn {
+    color: var(--text-dark) !important;
+}
+
+html.dark p,
+html.dark li,
+html.dark td,
+html.dark label,
+html.dark span,
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6 {
+    color: var(--text-dark);
+}
+
+/* Dark mode navbar */
+html.dark .navbar-dark {
+    background-color: var(--bg-dark-secondary) !important;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+html.dark .navbar-brand {
+    color: var(--text-dark) !important;
+}
+
+html.dark .nav-link {
+    color: #c0c0c0 !important;
+}
+
+html.dark .nav-link:hover,
+html.dark .nav-link:focus {
+    color: var(--text-dark) !important;
+}
+
+/* Dark mode cards and containers */
+html.dark .card {
+    background-color: var(--bg-dark-secondary);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+html.dark .card-body {
+    background-color: var(--bg-dark-secondary);
+    color: var(--text-dark);
+}
+
+html.dark .card-header {
+    background-color: var(--bg-dark-tertiary);
+    border-bottom-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+html.dark .card-footer {
+    background-color: var(--bg-dark-tertiary);
+    border-top-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+/* Dark mode forms */
+html.dark .form-control,
+html.dark .form-select,
+html.dark textarea {
+    background-color: var(--bg-dark-tertiary);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+html.dark .form-control:focus,
+html.dark .form-select:focus,
+html.dark textarea:focus {
+    background-color: var(--bg-dark-tertiary);
+    border-color: #6db5ff;
+    color: var(--text-dark);
+    box-shadow: 0 0 0 0.2rem rgba(109, 181, 255, 0.25);
+}
+
+html.dark .form-control::placeholder,
+html.dark textarea::placeholder {
+    color: #888888;
+}
+
+html.dark .form-label {
+    color: var(--text-dark);
+}
+
+/* Dark mode modals */
+html.dark .modal-content {
+    background-color: var(--bg-dark-secondary);
+    border-color: var(--border-dark);
+}
+
+html.dark .modal-header {
+    background-color: var(--bg-dark-tertiary);
+    border-bottom-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+html.dark .modal-title {
+    color: var(--text-dark);
+}
+
+html.dark .close,
+html.dark .btn-close {
+    color: var(--text-dark);
+}
+
+/* Dark mode dropdowns */
+html.dark .dropdown-menu {
+    background-color: var(--bg-dark-secondary);
+    border-color: var(--border-dark);
+}
+
+html.dark .dropdown-item {
+    color: #c0c0c0;
+}
+
+html.dark .dropdown-item:hover,
+html.dark .dropdown-item:focus {
+    background-color: var(--bg-dark-tertiary);
+    color: var(--text-dark);
+}
+
+html.dark .dropdown-item.active {
+    background-color: #1f7ae8;
+    color: white;
+}
+
+/* Dark mode pagination */
+html.dark .pagination .page-link {
+    background-color: var(--bg-dark-secondary);
+    border-color: var(--border-dark);
+    color: #c0c0c0;
+}
+
+html.dark .pagination .page-link:hover {
+    background-color: var(--bg-dark-tertiary);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+html.dark .pagination .page-item.active .page-link {
+    background-color: #1f7ae8;
+    border-color: #1f7ae8;
+    color: white;
+}
+
+/* Dark mode tables */
+html.dark .table {
+    color: var(--text-dark);
+    border-color: var(--border-dark);
+}
+
+html.dark .table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--bg-dark-tertiary);
+}
+
+html.dark .table-striped tbody tr:hover {
+    background-color: var(--bg-dark-tertiary);
+}
+
+html.dark .table td,
+html.dark .table th {
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+/* Dark mode alerts */
+html.dark .alert {
+    background-color: var(--bg-dark-secondary);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+html.dark .alert-primary {
+    background-color: rgba(31, 122, 232, 0.2);
+    border-color: #1f7ae8;
+    color: #8dc9ff;
+}
+
+html.dark .alert-success {
+    background-color: rgba(40, 167, 69, 0.2);
+    border-color: #28a745;
+    color: #6fe58f;
+}
+
+html.dark .alert-warning {
+    background-color: rgba(255, 193, 7, 0.2);
+    border-color: #ffc107;
+    color: #ffe066;
+}
+
+html.dark .alert-danger {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: #dc3545;
+    color: #ff6b7a;
+}
+
+html.dark .alert-info {
+    background-color: rgba(23, 162, 184, 0.2);
+    border-color: #17a2b8;
+    color: #5dd9e8;
+}
+
+/* Dark mode badges */
+html.dark .badge {
+    background-color: #1f7ae8;
+    color: white;
+}
+
+html.dark .badge-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Dark mode breadcrumbs */
+html.dark .breadcrumb {
+    background-color: var(--bg-dark-tertiary);
+}
+
+html.dark .breadcrumb-item {
+    color: #c0c0c0;
+}
+
+html.dark .breadcrumb-item.active {
+    color: var(--text-dark);
+}
+
+/* Dark mode sidebars and custom elements */
+html.dark .sidebar {
+    background-color: var(--bg-dark-secondary) !important;
+    color: var(--text-dark);
+    border-right: 1px solid var(--border-dark);
+}
+
+html.dark .sidebar .nav-link {
+    color: #c0c0c0;
+}
+
+html.dark .sidebar .nav-link:hover,
+html.dark .sidebar .nav-link.active {
+    color: var(--text-dark);
+    background-color: var(--bg-dark-tertiary);
+}
+
+/* Dark mode jobs and career elements */
+html.dark .job-list,
+html.dark .jobs-list-shell .job-list {
+    background-color: var(--bg-dark-secondary) !important;
+    border-color: var(--border-dark) !important;
+    color: var(--text-dark) !important;
+}
+
+html.dark .jobs-list-shell .filter-txt,
+html.dark .jobs-list-shell .truncate,
+html.dark .jobs-list-shell .job-list small,
+html.dark .jobs-list-shell .job-list b {
+    color: var(--text-dark) !important;
+}
+
+html.dark .jobs-list-shell .job-list::before {
+    background: rgba(109, 181, 255, 0.1) !important;
+}
+
+/* Dark mode benefit cards */
+html.dark .benefit-card,
+html.dark .home-benefit-card {
+    background-color: var(--bg-dark-secondary) !important;
+    border-color: var(--border-dark) !important;
+    color: var(--text-dark) !important;
+}
+
+html.dark .home-benefit-card h4 {
+    color: var(--text-dark) !important;
+}
+
+html.dark .home-benefit-card p {
+    color: #c0c0c0 !important;
+}
+
+/* Dark mode inputs and search */
+html.dark .smart-search-input {
+    background-color: var(--bg-dark-tertiary);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+html.dark .smart-search-input:focus {
+    border-color: #6db5ff;
+    box-shadow: 0 0 0 3px rgba(109, 181, 255, 0.2);
+}
+
+html.dark .smart-dropdown-trigger {
+    background-color: var(--bg-dark-tertiary);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+html.dark .smart-dropdown-menu {
+    background-color: var(--bg-dark-secondary);
+    border-color: var(--border-dark);
+}
+
+html.dark .smart-dropdown-option {
+    color: #c0c0c0;
+}
+
+html.dark .smart-dropdown-option:hover {
+    background-color: var(--bg-dark-tertiary);
+    color: var(--text-dark);
+}
+
+html.dark .smart-dropdown-option.active {
+    background-color: #1f7ae8;
+    color: white;
+}
+
+/* Dark mode forum elements */
+html.dark .Forum-list {
+    background-color: var(--bg-dark-secondary) !important;
+    border-color: var(--border-dark) !important;
+}
+
+/* Dark mode gallery and images */
+html.dark .gallery-item {
+    background-color: var(--bg-dark-tertiary);
+}
+
+/* Dark mode home page */
+html.dark .home-page {
+    --home-surface: #1a1a1a;
+    --home-muted: #c8d6e2;
+}
+
+html.dark .home-benefit-card {
+    background-color: var(--bg-dark-secondary);
+    border-color: var(--border-dark);
+}
+
+html.dark .home-benefit-card h4 {
+    color: var(--text-dark);
+}
+
+html.dark .home-benefit-card p {
+    color: #c0c0c0;
+}
+
+html.dark .home-event-card {
+    background-color: var(--bg-dark-secondary) !important;
+    border-color: var(--border-dark) !important;
+}
+
+html.dark .home-event-card h3 {
+    color: var(--text-dark) !important;
+}
+
+html.dark .home-event-location {
+    color: #a0a0a0 !important;
+}
+
+/* Dark mode loading and spinners */
+html.dark .spinner-border {
+    border-color: var(--border-dark);
+    border-right-color: #1f7ae8;
+}
+
+/* Dark mode specific scrollbar (for webkit browsers) */
+html.dark ::-webkit-scrollbar {
+    width: 10px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+    background: var(--bg-dark-tertiary);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+    background: var(--border-dark);
+    border-radius: 5px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+}
+}
+
 .home-empty-events h4 {
     margin: 0;
     color: #19496f;
