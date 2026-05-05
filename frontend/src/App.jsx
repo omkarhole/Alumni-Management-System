@@ -48,6 +48,8 @@ import Chatbot from "./components/Chatbot";
 // Missing Imports
 import RegisterBusiness from "./components/RegisterBusiness";
 import MyBusiness from "./components/MyBusiness";
+import ReferralList from "./components/ReferralList";
+import ReferralDetail from "./components/ReferralDetail";
 import AdminRoutes from "./components/routes/AdminRoutes";
 import StudentRoutes from "./components/routes/StudentRoutes";
 
@@ -59,6 +61,8 @@ const privateComponentMap = {
   JobRecommendations,
   RegisterBusiness,
   MyBusiness,
+  ReferralList,
+  ReferralDetail,
 };
 
 function App() {
@@ -143,6 +147,22 @@ function AppRouter() {
         </Route>
 
         {/* Private Routes - imported from centralized config */}
+        {privateRoutes.map((route, index) => {
+          const Component = privateComponentMap[route.component];
+          return (
+            <Route
+              key={index}
+              path={route.path}
+              element={
+                <PrivateRoute allow={route.roles}>
+                  <Component />
+                </PrivateRoute>
+              }
+            />
+          );
+        })}
+
+        {/* Referral Routes */}
         {privateRoutes.map((route, index) => {
           const Component = privateComponentMap[route.component];
           return (

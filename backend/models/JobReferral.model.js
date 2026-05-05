@@ -1,62 +1,64 @@
 const mongoose = require('mongoose');
 
-// JobReferral Schema definition
+// JobReferral Schema for standalone referral opportunities
 const jobReferralSchema = new mongoose.Schema({
-  job: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Career',
+  jobTitle: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  company: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  description: {
+    type: String,
     required: true
   },
-  referrer: {
+  referralBonus: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  deadline: {
+    type: Date
+  },
+  applicants: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    appliedAt: {
+      type: Date,
+      default: Date.now
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'accepted', 'rejected'],
+      default: 'pending'
+    }
+  }],
+  status: {
+    type: String,
+    enum: ['open', 'closed', 'filled'],
+    default: 'open'
+  },
+  postedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  },
-  candidateName: {
-    type: String,
-    required: true
-  },
-  candidateEmail: {
-    type: String,
-    required: true
-  },
-  candidatePhone: {
-    type: String,
-    default: ''
-  },
-  candidateResume: {
-    type: String,
-    default: ''
-  },
-  candidateLinkedIn: {
-    type: String,
-    default: ''
-  },
-  candidateExperience: {
-    type: String,
-    default: ''
-  },
-  status: {
-    type: String,
-    enum: ['pending', 'reviewed', 'shortlisted', 'interviewed', 'offered', 'accepted', 'rejected', 'withdrawn'],
-    default: 'pending'
-  },
-  notes: {
-    type: String,
-    default: ''
-  },
-  outcome: {
-    type: String,
-    default: ''
   }
 }, {
   timestamps: true
 });
 
-// Indexes for efficient querying
-jobReferralSchema.index({ job: 1 });
-jobReferralSchema.index({ referrer: 1 });
+// Indexes for efficient querying and search
 jobReferralSchema.index({ status: 1 });
-jobReferralSchema.index({ createdAt: -1 });
+jobReferralSchema.index({ 'postedBy': 1 });
+jobReferralSchema.index({ deadline: 1 });
+jobReferralSchema.index({ 'jobTitle': 'text', 'company': 'text', 'description': 'text' });
 
 module.exports = mongoose.model('JobReferral', jobReferralSchema);
+
