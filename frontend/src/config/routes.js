@@ -84,7 +84,18 @@ export const privateRoutes = [
     component: "MyBusiness", 
     roles: ["alumnus"] 
   },
+  { 
+    path: "/referrals", 
+    component: "ReferralList", 
+    roles: ["alumnus", "student", "admin"] 
+  },
+  { 
+    path: "/referrals/:id", 
+    component: "ReferralDetail", 
+    roles: ["alumnus", "student", "admin"] 
+  },
 ];
+
 
 // Route Groups for easy import
 export const routeGroups = {
