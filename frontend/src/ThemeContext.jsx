@@ -14,7 +14,25 @@ export const ThemeProvider = ({ children }) => {
   useEffect(() => {
     // Save the theme to local storage whenever it changes
     localStorage.setItem('theme', theme);
+    
+    // Apply the theme to the HTML element
+    const htmlElement = document.documentElement;
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
   }, [theme]);
+
+  // Apply theme on component mount
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  }, []);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
