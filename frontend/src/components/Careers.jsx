@@ -10,6 +10,8 @@ import { smoothScrollToTop } from '../utils/smoothScroll';
 import SmartSearchBar from './SmartSearchBar';
 import SmartFilterDropdown from './SmartFilterDropdown';
 import ReferralForm from './ReferralForm';
+import ResumeAnalyzer from './ResumeAnalyzer';
+
 
 
 const previewJobs = [
@@ -53,6 +55,8 @@ const Careers = () => {
     const [activeTab, setActiveTab] = useState('all');
     const [recommendations, setRecommendations] = useState([]);
     const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+    const [showResumeAnalyzer, setShowResumeAnalyzer] = useState(false);
+
 
     const openModal = (job) => {
         setSelectedJob(job);
@@ -214,6 +218,20 @@ const Careers = () => {
     return (
         <>
             <header className="masthead">
+                {isLoggedIn && !isStudent && (
+                    <div className="container-fluid mb-3">
+                        <div className="d-flex justify-content-end">
+                            <button
+                                type="button"
+                                className="btn btn-outline-light"
+                                onClick={() => setShowResumeAnalyzer(true)}
+                            >
+                                Analyze My Resume
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <div className="container-fluid h-100">
                     <div className="row h-100 align-items-center justify-content-center text-center">
                         <div className="col-lg-8 align-self-end mb-4 page-title">
@@ -428,8 +446,31 @@ const Careers = () => {
                     <button type="button" className="btn-close" onClick={() => setReferralSuccess(false)}></button>
                 </div>
             )}
+
+            {showResumeAnalyzer && (
+                <div className="fixed inset-0 z-50 bg-black/50 overflow-y-auto">
+                    <div className="min-h-screen px-4 py-10 flex items-start justify-center">
+                        <div className="w-full max-w-4xl">
+                            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                                <div className="flex items-center justify-between px-6 py-4 border-b">
+                                    <h2 className="text-lg font-bold text-gray-900">Resume Analyzer</h2>
+                                    <button
+                                        type="button"
+                                        className="text-gray-600 hover:text-gray-900"
+                                        onClick={() => setShowResumeAnalyzer(false)}
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                                <ResumeAnalyzer />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     )
 }
+
 
 export default Careers

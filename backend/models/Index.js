@@ -28,6 +28,7 @@ const DonationCampaign = require('./DonationCampaign.model');
 const Business = require('./Business.model');
 const BusinessReview = require('./BusinessReview.model');
 const StreamSession = require('./StreamSession.model');
+const ResumeAnalysis = require('./ResumeAnalysis.model');
 
 module.exports = {
   User,
@@ -57,5 +58,6 @@ module.exports = {
   Donation,
   DonationCampaign,
   Business,
-  BusinessReview
+  BusinessReview,
+  ResumeAnalysis
 };
