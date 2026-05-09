@@ -26,6 +26,7 @@ const courseRouter = require('./routes/course.routes');
 const eventCalendarRouter = require('./routes/eventCalendar.routes');
 const reunionRouter = require('./routes/reunion.routes');
 const referralRouter = require('./routes/referral.routes');
+const streamRouter = require('./routes/stream.routes');
 
 
 dotenv.config();
@@ -135,6 +136,7 @@ app.use('/api/v1/courses', courseRouter);
 app.use('/api/v1/event-calendar', eventCalendarRouter);
 app.use('/api/v1/reunions', reunionRouter);
 app.use('/api/v1/referrals', referralRouter);
+app.use('/api/v1/stream', streamRouter);
 app.use('/api/v1', badgeRouter);
 
 /* Backward compatibility for old routes (deprecated) */

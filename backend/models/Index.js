@@ -27,10 +27,11 @@ const Donation = require('./Donation.model');
 const DonationCampaign = require('./DonationCampaign.model');
 const Business = require('./Business.model');
 const BusinessReview = require('./BusinessReview.model');
+const StreamSession = require('./StreamSession.model');
 
 module.exports = {
   User,
-  Course,
+  StreamSession,
   Enrollment,
   Career,
   Event,

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ArrowLeft, MapPin, Calendar, Clock, Users, Share2, Copy, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import '../styles/EventDetails.css';
+import EventStream from './EventStream';
 
 const EventDetails = () => {
   const { eventId } = useParams();
@@ -245,8 +246,16 @@ const EventDetails = () => {
             </div>
           )}
 
-          {/* Virtual Link */}
-          {(event.eventMode === 'virtual' || event.eventMode === 'hybrid') && event.virtualLink && (
+          {/* Live Stream (virtual_stream) */}
+          {event.eventType === 'virtual_stream' && (
+            <div className="virtual-link-section">
+              <h3>Join Live Stream</h3>
+              <EventStream eventId={event._id} />
+            </div>
+          )}
+
+          {/* Legacy Virtual Link */}
+          {event.eventType !== 'virtual_stream' && (event.eventMode === 'virtual' || event.eventMode === 'hybrid') && event.virtualLink && (
             <div className="virtual-link-section">
               <h3>Join Online</h3>
               <div className="virtual-link-card">

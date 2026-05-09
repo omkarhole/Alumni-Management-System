@@ -1,6 +1,7 @@
 const DirectMessage = require('../models/DirectMessage.model');
 const User = require('../models/User.model');
 
+
 // Store active connections: { userId: socketId }
 const activeUsers = new Map();
 // Store conversation rooms: { conversationId: Set(socketIds) }
@@ -19,9 +20,11 @@ const conversationRooms = new Map();
  * 8. messageDelete - Delete a message
  * 9. messageEdit - Edit a message
  */
+const streamRooms = new Map(); // eventId -> Set(socketIds)
 const initializeSocket = (io) => {
   io.on('connection', (socket) => {
     console.log(`User connected: ${socket.id}`);
+
 
     // ===== EVENT 1: JOIN CONVERSATION =====
     socket.on('joinConversation', (data) => {
@@ -256,6 +259,60 @@ const initializeSocket = (io) => {
       } catch (error) {
         console.error('Error in messageEdit:', error);
         socket.emit('connect_error', { message: 'Failed to edit message' });
+      }
+    });
+
+    // ===== STREAM: JOIN/LEAVE VIEWER COUNTS =====
+    socket.on('joinStream', (data) => {
+      try {
+        const { eventId } = data || {};
+        if (!eventId) {
+          socket.emit('error', { message: 'eventId is required' });
+          return;
+        }
+
+        const roomId = `stream:${eventId}`;
+        socket.join(roomId);
+
+        if (!streamRooms.has(eventId)) {
+          streamRooms.set(eventId, new Set());
+        }
+        streamRooms.get(eventId).add(socket.id);
+
+        io.to(roomId).emit('streamViewerCount', {
+          eventId,
+          viewerCount: streamRooms.get(eventId).size,
+          timestamp: new Date(),
+        });
+      } catch (error) {
+        console.error('Error in joinStream:', error);
+      }
+    });
+
+    socket.on('leaveStream', (data) => {
+      try {
+        const { eventId } = data || {};
+        if (!eventId) return;
+
+        const roomId = `stream:${eventId}`;
+        socket.leave(roomId);
+
+        if (streamRooms.has(eventId)) {
+          streamRooms.get(eventId).delete(socket.id);
+          const size = streamRooms.get(eventId).size;
+
+          io.to(roomId).emit('streamViewerCount', {
+            eventId,
+            viewerCount: size,
+            timestamp: new Date(),
+          });
+
+          if (size === 0) {
+            streamRooms.delete(eventId);
+          }
+        }
+      } catch (error) {
+        console.error('Error in leaveStream:', error);
       }
     });
 

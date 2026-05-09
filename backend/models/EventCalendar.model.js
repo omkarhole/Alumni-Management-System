@@ -33,7 +33,7 @@ const eventCalendarSchema = new mongoose.Schema({
   },
   eventType: {
     type: String,
-    enum: ['workshop', 'reunion', 'networking', 'webinar', 'social'],
+    enum: ['workshop', 'reunion', 'networking', 'webinar', 'social', 'virtual_stream'],
     required: true
   },
   startDate: {
@@ -56,6 +56,11 @@ const eventCalendarSchema = new mongoose.Schema({
   virtualLink: {
     type: String,
     default: ''
+  },
+  streamSessionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'StreamSession',
+    default: null,
   },
   capacity: {
     type: Number,
