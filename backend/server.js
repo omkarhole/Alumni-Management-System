@@ -28,6 +28,7 @@ const reunionRouter = require('./routes/reunion.routes');
 const referralRouter = require('./routes/referral.routes');
 const streamRouter = require('./routes/stream.routes');
 const resumeAnalyzerRouter = require('./routes/resumeAnalyzer.routes');
+const marketplaceRouter = require('./routes/marketplace.routes');
 
 dotenv.config();
 const app = express();
@@ -138,6 +139,7 @@ app.use('/api/v1/reunions', reunionRouter);
 app.use('/api/v1/referrals', referralRouter);
 app.use('/api/v1/stream', streamRouter);
 app.use('/api/v1/resume-analyzer', resumeAnalyzerRouter);
+app.use('/api/v1/marketplace', marketplaceRouter);
 app.use('/api/v1', badgeRouter);
 
 
@@ -152,6 +154,7 @@ app.use('/api/courses', courseRouter);
 app.use('/api/event-calendar', eventCalendarRouter);
 app.use('/api/reunions', reunionRouter);
 app.use('/api/referrals', referralRouter);
+app.use('/api/marketplace', marketplaceRouter);
 app.use('/api', badgeRouter);
 
 /* =========================
