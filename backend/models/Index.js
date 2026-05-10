@@ -30,6 +30,7 @@ const BusinessReview = require('./BusinessReview.model');
 const StreamSession = require('./StreamSession.model');
 const ResumeAnalysis = require('./ResumeAnalysis.model');
 const Marketplace = require('./Marketplace.model');
+const Poll = require('./Poll.model');
 
 module.exports = {
   User,
@@ -61,5 +62,6 @@ module.exports = {
   Business,
   BusinessReview,
   ResumeAnalysis,
-  Marketplace
+  Marketplace,
+  Poll
 };
