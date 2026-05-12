@@ -50,6 +50,9 @@ import RegisterBusiness from "./components/RegisterBusiness";
 import MyBusiness from "./components/MyBusiness";
 import ReferralList from "./components/ReferralList";
 import ReferralDetail from "./components/ReferralDetail";
+import Marketplace from "./components/Marketplace";
+import MarketplaceForm from "./components/MarketplaceForm";
+import MarketplaceDetail from "./components/MarketplaceDetail";
 import AdminRoutes from "./components/routes/AdminRoutes";
 import StudentRoutes from "./components/routes/StudentRoutes";
 
@@ -108,6 +111,10 @@ function AppRouter() {
         <Route path="/messages" element={<Messages />} />
         <Route path="/messages/:userId" element={<DirectChat />} />
         <Route path="/jobs" element={<Careers />} />
+        <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/marketplace/:listingId" element={<MarketplaceDetail />} />
+        <Route path="/marketplace/create" element={<PrivateRoute allow={["student", "admin"]}><MarketplaceForm /></PrivateRoute>} />
+        <Route path="/marketplace/edit/:listingId" element={<PrivateRoute allow={["student", "admin"]}><MarketplaceForm /></PrivateRoute>} />
         <Route path="/mentorship" element={<Mentorship />} />
         <Route path="/forums" element={<Forum />} />
         <Route path="/forum/view" element={<ViewTopic />} />
