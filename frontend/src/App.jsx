@@ -53,6 +53,8 @@ import ReferralDetail from "./components/ReferralDetail";
 import Marketplace from "./components/Marketplace";
 import MarketplaceForm from "./components/MarketplaceForm";
 import MarketplaceDetail from "./components/MarketplaceDetail";
+import Polls from "./components/Polls";
+import PollCreateForm from "./components/PollCreateForm";
 import AdminRoutes from "./components/routes/AdminRoutes";
 import StudentRoutes from "./components/routes/StudentRoutes";
 
@@ -115,6 +117,9 @@ function AppRouter() {
         <Route path="/marketplace/:listingId" element={<MarketplaceDetail />} />
         <Route path="/marketplace/create" element={<PrivateRoute allow={["student", "admin"]}><MarketplaceForm /></PrivateRoute>} />
         <Route path="/marketplace/edit/:listingId" element={<PrivateRoute allow={["student", "admin"]}><MarketplaceForm /></PrivateRoute>} />
+        <Route path="/polls" element={<Polls />} />
+        <Route path="/polls/create" element={<PrivateRoute allow={["student", "admin"]}><PollCreateForm /></PrivateRoute>} />
+        <Route path="/polls/edit/:pollId" element={<PrivateRoute allow={["student", "admin"]}><PollCreateForm /></PrivateRoute>} />
         <Route path="/mentorship" element={<Mentorship />} />
         <Route path="/forums" element={<Forum />} />
         <Route path="/forum/view" element={<ViewTopic />} />
