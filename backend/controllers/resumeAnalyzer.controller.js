@@ -59,6 +59,61 @@ function getMissingSkills({ resumeSkills = [], jobSkills = [] }) {
   return missing;
 }
 
+function normalizeSkillText(value = '') {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9+#\s.-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function buildSkillExplanations({ resumeText = '', resumeSkills = [], requiredSkills = [], source = 'jobRequirements' }) {
+  const normalizedResumeText = normalizeSkillText(resumeText);
+  const normalizedResumeSkills = new Set(
+    (resumeSkills || []).map((skill) => normalizeSkillText(skill)).filter(Boolean)
+  );
+
+  return (requiredSkills || []).map((skill) => {
+    const skillLabel = String(skill || '').trim();
+    const normalizedSkill = normalizeSkillText(skillLabel);
+    const skillTokens = normalizedSkill.split(' ').filter(Boolean);
+    const matchedBecause = [];
+    let matchedType = 'none';
+    let status = 'missing';
+
+    const exactHit = normalizedSkill && normalizedResumeText.includes(normalizedSkill);
+    const tokenHits = skillTokens.filter((token) => normalizedResumeText.includes(token));
+    const resumeSkillHit = normalizedResumeSkills.has(normalizedSkill);
+
+    if (exactHit || resumeSkillHit) {
+      matchedType = 'exact';
+      status = 'matched';
+      matchedBecause.push(`resume includes '${skillLabel}'`);
+      if (!exactHit && resumeSkillHit) {
+        matchedBecause.push(`skill extractor detected '${skillLabel}' in the resume`);
+      }
+    } else if (skillTokens.length > 1 && tokenHits.length >= Math.ceil(skillTokens.length / 2)) {
+      matchedType = 'partial';
+      status = 'matched';
+      matchedBecause.push(`resume includes related terms for '${skillLabel}': ${tokenHits.map((token) => `'${token}'`).join(', ')}`);
+    } else if (tokenHits.length > 0) {
+      matchedType = 'partial';
+      status = 'matched';
+      matchedBecause.push(`resume includes partial keyword hits for '${skillLabel}': ${tokenHits.map((token) => `'${token}'`).join(', ')}`);
+    } else {
+      matchedBecause.push(`resume does not include '${skillLabel}'`);
+    }
+
+    return {
+      skill: skillLabel,
+      status,
+      matchedType,
+      matchedBecause,
+      source,
+    };
+  });
+}
+
 function buildRecommendations({ missingSkills = [], score = 0 }) {
   const recommendations = [];
 
@@ -146,6 +201,7 @@ async function analyzeResume(req, res, next) {
         score: 0,
         matchedSkills: [],
         missingSkills: [],
+        skillExplanations: [],
         recommendations: [
           'Could not detect job required skills. Provide jobSkills or jobId (preferred).',
         ],
@@ -168,8 +224,14 @@ async function analyzeResume(req, res, next) {
     const score = calculateSkillsMatchPercentage(resumeSkills, requiredSkills);
 
     // Compute matched + missing skill lists for UI visibility
-    const missingSkills = getMissingSkills({ resumeSkills, jobSkills: requiredSkills });
-    const matchedSkills = requiredSkills.filter((s) => !missingSkills.includes(s));
+    const skillExplanations = buildSkillExplanations({
+      resumeText,
+      resumeSkills,
+      requiredSkills,
+      source: career?._id ? 'career.skills' : (Array.isArray(jobSkills) && jobSkills.length > 0 ? 'jobSkills' : 'jobDescription'),
+    });
+    const matchedSkills = skillExplanations.filter((entry) => entry.status === 'matched').map((entry) => entry.skill);
+    const missingSkills = skillExplanations.filter((entry) => entry.status === 'missing').map((entry) => entry.skill);
 
     // Course suggestions: match missing skills against course tags/title (best-effort)
     // We still return generic recommendations even if no matching courses are found.
@@ -216,6 +278,7 @@ async function analyzeResume(req, res, next) {
       score,
       matchedSkills,
       missingSkills,
+      skillExplanations,
       recommendations: recommendations.map((r) => ({ text: r })).map((x) => x.text).map((t) => t),
       jobRequirements: requiredSkills,
       resumeSkills,
@@ -227,6 +290,7 @@ async function analyzeResume(req, res, next) {
       score: analysis.score,
       matchedSkills: analysis.matchedSkills,
       missingSkills: analysis.missingSkills,
+      skillExplanations: analysis.skillExplanations || skillExplanations,
       recommendations: analysis.recommendations,
       resumeSkills: analysis.resumeSkills,
       jobRequirements: analysis.jobRequirements,
@@ -267,6 +331,7 @@ async function getRecommendations(req, res, next) {
       score: analysis.score,
       matchedSkills: analysis.matchedSkills || [],
       missingSkills: analysis.missingSkills || [],
+      skillExplanations: analysis.skillExplanations || [],
     });
   } catch (err) {
     next(err);

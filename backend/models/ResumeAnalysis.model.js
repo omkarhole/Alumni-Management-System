@@ -35,6 +35,36 @@ const resumeAnalysisSchema = new mongoose.Schema(
       default: [],
     },
 
+    skillExplanations: {
+      type: [
+        {
+          skill: {
+            type: String,
+            required: true,
+          },
+          status: {
+            type: String,
+            enum: ['matched', 'missing'],
+            required: true,
+          },
+          matchedType: {
+            type: String,
+            enum: ['exact', 'partial', 'none'],
+            default: 'none',
+          },
+          matchedBecause: {
+            type: [String],
+            default: [],
+          },
+          source: {
+            type: String,
+            default: 'jobRequirements',
+          },
+        },
+      ],
+      default: [],
+    },
+
     // Free-form recommendations (e.g. skills to develop, course suggestions)
     recommendations: {
       type: [
