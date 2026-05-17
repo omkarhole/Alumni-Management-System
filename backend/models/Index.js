@@ -15,6 +15,7 @@ const MentorshipMatch = require('./MentorshipMatch.model');
 const MentorshipSession = require('./MentorshipSession.model');
 const MentorshipMessage = require('./MentorshipMessage.model');
 const JobReferral = require('./JobReferral.model');
+const ReferralMessage = require('./ReferralMessage.model');
 const JobSubscription = require('./JobSubscription.model');
 const Otp = require('./Otp.model');
 const BlacklistedToken = require('./BlacklistedToken.model');
@@ -49,6 +50,7 @@ module.exports = {
   MentorshipSession,
   MentorshipMessage,
   JobReferral,
+  ReferralMessage,
   JobSubscription,
   Otp,
   BlacklistedToken,

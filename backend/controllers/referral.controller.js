@@ -1,4 +1,4 @@
-const { JobReferral, User, Badge, UserBadge } = require('../models/Index');
+const { JobReferral, User, Badge, UserBadge, ReferralMessage } = require('../models/Index');
 const logger = require('../utils/logger');
 
 async function getCurrentUserSummary(userId) {
@@ -22,6 +22,30 @@ function appendTimelineEvent(referral, event) {
     applicantName: event.applicantName,
     details: event.details
   });
+}
+
+async function getReferralAccess(referralId, userId) {
+  const referral = await JobReferral.findById(referralId)
+    .populate('postedBy', 'name email alumnus_bio')
+    .populate('applicants.user', 'name email alumnus_bio');
+
+  if (!referral) {
+    return { referral: null, access: false, currentUser: null, isOwner: false, isApplicant: false };
+  }
+
+  const currentUser = await getCurrentUserSummary(userId);
+  const isOwner = referral.postedBy?._id?.toString() === userId;
+  const isApplicant = referral.applicants?.some((applicant) => applicant.user?._id?.toString() === userId);
+  const isAdmin = currentUser?.type === 'admin';
+
+  return {
+    referral,
+    currentUser,
+    access: Boolean(isOwner || isApplicant || isAdmin),
+    isOwner,
+    isApplicant,
+    isAdmin
+  };
 }
 
 // Create a new job referral opportunity
@@ -386,6 +410,113 @@ async function closeReferral(req, res, next) {
   }
 }
 
+async function getReferralMessages(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { referral, access } = await getReferralAccess(id, req.user.id);
+
+    if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    if (!access) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const messages = await ReferralMessage.find({ referralId: id })
+      .populate('sender', 'name email alumnus_bio')
+      .populate('recipient', 'name email alumnus_bio')
+      .sort({ createdAt: 1 });
+
+    res.json({ messages });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function sendReferralMessage(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { body, recipientId } = req.body;
+    const { referral, currentUser, access, isOwner, isApplicant } = await getReferralAccess(id, req.user.id);
+
+    if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    if (!access) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const trimmedBody = String(body || '').trim();
+    if (!trimmedBody) {
+      return res.status(400).json({ message: 'Message body is required' });
+    }
+
+    let recipientUser = null;
+
+    if (isOwner) {
+      if (!recipientId) {
+        return res.status(400).json({ message: 'Recipient is required for poster messages' });
+      }
+
+      const applicant = referral.applicants.find((entry) => entry.user?._id?.toString() === recipientId);
+      if (!applicant) {
+        return res.status(400).json({ message: 'Recipient must be an applicant on this referral' });
+      }
+
+      recipientUser = applicant.user;
+    } else if (isApplicant) {
+      recipientUser = referral.postedBy;
+    } else if (currentUser?.type === 'admin') {
+      if (!recipientId) {
+        return res.status(400).json({ message: 'Recipient is required for admin messages' });
+      }
+
+      const posterId = referral.postedBy?._id?.toString() || referral.postedBy?.toString();
+      if (recipientId === posterId) {
+        recipientUser = referral.postedBy;
+      } else {
+        const applicant = referral.applicants.find((entry) => entry.user?._id?.toString() === recipientId);
+        if (!applicant) {
+          return res.status(400).json({ message: 'Recipient must belong to this referral' });
+        }
+        recipientUser = applicant.user;
+      }
+    }
+
+    if (!recipientUser?._id && !recipientUser?.toString) {
+      return res.status(400).json({ message: 'Unable to resolve recipient' });
+    }
+
+    const message = await ReferralMessage.create({
+      referralId: id,
+      sender: req.user.id,
+      recipient: recipientUser._id || recipientUser,
+      body: trimmedBody
+    });
+
+    const populatedMessage = await ReferralMessage.findById(message._id)
+      .populate('sender', 'name email alumnus_bio')
+      .populate('recipient', 'name email alumnus_bio');
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`referral:${id}`).emit('referralMessageCreated', {
+        referralId: id,
+        message: populatedMessage
+      });
+    }
+
+    res.status(201).json({
+      message: 'Message sent successfully',
+      data: populatedMessage
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // Get my referrals (posted by me)
 async function getMyReferrals(req, res, next) {
   try {
@@ -406,6 +537,8 @@ module.exports = {
   acceptReferral,
   rejectReferral,
   closeReferral,
+  getReferralMessages,
+  sendReferralMessage,
   getMyReferrals,
   getReferralById,
   getReferralTimeline
