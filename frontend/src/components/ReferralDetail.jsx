@@ -6,13 +6,16 @@ import { toast } from 'react-toastify';
 
 const ReferralDetail = () => {
   const { id } = useParams();
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const { isAuthReady } = useAuth();
   const [referral, setReferral] = useState(null);
+  const [timeline, setTimeline] = useState([]);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
-  const [isOwner, setIsOwner] = useState(false);
   const [applicants, setApplicants] = useState([]);
+
+  const currentUserId = localStorage.getItem('user_id');
+  const currentUserType = (localStorage.getItem('user_type') || '').toLowerCase();
 
   useEffect(() => {
     fetchReferral();
@@ -21,20 +24,25 @@ const ReferralDetail = () => {
   const fetchReferral = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get(`/api/referrals/${id}?populate=true`);
-      const data = response.data;
+      const [referralResponse, timelineResponse] = await Promise.all([
+        apiClient.get(`/api/referrals/${id}`),
+        apiClient.get(`/api/referrals/${id}/timeline`)
+      ]);
+
+      const data = referralResponse.data;
       setReferral(data);
       setApplicants(data.applicants || []);
-      setIsOwner(user && data.postedBy?._id === user.id);
+      setTimeline(timelineResponse.data?.timeline || []);
     } catch (err) {
       toast.error('Failed to load referral details');
+      setTimeline([]);
     } finally {
       setLoading(false);
     }
   };
 
   const handleApply = async () => {
-    if (!user) {
+    if (!currentUserId) {
       toast.error('Please login to apply');
       return;
     }
@@ -95,9 +103,34 @@ const ReferralDetail = () => {
   }
 
   const canApply = referral.status === 'open' && 
-    !referral.applicants?.some(app => app.user._id === user?.id) &&
-    user && 
-    !isOwner;
+    !referral.applicants?.some(app => (app.user?._id || app.user?.id || app.user) === currentUserId) &&
+    currentUserId && 
+    currentUserType === 'student' &&
+    (referral.postedBy?._id || referral.postedBy?.id || referral.postedBy) !== currentUserId;
+
+  const isOwner = Boolean(
+    currentUserId && (referral.postedBy?._id || referral.postedBy?.id || referral.postedBy) === currentUserId
+  );
+
+  const describeTimelineEvent = (event) => {
+    const actionMap = {
+      posted: 'Referral posted',
+      applied: 'Application submitted',
+      accepted: 'Applicant accepted',
+      rejected: 'Applicant rejected',
+      filled: 'Referral filled',
+      closed: 'Referral closed'
+    };
+
+    return actionMap[event.action] || event.action;
+  };
+
+  const timelineTone = (event) => {
+    if (event.status === 'accepted' || event.status === 'filled') return 'from-green-500 to-emerald-600';
+    if (event.status === 'rejected' || event.status === 'closed') return 'from-red-500 to-rose-600';
+    if (event.status === 'pending') return 'from-yellow-500 to-amber-500';
+    return 'from-blue-500 to-cyan-500';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -152,6 +185,54 @@ const ReferralDetail = () => {
               </div>
             </div>
 
+            {/* Timeline */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Status Timeline</h2>
+                <span className="text-sm text-gray-500">Chronological activity feed</span>
+              </div>
+              {timeline.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-gray-200 p-6 text-gray-500">
+                  No timeline events yet.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {timeline.map((event, index) => (
+                    <div key={`${event.timestamp}-${index}`} className="flex gap-4">
+                      <div className={`mt-1 h-3 w-3 rounded-full bg-gradient-to-r ${timelineTone(event)} shadow-sm`} />
+                      <div className="flex-1 pb-4 border-b border-gray-100 last:border-b-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div>
+                            <p className="font-semibold text-gray-900">{describeTimelineEvent(event)}</p>
+                            <p className="text-sm text-gray-600">
+                              {event.actorName ? `by ${event.actorName}` : 'System'}
+                              {event.applicantName ? ` for ${event.applicantName}` : ''}
+                            </p>
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {event.timestamp ? new Date(event.timestamp).toLocaleString() : ''}
+                          </div>
+                        </div>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                            {String(event.status || '').toUpperCase()}
+                          </span>
+                          {event.scope && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">
+                              {event.scope}
+                            </span>
+                          )}
+                        </div>
+                        {event.details && (
+                          <p className="mt-3 text-sm text-gray-600">{event.details}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Apply Section */}
             {canApply && (
               <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-8 shadow-2xl mb-8">
@@ -174,7 +255,7 @@ const ReferralDetail = () => {
               </div>
             )}
 
-            {!user && (
+            {!currentUserId && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-8 mb-8">
                 <h3 className="text-xl font-bold text-yellow-900 mb-4">Login to Apply</h3>
                 <p className="text-yellow-800 mb-6">Sign in to your account to apply for this referral opportunity and track your applications.</p>

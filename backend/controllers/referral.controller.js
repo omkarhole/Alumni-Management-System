@@ -1,17 +1,52 @@
 const { JobReferral, User, Badge, UserBadge } = require('../models/Index');
 const logger = require('../utils/logger');
 
+async function getCurrentUserSummary(userId) {
+  return User.findById(userId).select('_id name type');
+}
+
+function appendTimelineEvent(referral, event) {
+  if (!referral.timeline) {
+    referral.timeline = [];
+  }
+
+  referral.timeline.push({
+    action: event.action,
+    status: event.status,
+    scope: event.scope || 'referral',
+    timestamp: event.timestamp || new Date(),
+    actor: event.actor?._id || event.actor,
+    actorName: event.actorName,
+    actorType: event.actorType,
+    applicant: event.applicant?._id || event.applicant,
+    applicantName: event.applicantName,
+    details: event.details
+  });
+}
+
 // Create a new job referral opportunity
 async function createReferral(req, res, next) {
   try {
+    const currentUser = await getCurrentUserSummary(req.user.id);
     const referralData = {
       jobTitle: req.body.jobTitle,
       company: req.body.company,
       description: req.body.description,
       referralBonus: req.body.referralBonus || 0,
       deadline: req.body.deadline ? new Date(req.body.deadline) : null,
-      postedBy: req.user.id
+      postedBy: req.user.id,
+      timeline: []
     };
+
+    appendTimelineEvent(referralData, {
+      action: 'posted',
+      status: 'open',
+      scope: 'referral',
+      actor: currentUser,
+      actorName: currentUser?.name,
+      actorType: currentUser?.type,
+      details: 'Referral posted'
+    });
 
     const referral = await JobReferral.create(referralData);
 
@@ -99,6 +134,11 @@ async function getReferrals(req, res, next) {
 async function applyForReferral(req, res, next) {
   try {
     const { id } = req.params;
+    const currentUser = await getCurrentUserSummary(req.user.id);
+
+    if (!currentUser || currentUser.type !== 'student') {
+      return res.status(403).json({ message: 'Only students can apply for referrals' });
+    }
 
     const referral = await JobReferral.findById(id);
     if (!referral) {
@@ -125,6 +165,18 @@ async function applyForReferral(req, res, next) {
       user: req.user.id
     });
 
+    appendTimelineEvent(referral, {
+      action: 'applied',
+      status: 'pending',
+      scope: 'applicant',
+      actor: currentUser,
+      actorName: currentUser.name,
+      actorType: currentUser.type,
+      applicant: currentUser,
+      applicantName: currentUser.name,
+      details: `${currentUser.name} applied for this referral`
+    });
+
     await referral.save();
 
     await referral.populate('applicants.user', 'name email alumnus_bio');
@@ -142,9 +194,16 @@ async function applyForReferral(req, res, next) {
 async function acceptReferral(req, res, next) {
   try {
     const { id, applicantId } = req.params;
+    const currentUser = await getCurrentUserSummary(req.user.id);
 
-    const referral = await JobReferral.findOne({ _id: id, postedBy: req.user.id });
+    const referral = await JobReferral.findById(id);
     if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    const isOwner = referral.postedBy.toString() === req.user.id;
+    const isAdmin = currentUser?.type === 'admin';
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'Access denied' });
     }
 
@@ -155,8 +214,34 @@ async function acceptReferral(req, res, next) {
       return res.status(404).json({ message: 'Applicant not found' });
     }
 
+    const applicantUser = await User.findById(applicantId).select('_id name');
+
     referral.applicants[applicantIndex].status = 'accepted';
     referral.status = 'filled'; // Close after accept
+
+    appendTimelineEvent(referral, {
+      action: 'accepted',
+      status: 'accepted',
+      scope: 'applicant',
+      actor: currentUser,
+      actorName: currentUser?.name,
+      actorType: currentUser?.type,
+      applicant: applicantUser?._id || applicantId,
+      applicantName: applicantUser?.name,
+      details: `${applicantUser?.name || 'Applicant'} was accepted`
+    });
+
+    appendTimelineEvent(referral, {
+      action: 'filled',
+      status: 'filled',
+      scope: 'referral',
+      actor: currentUser,
+      actorName: currentUser?.name,
+      actorType: currentUser?.type,
+      applicant: applicantUser?._id || applicantId,
+      applicantName: applicantUser?.name,
+      details: 'Referral marked as filled'
+    });
 
     await referral.save();
 
@@ -175,9 +260,16 @@ async function acceptReferral(req, res, next) {
 async function rejectReferral(req, res, next) {
   try {
     const { id, applicantId } = req.params;
+    const currentUser = await getCurrentUserSummary(req.user.id);
 
-    const referral = await JobReferral.findOne({ _id: id, postedBy: req.user.id });
+    const referral = await JobReferral.findById(id);
     if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    const isOwner = referral.postedBy.toString() === req.user.id;
+    const isAdmin = currentUser?.type === 'admin';
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'Access denied' });
     }
 
@@ -188,7 +280,21 @@ async function rejectReferral(req, res, next) {
       return res.status(404).json({ message: 'Applicant not found' });
     }
 
+    const applicantUser = await User.findById(applicantId).select('_id name');
+
     referral.applicants[applicantIndex].status = 'rejected';
+
+    appendTimelineEvent(referral, {
+      action: 'rejected',
+      status: 'rejected',
+      scope: 'applicant',
+      actor: currentUser,
+      actorName: currentUser?.name,
+      actorType: currentUser?.type,
+      applicant: applicantUser?._id || applicantId,
+      applicantName: applicantUser?.name,
+      details: `${applicantUser?.name || 'Applicant'} was rejected`
+    });
 
     await referral.save();
 
@@ -220,6 +326,66 @@ async function getReferralById(req, res, next) {
   }
 }
 
+async function getReferralTimeline(req, res, next) {
+  try {
+    const referral = await JobReferral.findById(req.params.id).select('timeline');
+    if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    const timeline = [...(referral.timeline || [])].sort(
+      (left, right) => new Date(left.timestamp) - new Date(right.timestamp)
+    );
+
+    res.json({ timeline });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function closeReferral(req, res, next) {
+  try {
+    const { id } = req.params;
+    const currentUser = await getCurrentUserSummary(req.user.id);
+
+    const referral = await JobReferral.findById(id);
+    if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    const isOwner = referral.postedBy.toString() === req.user.id;
+    const isAdmin = currentUser?.type === 'admin';
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    if (referral.status === 'closed' || referral.status === 'filled') {
+      return res.status(400).json({ message: 'Referral is already closed' });
+    }
+
+    referral.status = 'closed';
+
+    appendTimelineEvent(referral, {
+      action: 'closed',
+      status: 'closed',
+      scope: 'referral',
+      actor: currentUser,
+      actorName: currentUser?.name,
+      actorType: currentUser?.type,
+      details: 'Referral closed'
+    });
+
+    await referral.save();
+
+    res.json({
+      message: 'Referral closed successfully',
+      referral
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // Get my referrals (posted by me)
 async function getMyReferrals(req, res, next) {
   try {
@@ -239,7 +405,9 @@ module.exports = {
   applyForReferral,
   acceptReferral,
   rejectReferral,
+  closeReferral,
   getMyReferrals,
-  getReferralById
+  getReferralById,
+  getReferralTimeline
 };
 
