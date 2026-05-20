@@ -46,6 +46,121 @@ const referralTimelineSchema = new mongoose.Schema({
   }
 }, { _id: false });
 
+const referralBonusPolicySchema = new mongoose.Schema({
+  enabled: {
+    type: Boolean,
+    default: true
+  },
+  payoutOn: {
+    type: String,
+    enum: ['accepted', 'filled'],
+    default: 'filled'
+  },
+  companyName: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  companyMultiplier: {
+    type: Number,
+    default: 1,
+    min: 0
+  },
+  companyFlatBonus: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  deadlineReductionPerDayPercent: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  deadlineReductionCapPercent: {
+    type: Number,
+    default: 100,
+    min: 0,
+    max: 100
+  },
+  notes: {
+    type: String,
+    trim: true,
+    default: ''
+  }
+}, { _id: false });
+
+const referralBonusComputationSchema = new mongoose.Schema({
+  status: {
+    type: String,
+    enum: ['pending', 'eligible', 'not-eligible'],
+    default: 'pending'
+  },
+  amount: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  baseAmount: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  multiplier: {
+    type: Number,
+    default: 1,
+    min: 0
+  },
+  flatBonus: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  deadlinePenaltyPercent: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
+  },
+  deadlinePenaltyAmount: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  payoutEvent: {
+    type: String,
+    enum: ['accepted', 'filled'],
+    default: 'filled'
+  },
+  eligibleApplicantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  eligibleApplicantName: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  computedAt: {
+    type: Date,
+    default: null
+  },
+  computedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  reason: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  policySnapshot: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  }
+}, { _id: false });
+
 // JobReferral Schema for standalone referral opportunities
 const jobReferralSchema = new mongoose.Schema({
   jobTitle: {
@@ -67,6 +182,14 @@ const jobReferralSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+  bonusPolicy: {
+    type: referralBonusPolicySchema,
+    default: () => ({})
+  },
+  bonusComputation: {
+    type: referralBonusComputationSchema,
+    default: () => ({ status: 'pending', amount: 0, baseAmount: 0, multiplier: 1, flatBonus: 0, deadlinePenaltyPercent: 0, deadlinePenaltyAmount: 0, payoutEvent: 'filled', eligibleApplicantId: null, eligibleApplicantName: '', computedAt: null, computedBy: null, reason: '', policySnapshot: {} })
+  },
   deadline: {
     type: Date
   },
@@ -84,6 +207,14 @@ const jobReferralSchema = new mongoose.Schema({
       type: String,
       enum: ['pending', 'accepted', 'rejected'],
       default: 'pending'
+    },
+    acceptedAt: {
+      type: Date,
+      default: null
+    },
+    rejectedAt: {
+      type: Date,
+      default: null
     }
   }],
   timeline: [referralTimelineSchema],
@@ -91,6 +222,18 @@ const jobReferralSchema = new mongoose.Schema({
     type: String,
     enum: ['open', 'closed', 'filled'],
     default: 'open'
+  },
+  acceptedAt: {
+    type: Date,
+    default: null
+  },
+  filledAt: {
+    type: Date,
+    default: null
+  },
+  closedAt: {
+    type: Date,
+    default: null
   },
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
