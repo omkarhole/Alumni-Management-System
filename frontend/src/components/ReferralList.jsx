@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import apiClient from '../api/client';
 import { useAuth } from '../AuthContext';
 import { toast } from 'react-toastify';
@@ -12,11 +13,35 @@ const ReferralList = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('open');
   const [page, setPage] = useState(1);
+  const [savedItems, setSavedItems] = useState([]);
   const limit = 10;
 
   useEffect(() => {
     fetchReferrals();
   }, [statusFilter, page]);
+
+  useEffect(() => {
+    if (!user) {
+      setSavedItems([]);
+      return;
+    }
+
+    let active = true;
+
+    apiClient.get('/saved')
+      .then((response) => {
+        if (!active) return;
+        setSavedItems(response.data?.savedItems || []);
+      })
+      .catch(() => {
+        if (!active) return;
+        setSavedItems([]);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   const fetchReferrals = async () => {
     try {
@@ -53,6 +78,38 @@ const ReferralList = () => {
     ref.jobTitle.toLowerCase().includes(search.toLowerCase()) ||
     ref.company.toLowerCase().includes(search.toLowerCase())
   );
+
+  const savedMap = savedItems.reduce((accumulator, item) => {
+    accumulator[`${item.entityType}:${item.entityId}`] = item;
+    return accumulator;
+  }, {});
+
+  const handleToggleSave = async (referral) => {
+    if (!user) {
+      toast.error('Please log in to save opportunities');
+      return;
+    }
+
+    try {
+      const response = await apiClient.post('/saved', {
+        entityType: 'referral',
+        entityId: referral._id
+      });
+
+      if (response.data?.saved) {
+        setSavedItems((currentItems) => [
+          ...currentItems.filter((item) => !(item.entityType === 'referral' && String(item.entityId) === String(referral._id))),
+          response.data.savedItem
+        ]);
+      } else {
+        setSavedItems((currentItems) => currentItems.filter((item) => !(item.entityType === 'referral' && String(item.entityId) === String(referral._id))));
+      }
+
+      toast.success(response.data?.saved ? 'Referral saved' : 'Referral removed from saved items');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update saved referrals');
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -169,6 +226,15 @@ const ReferralList = () => {
                 </Link>
                 {user && (
                   <button
+                    onClick={() => handleToggleSave(referral)}
+                    className={`py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl ${savedMap[`referral:${referral._id}`] ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'}`}
+                    title={savedMap[`referral:${referral._id}`] ? 'Remove saved referral' : 'Save referral'}
+                  >
+                    {savedMap[`referral:${referral._id}`] ? <FaBookmark /> : <FaRegBookmark />}
+                  </button>
+                )}
+                {user && (
+                  <button
                     onClick={() => {
                       // Quick apply confirmation
                       if (confirm('Apply for this referral?')) {
@@ -191,7 +257,8 @@ const ReferralList = () => {
                 </div>
               </div>
             </div>
-          ))}
+          ))
+        )}
 
       </div>
 

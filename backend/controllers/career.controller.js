@@ -123,7 +123,9 @@ async function addCareer(req,res,next){
             skills: req.body.skills || [],
             job_type: req.body.job_type || 'full-time',
             experience_level: req.body.experience_level || 'mid',
-            salary_range: req.body.salary_range || ''
+            salary_range: req.body.salary_range || '',
+            deadline: req.body.deadline ? new Date(req.body.deadline) : null,
+            status: req.body.status || 'open'
         };
         const career=await Career.create(careerData);
         
