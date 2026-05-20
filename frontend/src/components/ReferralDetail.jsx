@@ -10,6 +10,10 @@ const ReferralDetail = () => {
   const { isAuthReady } = useAuth();
   const [referral, setReferral] = useState(null);
   const [timeline, setTimeline] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [messageBody, setMessageBody] = useState('');
+  const [selectedRecipientId, setSelectedRecipientId] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
   const [applicants, setApplicants] = useState([]);
@@ -17,9 +21,47 @@ const ReferralDetail = () => {
   const currentUserId = localStorage.getItem('user_id');
   const currentUserType = (localStorage.getItem('user_type') || '').toLowerCase();
 
+  const getDocId = (value) => value?._id || value?.id || value;
+
+  const getCurrentConversationRecipient = () => {
+    if (!referral) {
+      return '';
+    }
+
+    if (isOwner) {
+      return selectedRecipientId || getDocId(applicants[0]?.user) || '';
+    }
+
+    return getDocId(referral.postedBy) || '';
+  };
+
+  const isOwner = Boolean(
+    currentUserId && getDocId(referral?.postedBy) === currentUserId
+  );
+
+  const isApplicant = Boolean(
+    currentUserId && applicants.some((applicant) => getDocId(applicant.user) === currentUserId)
+  );
+
+  const canMessage = Boolean(currentUserId && (isOwner || isApplicant));
+
   useEffect(() => {
     fetchReferral();
   }, [id]);
+
+  useEffect(() => {
+    if (!referral) {
+      return;
+    }
+
+    if (isOwner && applicants.length > 0 && !selectedRecipientId) {
+      setSelectedRecipientId(getDocId(applicants[0].user));
+    }
+
+    if (!isOwner) {
+      setSelectedRecipientId(getDocId(referral.postedBy));
+    }
+  }, [referral, applicants, isOwner, selectedRecipientId]);
 
   const fetchReferral = async () => {
     try {
@@ -33,11 +75,33 @@ const ReferralDetail = () => {
       setReferral(data);
       setApplicants(data.applicants || []);
       setTimeline(timelineResponse.data?.timeline || []);
+
+      if (currentUserId && (getDocId(data.postedBy) === currentUserId || (data.applicants || []).some((applicant) => getDocId(applicant.user) === currentUserId))) {
+        const messagesResponse = await apiClient.get(`/api/referrals/${id}/messages`);
+        setMessages(messagesResponse.data?.messages || []);
+      } else {
+        setMessages([]);
+      }
     } catch (err) {
       toast.error('Failed to load referral details');
       setTimeline([]);
+      setMessages([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMessages = async () => {
+    try {
+      if (!canMessage) {
+        setMessages([]);
+        return;
+      }
+
+      const response = await apiClient.get(`/api/referrals/${id}/messages`);
+      setMessages(response.data?.messages || []);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to load referral messages');
     }
   };
 
@@ -76,6 +140,37 @@ const ReferralDetail = () => {
       fetchReferral();
     } catch (err) {
       toast.error('Failed to reject applicant');
+    }
+  };
+
+  const handleSendMessage = async (event) => {
+    event.preventDefault();
+
+    const trimmedBody = messageBody.trim();
+    if (!trimmedBody) {
+      toast.error('Enter a message before sending');
+      return;
+    }
+
+    const recipientId = getCurrentConversationRecipient();
+    if (isOwner && !recipientId) {
+      toast.error('Select an applicant to message');
+      return;
+    }
+
+    try {
+      setSendingMessage(true);
+      await apiClient.post(`/api/referrals/${id}/messages`, {
+        body: trimmedBody,
+        ...(isOwner ? { recipientId } : {})
+      });
+      setMessageBody('');
+      await fetchMessages();
+      toast.success('Message sent');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to send message');
+    } finally {
+      setSendingMessage(false);
     }
   };
 
@@ -131,6 +226,8 @@ const ReferralDetail = () => {
     if (event.status === 'pending') return 'from-yellow-500 to-amber-500';
     return 'from-blue-500 to-cyan-500';
   };
+
+  const getMessageSide = (message) => getDocId(message.sender) === currentUserId ? 'self' : 'other';
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -229,6 +326,101 @@ const ReferralDetail = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+
+            {/* Messaging */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Candidate Q&amp;A</h2>
+                  <p className="text-sm text-gray-500 mt-1">Private clarification thread for the poster and applicants</p>
+                </div>
+                {canMessage && (
+                  <button
+                    type="button"
+                    onClick={fetchMessages}
+                    className="text-sm font-semibold text-blue-600 hover:text-blue-800"
+                  >
+                    Refresh
+                  </button>
+                )}
+              </div>
+
+              {!canMessage ? (
+                <div className="rounded-xl border border-dashed border-gray-200 p-6 text-gray-500">
+                  Only the referral poster and applicants can exchange messages here.
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  <div className="max-h-80 overflow-y-auto rounded-2xl border border-gray-200 bg-gray-50 p-4 space-y-3">
+                    {messages.length === 0 ? (
+                      <div className="rounded-xl border border-dashed border-gray-200 bg-white p-6 text-gray-500">
+                        No messages yet. Start the conversation below.
+                      </div>
+                    ) : (
+                      messages.map((message) => {
+                        const side = getMessageSide(message);
+                        return (
+                          <div
+                            key={message._id}
+                            className={`flex ${side === 'self' ? 'justify-end' : 'justify-start'}`}
+                          >
+                            <div className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-sm ${side === 'self' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border border-gray-200'}`}>
+                              <div className="flex items-center justify-between gap-4 mb-2 text-xs opacity-80">
+                                <span className="font-semibold">
+                                  {getDocId(message.sender) === currentUserId ? 'You' : message.sender?.name || 'Member'}
+                                  {' '}→{' '}
+                                  {message.recipient?.name || 'Recipient'}
+                                </span>
+                                <span>{message.createdAt ? new Date(message.createdAt).toLocaleString() : ''}</span>
+                              </div>
+                              <p className="whitespace-pre-wrap leading-relaxed">{message.body}</p>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+
+                  <form onSubmit={handleSendMessage} className="space-y-4">
+                    {isOwner && applicants.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Reply to applicant</label>
+                        <select
+                          value={selectedRecipientId}
+                          onChange={(e) => setSelectedRecipientId(e.target.value)}
+                          className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        >
+                          {applicants.map((applicant) => (
+                            <option key={getDocId(applicant.user)} value={getDocId(applicant.user)}>
+                              {applicant.user?.name || 'Applicant'} - {applicant.status.toUpperCase()}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+                      <textarea
+                        rows="4"
+                        value={messageBody}
+                        onChange={(e) => setMessageBody(e.target.value)}
+                        placeholder={isOwner ? 'Ask a question or reply to an applicant...' : 'Ask the poster a clarification question...'}
+                        className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={sendingMessage}
+                      className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white shadow-lg transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {sendingMessage ? 'Sending...' : 'Send Message'}
+                    </button>
+                  </form>
                 </div>
               )}
             </div>

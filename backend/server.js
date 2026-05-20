@@ -201,6 +201,8 @@ const io = socketIO(server, {
   transports: ['websocket', 'polling']
 });
 
+app.set('io', io);
+
 // Initialize socket event handlers
 initializeSocket(io);
 

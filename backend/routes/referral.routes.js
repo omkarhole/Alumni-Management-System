@@ -6,6 +6,8 @@ const {
   acceptReferral,
   rejectReferral,
   closeReferral,
+  getReferralMessages,
+  sendReferralMessage,
   getMyReferrals,
   getReferralById,
   getReferralTimeline
@@ -22,6 +24,10 @@ router.get('/', authenticate, getReferrals);
 
 // Apply for referral
 router.post('/:id/apply', authenticate, isStudent, applyForReferral);
+
+// Referral Q&A / messaging
+router.post('/:id/messages', authenticate, sendReferralMessage);
+router.get('/:id/messages', authenticate, getReferralMessages);
 
 // Manage applicants (only poster)
 router.put('/:id/applicants/:applicantId/accept', authenticate, acceptReferral);
