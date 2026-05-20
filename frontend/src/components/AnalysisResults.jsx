@@ -71,6 +71,82 @@ const SimpleBarChart = ({ matched, missing }) => {
   );
 };
 
+const SkillExplanationRow = ({ item }) => {
+  const isMatched = item?.status === 'matched';
+  const matchedTypeLabel = item?.matchedType || 'none';
+  const toneClass = isMatched
+    ? 'border-green-200 bg-green-50 text-green-800'
+    : 'border-red-200 bg-red-50 text-red-800';
+
+  return (
+    <details className={`group rounded-2xl border p-4 ${toneClass}`}>
+      <summary className="cursor-pointer list-none flex items-start justify-between gap-4">
+        <div>
+          <p className="font-semibold text-gray-900">
+            {isMatched ? 'Matched' : 'Missing'}: {item.skill}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            {item.source ? `Source: ${item.source}` : 'Source: job requirements'}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2 justify-end">
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${isMatched ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+            {isMatched ? 'Matched' : 'Missing'}
+          </span>
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/80 text-gray-700 border border-current/20">
+            {matchedTypeLabel}
+          </span>
+        </div>
+      </summary>
+
+      <div className="mt-4 space-y-2 text-sm text-gray-700">
+        <p className="font-semibold text-gray-800">Why this result</p>
+        <ul className="space-y-1 pl-5 list-disc">
+          {(item.matchedBecause || []).map((reason, index) => (
+            <li key={`${item.skill}-${index}`}>{reason}</li>
+          ))}
+        </ul>
+      </div>
+    </details>
+  );
+};
+
+const SkillExplanationsPanel = ({ analysis }) => {
+  const explanations = Array.isArray(analysis?.skillExplanations) && analysis.skillExplanations.length > 0
+    ? analysis.skillExplanations
+    : [
+        ...(analysis?.matchedSkills || []).map((skill) => ({
+          skill,
+          status: 'matched',
+          matchedType: 'exact',
+          matchedBecause: [`Analysis reported '${skill}' as matched.`],
+          source: 'analysis',
+        })),
+        ...(analysis?.missingSkills || []).map((skill) => ({
+          skill,
+          status: 'missing',
+          matchedType: 'none',
+          matchedBecause: [`Analysis reported '${skill}' as missing.`],
+          source: 'analysis',
+        })),
+      ];
+
+  if (explanations.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-6">
+      <h3 className="font-bold text-gray-900 mb-3">Skill Explanations</h3>
+      <div className="space-y-3">
+        {explanations.map((item) => (
+          <SkillExplanationRow key={`${item.skill}-${item.status}`} item={item} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const AnalysisResults = ({ analysis }) => {
   if (!analysis) return null;
 
@@ -124,6 +200,8 @@ const AnalysisResults = ({ analysis }) => {
           </ul>
         )}
       </div>
+
+      <SkillExplanationsPanel analysis={analysis} />
     </div>
   );
 };
