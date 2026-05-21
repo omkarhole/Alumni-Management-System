@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { FaArrowLeft, FaChartBar, FaX } from 'react-icons/fa';
+import { FaArrowLeft, FaChartBar} from 'react-icons/fa';
 import { baseUrl } from '../utils/globalurl';
 
 const PollResults = ({ poll, onClose }) => {
