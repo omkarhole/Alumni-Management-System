@@ -191,7 +191,8 @@ const ReferralList = () => {
                 </div>
               </div>
             </div>
-          ))}
+          ))
+        )}
 
       </div>
 
