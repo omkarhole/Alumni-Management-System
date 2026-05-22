@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaLinkedin, FaTwitter, FaFacebook, FaInstagram } from 'react-icons/fa';
+import { FaLinkedin, FaTwitter, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { useTheme } from '../ThemeContext';
 import { GoVerified } from "react-icons/go";
 import { Link } from 'react-router-dom';
@@ -27,10 +27,10 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { icon: FaLinkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
-    { icon: FaTwitter, href: 'https://twitter.com', label: 'Twitter' },
-    { icon: FaFacebook, href: 'https://facebook.com', label: 'Facebook' },
-    { icon: FaInstagram, href: 'https://instagram.com', label: 'Instagram' },
+    { icon: FaLinkedin, href: 'https://www.linkedin.com/in/omkar-hole-c0der/', label: 'LinkedIn' },
+    { icon: FaTwitter, href: 'https://x.com/omkarhole314', label: 'Twitter' },
+    { icon: FaGithub, href: 'https://github.com/omkarhole', label: 'GitHub' },
+    { icon: FaEnvelope, href: 'mailto:omkarhole314@gmail.com', label: 'Email' },
   ];
 
   const contactInfo = [
