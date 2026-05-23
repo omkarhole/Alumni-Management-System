@@ -1,6 +1,13 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
-import { FaLinkedin, FaTwitter, FaGithub, FaEnvelope } from 'react-icons/fa';
+import { 
+  FaLinkedin, 
+  FaTwitter, 
+  FaGithub, 
+  FaEnvelope, 
+  FaPhone,
+  FaMapMarkerAlt 
+} from 'react-icons/fa';
 import { useTheme } from '../ThemeContext';
 import { GoVerified } from "react-icons/go";
 import { Link } from 'react-router-dom';

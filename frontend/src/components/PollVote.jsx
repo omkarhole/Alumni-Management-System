@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { FaChartBar, FaX } from 'react-icons/fa';
+import { FaChartBar, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { baseUrl } from '../utils/globalurl';
@@ -87,7 +87,7 @@ const PollVote = ({ poll, onClose }) => {
             onClick={onClose}
             className="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-lg transition-colors"
           >
-            <FaX className="text-xl" />
+            <FaTimes className="text-xl" />
           </button>
         </div>
 
