@@ -1,0 +1,44 @@
+name: Auto Label NSOC'26 Pull Requests
+
+on:
+  pull_request:
+    types:
+      - opened
+
+permissions:
+  issues: write
+  pull-requests: read
+
+jobs:
+  add-nsoc-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add NSOC'26 label to new pull requests
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labelName = "NSOC'26";
+            const { owner, repo } = context.repo;
+            const pullNumber = context.payload.pull_request.number;
+
+            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner,
+              repo,
+              issue_number: pullNumber
+            });
+
+            const alreadyLabeled = currentLabels.some((label) => label.name === labelName);
+
+            if (alreadyLabeled) {
+              console.log(`Pull request #${pullNumber} already has label: ${labelName}`);
+              return;
+            }
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: pullNumber,
+              labels: [labelName]
+            });
+
+            console.log(`Added label ${labelName} to pull request #${pullNumber}`);
