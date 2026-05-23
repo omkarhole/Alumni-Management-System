@@ -1,13 +1,12 @@
 name: Auto Label NSOC'26 Pull Requests
 
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
 
 permissions:
   issues: write
-  pull-requests: read
 
 jobs:
   add-nsoc-label:
@@ -18,8 +17,30 @@ jobs:
         with:
           script: |
             const labelName = "NSOC'26";
+            const labelColor = "f9d0c4";
+            const labelDescription = "PRs for the NSOC 2026 program";
             const { owner, repo } = context.repo;
             const pullNumber = context.payload.pull_request.number;
+
+            try {
+              await github.rest.issues.getLabel({
+                owner,
+                repo,
+                name: labelName
+              });
+            } catch (error) {
+              if (error.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner,
+                  repo,
+                  name: labelName,
+                  color: labelColor,
+                  description: labelDescription
+                });
+              } else {
+                throw error;
+              }
+            }
 
             const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
               owner,
