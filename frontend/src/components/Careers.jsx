@@ -1,9 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useMemo, useState } from 'react'
-import { FaBuilding, FaMapMarker, FaPlus, FaSearch, FaStar, FaThumbsUp, FaUserPlus } from 'react-icons/fa';
+import { FaBookmark, FaBuilding, FaMapMarker, FaPlus, FaRegBookmark, FaSearch, FaStar, FaThumbsUp, FaUserPlus } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import ViewJobs from '../admin/view/ViewJobs';
 import ManageJobs from '../admin/save/ManageJobs';
+import apiClient from '../api/client';
 import { useAuth } from '../AuthContext';
 import { baseUrl } from '../utils/globalurl';
 import { smoothScrollToTop } from '../utils/smoothScroll';
@@ -56,6 +58,7 @@ const Careers = () => {
     const [recommendations, setRecommendations] = useState([]);
     const [loadingRecommendations, setLoadingRecommendations] = useState(false);
     const [showResumeAnalyzer, setShowResumeAnalyzer] = useState(false);
+    const [savedItems, setSavedItems] = useState([]);
 
 
     const openModal = (job) => {
@@ -118,6 +121,29 @@ const Careers = () => {
         };
     }, [isLoggedIn]);
 
+    useEffect(() => {
+        if (!isLoggedIn) {
+            setSavedItems([]);
+            return;
+        }
+
+        let active = true;
+
+        apiClient.get('/saved')
+            .then((response) => {
+                if (!active) return;
+                setSavedItems(response.data?.savedItems || []);
+            })
+            .catch(() => {
+                if (!active) return;
+                setSavedItems([]);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [isLoggedIn]);
+
 // Fetch recommendations for logged in users
     useEffect(() => {
         if (isLoggedIn) {
@@ -153,6 +179,45 @@ const Careers = () => {
         if (source.includes('hybrid')) return 'hybrid';
         if (source.includes('on-site') || source.includes('onsite') || source.includes('on site')) return 'onsite';
         return 'unspecified';
+    };
+
+    const savedMap = useMemo(() => {
+        return savedItems.reduce((accumulator, item) => {
+            accumulator[`${item.entityType}:${item.entityId}`] = item;
+            return accumulator;
+        }, {});
+    }, [savedItems]);
+
+    const handleToggleSave = async (job) => {
+        if (!isLoggedIn) {
+            toast.error('Please log in to save opportunities');
+            return;
+        }
+
+        const entityId = job?._id || job?.id;
+        if (!entityId) {
+            return;
+        }
+
+        try {
+            const response = await apiClient.post('/saved', {
+                entityType: 'career',
+                entityId
+            });
+
+            if (response.data?.saved) {
+                setSavedItems((currentItems) => [
+                    ...currentItems.filter((item) => !(item.entityType === 'career' && String(item.entityId) === String(entityId))),
+                    response.data.savedItem
+                ]);
+            } else {
+                setSavedItems((currentItems) => currentItems.filter((item) => !(item.entityType === 'career' && String(item.entityId) === String(entityId))));
+            }
+
+            toast.success(response.data?.saved ? 'Job saved' : 'Job removed from saved items');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to update saved jobs');
+        }
     };
 
     useEffect(() => {
@@ -407,6 +472,17 @@ const Careers = () => {
                                                         <b><i>Posted by: {j.user?.name || 'Unknown'}</i></b>
                                                     </span>
                                                     <div>
+                                                            {isLoggedIn && (
+                                                                <button
+                                                                    type="button"
+                                                                    className={`btn btn-sm me-2 ${savedMap[`career:${j._id || j.id}`] ? 'btn-warning' : 'btn-outline-secondary'}`}
+                                                                    onClick={() => handleToggleSave(j)}
+                                                                    title={savedMap[`career:${j._id || j.id}`] ? 'Remove saved job' : 'Save job'}
+                                                                >
+                                                                    {savedMap[`career:${j._id || j.id}`] ? <FaBookmark className="me-1" /> : <FaRegBookmark className="me-1" />}
+                                                                    {savedMap[`career:${j._id || j.id}`] ? 'Saved' : 'Save'}
+                                                                </button>
+                                                            )}
                                                         {isAlumnus && (
                                                             <button 
                                                                 className="btn btn-sm btn-success me-2" 

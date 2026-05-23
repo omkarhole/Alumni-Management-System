@@ -50,6 +50,7 @@ import RegisterBusiness from "./components/RegisterBusiness";
 import MyBusiness from "./components/MyBusiness";
 import ReferralList from "./components/ReferralList";
 import ReferralDetail from "./components/ReferralDetail";
+import NotificationsPage from "./components/NotificationsPage";
 import Marketplace from "./components/Marketplace";
 import MarketplaceForm from "./components/MarketplaceForm";
 import MarketplaceDetail from "./components/MarketplaceDetail";
@@ -68,6 +69,7 @@ const privateComponentMap = {
   MyBusiness,
   ReferralList,
   ReferralDetail,
+  NotificationsPage,
 };
 
 function App() {
@@ -159,22 +161,6 @@ function AppRouter() {
         </Route>
 
         {/* Private Routes - imported from centralized config */}
-        {privateRoutes.map((route, index) => {
-          const Component = privateComponentMap[route.component];
-          return (
-            <Route
-              key={index}
-              path={route.path}
-              element={
-                <PrivateRoute allow={route.roles}>
-                  <Component />
-                </PrivateRoute>
-              }
-            />
-          );
-        })}
-
-        {/* Referral Routes */}
         {privateRoutes.map((route, index) => {
           const Component = privateComponentMap[route.component];
           return (

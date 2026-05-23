@@ -1,8 +1,10 @@
-const { JobReferral, User, Badge, UserBadge, ReferralMessage } = require('../models/Index');
+const mongoose = require('mongoose');
+const { JobReferral, User, Badge, UserBadge, ReferralMessage, ReferralModerationAction } = require('../models/Index');
 const logger = require('../utils/logger');
+const { recomputeAndPersistReferralBonus } = require('../services/referralBonusService');
 
 async function getCurrentUserSummary(userId) {
-  return User.findById(userId).select('_id name type');
+  return User.findById(userId).select('_id name type referralPostingSuspended referralPostingSuspendedAt referralPostingSuspendedReason referralPostingSuspendedBy');
 }
 
 function appendTimelineEvent(referral, event) {
@@ -22,6 +24,60 @@ function appendTimelineEvent(referral, event) {
     applicantName: event.applicantName,
     details: event.details
   });
+}
+
+function normalizeModerationReason(reason, fallback = '') {
+  const text = String(reason || fallback || '').trim();
+  return text || fallback || '';
+}
+
+function isReferralHidden(referral) {
+  return ['hidden', 'removed'].includes(String(referral?.moderation?.status || referral?.moderationStatus || 'visible').toLowerCase());
+}
+
+async function writeModerationAction(session, actionData) {
+  const [moderationAction] = await ReferralModerationAction.create([actionData], { session });
+  return moderationAction;
+}
+
+async function moderateReferral({ referralId, adminId, actionType, reason, referralMutator, posterMutator }) {
+  const session = await mongoose.startSession();
+
+  try {
+    let referral = null;
+    let moderationAction = null;
+
+    await session.withTransaction(async () => {
+      referral = await JobReferral.findById(referralId)
+        .populate('postedBy', 'name email type referralPostingSuspended referralPostingSuspendedAt referralPostingSuspendedReason');
+
+      if (!referral) {
+        const notFoundError = new Error('Referral not found');
+        notFoundError.statusCode = 404;
+        throw notFoundError;
+      }
+
+      await referralMutator(referral, session);
+      await referral.save({ session });
+
+      if (typeof posterMutator === 'function') {
+        const posterId = referral.postedBy?._id || referral.postedBy;
+        await posterMutator(posterId, session, referral);
+      }
+
+      moderationAction = await writeModerationAction(session, {
+        adminId,
+        referralId: referral._id,
+        actionType,
+        reason: normalizeModerationReason(reason),
+        targetUserId: referral.postedBy?._id || referral.postedBy || null
+      });
+    });
+
+    return { referral, moderationAction };
+  } finally {
+    session.endSession();
+  }
 }
 
 async function getReferralAccess(referralId, userId) {
@@ -57,6 +113,7 @@ async function createReferral(req, res, next) {
       company: req.body.company,
       description: req.body.description,
       referralBonus: req.body.referralBonus || 0,
+      bonusPolicy: req.body.bonusPolicy || {},
       deadline: req.body.deadline ? new Date(req.body.deadline) : null,
       postedBy: req.user.id,
       timeline: []
@@ -130,14 +187,18 @@ async function getReferrals(req, res, next) {
   try {
     const { status = 'open', search, page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
+    const currentUser = req.user?.id ? await getCurrentUserSummary(req.user.id) : null;
 
     const query = { status };
+    if (currentUser?.type !== 'admin') {
+      query['moderation.status'] = { $nin: ['hidden', 'removed'] };
+    }
     if (search) {
       query.$text = { $search: search };
     }
 
     const referrals = await JobReferral.find(query)
-      .populate('postedBy', 'name email alumnus_bio')
+      .populate('postedBy', 'name email alumnus_bio type referralPostingSuspended referralPostingSuspendedReason')
       .populate('applicants.user', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip * 1)
@@ -166,6 +227,10 @@ async function applyForReferral(req, res, next) {
 
     const referral = await JobReferral.findById(id);
     if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    if (isReferralHidden(referral) && currentUser?.type !== 'admin') {
       return res.status(404).json({ message: 'Referral not found' });
     }
 
@@ -241,7 +306,9 @@ async function acceptReferral(req, res, next) {
     const applicantUser = await User.findById(applicantId).select('_id name');
 
     referral.applicants[applicantIndex].status = 'accepted';
+    referral.applicants[applicantIndex].acceptedAt = new Date();
     referral.status = 'filled'; // Close after accept
+    referral.filledAt = new Date();
 
     appendTimelineEvent(referral, {
       action: 'accepted',
@@ -268,6 +335,7 @@ async function acceptReferral(req, res, next) {
     });
 
     await referral.save();
+  await recomputeAndPersistReferralBonus(referral, { computedBy: req.user.id });
 
     await referral.populate('applicants.user', 'name email');
 
@@ -337,10 +405,16 @@ async function rejectReferral(req, res, next) {
 async function getReferralById(req, res, next) {
   try {
     const referral = await JobReferral.findById(req.params.id)
-      .populate('postedBy', 'name email alumnus_bio')
+      .populate('postedBy', 'name email alumnus_bio type referralPostingSuspended referralPostingSuspendedReason')
       .populate('applicants.user', 'name email alumnus_bio');
     
     if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    const currentUser = req.user?.id ? await getCurrentUserSummary(req.user.id) : null;
+    const isOwner = referral.postedBy?._id?.toString() === req.user?.id;
+    if (isReferralHidden(referral) && currentUser?.type !== 'admin' && !isOwner) {
       return res.status(404).json({ message: 'Referral not found' });
     }
 
@@ -352,8 +426,14 @@ async function getReferralById(req, res, next) {
 
 async function getReferralTimeline(req, res, next) {
   try {
-    const referral = await JobReferral.findById(req.params.id).select('timeline');
+    const referral = await JobReferral.findById(req.params.id).select('timeline moderation postedBy');
     if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    const currentUser = req.user?.id ? await getCurrentUserSummary(req.user.id) : null;
+    const isOwner = referral.postedBy?.toString() === req.user?.id;
+    if (isReferralHidden(referral) && currentUser?.type !== 'admin' && !isOwner) {
       return res.status(404).json({ message: 'Referral not found' });
     }
 
@@ -388,6 +468,7 @@ async function closeReferral(req, res, next) {
     }
 
     referral.status = 'closed';
+    referral.closedAt = new Date();
 
     appendTimelineEvent(referral, {
       action: 'closed',
@@ -400,12 +481,208 @@ async function closeReferral(req, res, next) {
     });
 
     await referral.save();
+    await recomputeAndPersistReferralBonus(referral, { computedBy: req.user.id });
 
     res.json({
       message: 'Referral closed successfully',
       referral
     });
   } catch (err) {
+    next(err);
+  }
+}
+
+async function getAdminReferrals(req, res, next) {
+  try {
+    const { status, moderationStatus, search, page = 1, limit = 20 } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const query = {};
+    if (status) {
+      query.status = status;
+    }
+    if (moderationStatus) {
+      query['moderation.status'] = moderationStatus;
+    }
+    if (search) {
+      query.$text = { $search: search };
+    }
+
+    const referrals = await JobReferral.find(query)
+      .populate('postedBy', 'name email alumnus_bio type referralPostingSuspended referralPostingSuspendedReason referralPostingSuspendedAt')
+      .populate('moderation.moderatedBy', 'name email type')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await JobReferral.countDocuments(query);
+
+    res.json({
+      referrals,
+      pagination: { total, page: Number(page), limit: Number(limit) }
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getReferralModerationActions(req, res, next) {
+  try {
+    const referral = await JobReferral.findById(req.params.id).select('_id');
+    if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    const actions = await ReferralModerationAction.find({ referralId: req.params.id })
+      .populate('adminId', 'name email type')
+      .sort({ createdAt: -1 });
+
+    res.json({ actions });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function flagReferralForSpam(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const { referral, moderationAction } = await moderateReferral({
+      referralId: id,
+      adminId: req.user.id,
+      actionType: 'flag',
+      reason: normalizeModerationReason(reason, 'Flagged for review'),
+      referralMutator: async (referralDoc) => {
+        referralDoc.moderation = {
+          status: 'flagged',
+          reason: normalizeModerationReason(reason, 'Flagged for review'),
+          moderatedBy: req.user.id,
+          moderatedAt: new Date()
+        };
+      }
+    });
+
+    res.json({
+      message: 'Referral flagged successfully',
+      referral,
+      moderationAction
+    });
+  } catch (err) {
+    if (err.statusCode === 404) {
+      return res.status(404).json({ message: err.message });
+    }
+    next(err);
+  }
+}
+
+async function hideReferral(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const { referral, moderationAction } = await moderateReferral({
+      referralId: id,
+      adminId: req.user.id,
+      actionType: 'hide',
+      reason: normalizeModerationReason(reason, 'Hidden by administrator'),
+      referralMutator: async (referralDoc) => {
+        referralDoc.moderation = {
+          status: 'hidden',
+          reason: normalizeModerationReason(reason, 'Hidden by administrator'),
+          moderatedBy: req.user.id,
+          moderatedAt: new Date()
+        };
+      }
+    });
+
+    res.json({
+      message: 'Referral hidden successfully',
+      referral,
+      moderationAction
+    });
+  } catch (err) {
+    if (err.statusCode === 404) {
+      return res.status(404).json({ message: err.message });
+    }
+    next(err);
+  }
+}
+
+async function restoreReferral(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const { referral, moderationAction } = await moderateReferral({
+      referralId: id,
+      adminId: req.user.id,
+      actionType: 'restore',
+      reason: normalizeModerationReason(reason, 'Restored by administrator'),
+      referralMutator: async (referralDoc) => {
+        referralDoc.moderation = {
+          status: 'visible',
+          reason: normalizeModerationReason(reason, 'Restored by administrator'),
+          moderatedBy: req.user.id,
+          moderatedAt: new Date()
+        };
+      }
+    });
+
+    res.json({
+      message: 'Referral restored successfully',
+      referral,
+      moderationAction
+    });
+  } catch (err) {
+    if (err.statusCode === 404) {
+      return res.status(404).json({ message: err.message });
+    }
+    next(err);
+  }
+}
+
+async function suspendReferralPoster(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const { referral, moderationAction } = await moderateReferral({
+      referralId: id,
+      adminId: req.user.id,
+      actionType: 'suspend_poster',
+      reason: normalizeModerationReason(reason, 'Poster suspended by administrator'),
+      referralMutator: async (referralDoc) => {
+        referralDoc.moderation = {
+          status: 'hidden',
+          reason: normalizeModerationReason(reason, 'Poster suspended by administrator'),
+          moderatedBy: req.user.id,
+          moderatedAt: new Date()
+        };
+      },
+      posterMutator: async (posterId, session, referralDoc) => {
+        if (!posterId) {
+          return;
+        }
+
+        await User.findByIdAndUpdate(posterId, {
+          referralPostingSuspended: true,
+          referralPostingSuspendedAt: new Date(),
+          referralPostingSuspendedReason: normalizeModerationReason(reason, 'Poster suspended by administrator'),
+          referralPostingSuspendedBy: req.user.id
+        }, { session });
+      }
+    });
+
+    res.json({
+      message: 'Referral poster suspended successfully',
+      referral,
+      moderationAction
+    });
+  } catch (err) {
+    if (err.statusCode === 404) {
+      return res.status(404).json({ message: err.message });
+    }
     next(err);
   }
 }
@@ -530,6 +807,30 @@ async function getMyReferrals(req, res, next) {
   }
 }
 
+async function computeReferralBonus(req, res, next) {
+  try {
+    const referral = await JobReferral.findById(req.params.id)
+      .populate('postedBy', 'name email alumnus_bio')
+      .populate('applicants.user', 'name email alumnus_bio');
+
+    if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    const { referral: persistedReferral, bonus } = await recomputeAndPersistReferralBonus(referral, {
+      computedBy: req.user?.id || null
+    });
+
+    res.json({
+      message: 'Referral bonus computed successfully',
+      bonus,
+      referral: persistedReferral
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   createReferral,
   getReferrals,
@@ -537,10 +838,17 @@ module.exports = {
   acceptReferral,
   rejectReferral,
   closeReferral,
+  getAdminReferrals,
+  getReferralModerationActions,
+  flagReferralForSpam,
+  hideReferral,
+  restoreReferral,
+  suspendReferralPoster,
   getReferralMessages,
   sendReferralMessage,
   getMyReferrals,
   getReferralById,
-  getReferralTimeline
+  getReferralTimeline,
+  computeReferralBonus
 };
 

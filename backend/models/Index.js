@@ -15,8 +15,12 @@ const MentorshipMatch = require('./MentorshipMatch.model');
 const MentorshipSession = require('./MentorshipSession.model');
 const MentorshipMessage = require('./MentorshipMessage.model');
 const JobReferral = require('./JobReferral.model');
+const ReferralModerationAction = require('./ReferralModerationAction.model');
 const ReferralMessage = require('./ReferralMessage.model');
 const JobSubscription = require('./JobSubscription.model');
+const SavedItem = require('./SavedItem.model');
+const Notification = require('./Notification.model');
+const NotificationPreference = require('./NotificationPreference.model');
 const Otp = require('./Otp.model');
 const BlacklistedToken = require('./BlacklistedToken.model');
 const Endorsement = require('./Endorsement.model');
@@ -50,8 +54,12 @@ module.exports = {
   MentorshipSession,
   MentorshipMessage,
   JobReferral,
+  ReferralModerationAction,
   ReferralMessage,
   JobSubscription,
+  SavedItem,
+  Notification,
+  NotificationPreference,
   Otp,
   BlacklistedToken,
   Endorsement,

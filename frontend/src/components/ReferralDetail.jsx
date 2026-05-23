@@ -20,6 +20,7 @@ const ReferralDetail = () => {
 
   const currentUserId = localStorage.getItem('user_id');
   const currentUserType = (localStorage.getItem('user_type') || '').toLowerCase();
+  const isAdmin = currentUserType === 'admin';
 
   const getDocId = (value) => value?._id || value?.id || value;
 
@@ -225,6 +226,25 @@ const ReferralDetail = () => {
 
   const getMessageSide = (message) => getDocId(message.sender) === currentUserId ? 'self' : 'other';
 
+  const bonusComputation = referral?.bonusComputation || {};
+  const bonusStatus = bonusComputation.status || 'pending';
+  const bonusAmount = Number(bonusComputation.amount || 0);
+  const bonusBadgeClass = bonusStatus === 'eligible'
+    ? 'bg-green-100 text-green-800'
+    : bonusStatus === 'not-eligible'
+      ? 'bg-red-100 text-red-800'
+      : 'bg-yellow-100 text-yellow-800';
+
+  const handleComputeBonus = async () => {
+    try {
+      const response = await apiClient.post(`/api/referrals/${id}/compute-bonus`);
+      setReferral(response.data?.referral || referral);
+      toast.success('Referral bonus computed');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to compute bonus');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -262,6 +282,46 @@ const ReferralDetail = () => {
                 }`}>
                   {new Date(referral.deadline).toLocaleDateString()}
                 </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-xl font-bold text-gray-900">Referral Bonus</h2>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${bonusBadgeClass}`}>
+                    {bonusStatus.replace('-', ' ')}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  Payout on {String(referral.bonusPolicy?.payoutOn || 'filled').toUpperCase()} with company rules for {referral.company}.
+                </p>
+                <div className="flex flex-wrap gap-3 text-sm text-gray-700">
+                  <span className="px-3 py-1 rounded-full bg-gray-100">Base: ${Number(referral.referralBonus || 0)}</span>
+                  <span className="px-3 py-1 rounded-full bg-gray-100">Computed: ${bonusAmount}</span>
+                  {bonusComputation.deadlinePenaltyPercent > 0 && (
+                    <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
+                      Deadline penalty: {bonusComputation.deadlinePenaltyPercent}%
+                    </span>
+                  )}
+                </div>
+                <p className="mt-3 text-sm text-gray-600">
+                  {bonusComputation.reason || 'Bonus has not been computed yet.'}
+                </p>
+              </div>
+
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={handleComputeBonus}
+                  className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white shadow-lg transition-colors hover:bg-blue-700"
+                >
+                  Compute Bonus
+                </button>
               )}
             </div>
           </div>

@@ -47,6 +47,18 @@ function checkUserRole(requiredRole) {
                 return res.status(403).json({ error: `Access denied. ${roleLabel} only.` });
             }
 
+            const canPostContent = Array.isArray(requiredRole)
+                ? requiredRole.includes('alumnus') || requiredRole.includes('admin')
+                : requiredRole === 'alumnus' || requiredRole === 'admin';
+
+            if (canPostContent && req.userData.type !== 'admin' && req.userData.referralPostingSuspended) {
+                return res.status(403).json({
+                    error: req.userData.referralPostingSuspendedReason
+                        ? `Posting suspended: ${req.userData.referralPostingSuspendedReason}`
+                        : 'Posting suspended by an administrator'
+                });
+            }
+
             next();
         } catch (err) {
             return res.status(500).json({ error: 'Server error' });
