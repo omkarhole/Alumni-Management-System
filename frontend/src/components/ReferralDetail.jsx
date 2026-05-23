@@ -204,10 +204,6 @@ const ReferralDetail = () => {
     currentUserType === 'student' &&
     (referral.postedBy?._id || referral.postedBy?.id || referral.postedBy) !== currentUserId;
 
-  const isOwner = Boolean(
-    currentUserId && (referral.postedBy?._id || referral.postedBy?.id || referral.postedBy) === currentUserId
-  );
-
   const describeTimelineEvent = (event) => {
     const actionMap = {
       posted: 'Referral posted',

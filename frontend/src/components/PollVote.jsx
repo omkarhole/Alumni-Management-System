@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { FaChartBar, FaX } from 'react-icons/fa';
+import { FaChartBar} from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { baseUrl } from '../utils/globalurl';

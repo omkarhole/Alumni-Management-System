@@ -1435,7 +1435,6 @@ html.dark ::-webkit-scrollbar-thumb {
 html.dark ::-webkit-scrollbar-thumb:hover {
     background: #555555;
 }
-}
 
 .home-empty-events h4 {
     margin: 0;
