@@ -14,6 +14,7 @@ const skillRouter=require('./skill.routes.js');
 const achievementRouter=require('./achievement.routes.js');
 const businessRouter=require('./business.routes.js');
 const badgeRouter=require('./badge.routes.js');
+const referralModerationRouter=require('./adminReferral.routes.js');
 
 const router=express.Router();
 
@@ -23,6 +24,7 @@ router.use('/dashboard', dashboardRouter);
 router.use('/users', userRouter);
 
 router.use('/jobs', careerRouter);
+router.use('/referrals', referralModerationRouter);
 router.use('/courses', courseRouter);
 router.use('/events', eventRouter);
 router.use('/forums', forumRouter);

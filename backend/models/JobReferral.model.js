@@ -161,6 +161,28 @@ const referralBonusComputationSchema = new mongoose.Schema({
   }
 }, { _id: false });
 
+const referralModerationStateSchema = new mongoose.Schema({
+  status: {
+    type: String,
+    enum: ['visible', 'flagged', 'hidden', 'removed'],
+    default: 'visible'
+  },
+  reason: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  moderatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  moderatedAt: {
+    type: Date,
+    default: null
+  }
+}, { _id: false });
+
 // JobReferral Schema for standalone referral opportunities
 const jobReferralSchema = new mongoose.Schema({
   jobTitle: {
@@ -189,6 +211,10 @@ const jobReferralSchema = new mongoose.Schema({
   bonusComputation: {
     type: referralBonusComputationSchema,
     default: () => ({ status: 'pending', amount: 0, baseAmount: 0, multiplier: 1, flatBonus: 0, deadlinePenaltyPercent: 0, deadlinePenaltyAmount: 0, payoutEvent: 'filled', eligibleApplicantId: null, eligibleApplicantName: '', computedAt: null, computedBy: null, reason: '', policySnapshot: {} })
+  },
+  moderation: {
+    type: referralModerationStateSchema,
+    default: () => ({ status: 'visible', reason: '', moderatedBy: null, moderatedAt: null })
   },
   deadline: {
     type: Date
@@ -246,6 +272,7 @@ const jobReferralSchema = new mongoose.Schema({
 
 // Indexes for efficient querying and search
 jobReferralSchema.index({ status: 1 });
+jobReferralSchema.index({ 'moderation.status': 1 });
 jobReferralSchema.index({ 'postedBy': 1 });
 jobReferralSchema.index({ deadline: 1 });
 jobReferralSchema.index({ 'jobTitle': 'text', 'company': 'text', 'description': 'text' });
