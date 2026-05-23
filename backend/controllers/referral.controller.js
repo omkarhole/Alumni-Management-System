@@ -1,5 +1,6 @@
 const { JobReferral, User, Badge, UserBadge, ReferralMessage } = require('../models/Index');
 const logger = require('../utils/logger');
+const { recomputeAndPersistReferralBonus } = require('../services/referralBonusService');
 
 async function getCurrentUserSummary(userId) {
   return User.findById(userId).select('_id name type');
@@ -57,6 +58,7 @@ async function createReferral(req, res, next) {
       company: req.body.company,
       description: req.body.description,
       referralBonus: req.body.referralBonus || 0,
+      bonusPolicy: req.body.bonusPolicy || {},
       deadline: req.body.deadline ? new Date(req.body.deadline) : null,
       postedBy: req.user.id,
       timeline: []
@@ -241,7 +243,9 @@ async function acceptReferral(req, res, next) {
     const applicantUser = await User.findById(applicantId).select('_id name');
 
     referral.applicants[applicantIndex].status = 'accepted';
+    referral.applicants[applicantIndex].acceptedAt = new Date();
     referral.status = 'filled'; // Close after accept
+    referral.filledAt = new Date();
 
     appendTimelineEvent(referral, {
       action: 'accepted',
@@ -268,6 +272,7 @@ async function acceptReferral(req, res, next) {
     });
 
     await referral.save();
+  await recomputeAndPersistReferralBonus(referral, { computedBy: req.user.id });
 
     await referral.populate('applicants.user', 'name email');
 
@@ -388,6 +393,7 @@ async function closeReferral(req, res, next) {
     }
 
     referral.status = 'closed';
+    referral.closedAt = new Date();
 
     appendTimelineEvent(referral, {
       action: 'closed',
@@ -400,6 +406,7 @@ async function closeReferral(req, res, next) {
     });
 
     await referral.save();
+    await recomputeAndPersistReferralBonus(referral, { computedBy: req.user.id });
 
     res.json({
       message: 'Referral closed successfully',
@@ -530,6 +537,30 @@ async function getMyReferrals(req, res, next) {
   }
 }
 
+async function computeReferralBonus(req, res, next) {
+  try {
+    const referral = await JobReferral.findById(req.params.id)
+      .populate('postedBy', 'name email alumnus_bio')
+      .populate('applicants.user', 'name email alumnus_bio');
+
+    if (!referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    const { referral: persistedReferral, bonus } = await recomputeAndPersistReferralBonus(referral, {
+      computedBy: req.user?.id || null
+    });
+
+    res.json({
+      message: 'Referral bonus computed successfully',
+      bonus,
+      referral: persistedReferral
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   createReferral,
   getReferrals,
@@ -541,6 +572,7 @@ module.exports = {
   sendReferralMessage,
   getMyReferrals,
   getReferralById,
-  getReferralTimeline
+  getReferralTimeline,
+  computeReferralBonus
 };
 
