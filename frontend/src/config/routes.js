@@ -94,6 +94,11 @@ export const privateRoutes = [
     component: "ReferralDetail", 
     roles: ["alumnus", "student", "admin"] 
   },
+  {
+    path: "/notifications",
+    component: "NotificationsPage",
+    roles: ["admin", "alumnus", "student"]
+  },
 ];
 
 

@@ -38,6 +38,15 @@ const careerSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  deadline: {
+    type: Date,
+    default: null
+  },
+  status: {
+    type: String,
+    enum: ['open', 'filled', 'closed'],
+    default: 'open'
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -70,5 +79,7 @@ careerSchema.index({ createdAt: -1 });
 careerSchema.index({ skills: 1 });
 careerSchema.index({ job_type: 1 });
 careerSchema.index({ experience_level: 1 });
+careerSchema.index({ status: 1 });
+careerSchema.index({ deadline: 1 });
 
 module.exports = mongoose.model('Career', careerSchema);

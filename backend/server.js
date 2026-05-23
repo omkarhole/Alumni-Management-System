@@ -26,10 +26,13 @@ const courseRouter = require('./routes/course.routes');
 const eventCalendarRouter = require('./routes/eventCalendar.routes');
 const reunionRouter = require('./routes/reunion.routes');
 const referralRouter = require('./routes/referral.routes');
+const savedRouter = require('./routes/saved.routes');
+const notificationRouter = require('./routes/notification.routes');
 const streamRouter = require('./routes/stream.routes');
 const resumeAnalyzerRouter = require('./routes/resumeAnalyzer.routes');
 const marketplaceRouter = require('./routes/marketplace.routes');
 const pollRouter = require('./routes/poll.routes');
+const { startOpportunityNotificationScanner } = require('./services/opportunityNotificationService');
 
 dotenv.config();
 const app = express();
@@ -138,6 +141,8 @@ app.use('/api/v1/courses', courseRouter);
 app.use('/api/v1/event-calendar', eventCalendarRouter);
 app.use('/api/v1/reunions', reunionRouter);
 app.use('/api/v1/referrals', referralRouter);
+app.use('/api/v1/saved', savedRouter);
+app.use('/api/v1/notifications', notificationRouter);
 app.use('/api/v1/stream', streamRouter);
 app.use('/api/v1/resume-analyzer', resumeAnalyzerRouter);
 app.use('/api/v1/marketplace', marketplaceRouter);
@@ -156,6 +161,8 @@ app.use('/api/courses', courseRouter);
 app.use('/api/event-calendar', eventCalendarRouter);
 app.use('/api/reunions', reunionRouter);
 app.use('/api/referrals', referralRouter);
+app.use('/api/saved', savedRouter);
+app.use('/api/notifications', notificationRouter);
 app.use('/api/marketplace', marketplaceRouter);
 app.use('/api/polls', pollRouter);
 app.use('/api', badgeRouter);
@@ -202,6 +209,8 @@ const io = socketIO(server, {
 });
 
 app.set('io', io);
+
+startOpportunityNotificationScanner();
 
 // Initialize socket event handlers
 initializeSocket(io);
