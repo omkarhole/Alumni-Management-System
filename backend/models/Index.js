@@ -15,6 +15,7 @@ const MentorshipMatch = require('./MentorshipMatch.model');
 const MentorshipSession = require('./MentorshipSession.model');
 const MentorshipMessage = require('./MentorshipMessage.model');
 const JobReferral = require('./JobReferral.model');
+const ReferralModerationAction = require('./ReferralModerationAction.model');
 const ReferralMessage = require('./ReferralMessage.model');
 const JobSubscription = require('./JobSubscription.model');
 const SavedItem = require('./SavedItem.model');
@@ -53,6 +54,7 @@ module.exports = {
   MentorshipSession,
   MentorshipMessage,
   JobReferral,
+  ReferralModerationAction,
   ReferralMessage,
   JobSubscription,
   SavedItem,

@@ -154,6 +154,24 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  referralPostingSuspended: {
+    type: Boolean,
+    default: false
+  },
+  referralPostingSuspendedAt: {
+    type: Date,
+    default: null
+  },
+  referralPostingSuspendedReason: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  referralPostingSuspendedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   alumnus_bio: alumnusBioSchema,
   // added student bio schema
   student_bio: studentBioSchema
