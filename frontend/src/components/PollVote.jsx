@@ -87,7 +87,7 @@ const PollVote = ({ poll, onClose }) => {
             onClick={onClose}
             className="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-lg transition-colors"
           >
-            <FaX className="text-xl" />
+            <FaTimes className="text-xl" />
           </button>
         </div>
 
