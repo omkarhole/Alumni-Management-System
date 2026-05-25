@@ -8,6 +8,8 @@ import { useAuth } from "../AuthContext";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [coursesError, setCoursesError] = useState("");
   const [values, setValues] = useState({
     name: "",
     email: "",
@@ -50,13 +52,45 @@ const Signup = () => {
     window.location.href = `${oauthUrl}/google`;
   };
 
+  const normalizedCourses = courses.map((course) => ({
+    value: course?._id || course?.id || course?.value || "",
+    label: course?.title || course?.course || course?.name || "Untitled course",
+  }));
+
   useEffect(() => {
+    let isMounted = true;
+    setCoursesLoading(true);
+    setCoursesError("");
+
     axios
       .get(`${baseUrl}/courses`)
       .then((res) => {
-        setCourses(res.data);
+        const courseList = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.data)
+            ? res.data.data
+            : [];
+
+        if (isMounted) {
+          setCourses(courseList);
+        }
       })
-      .catch(() => toast.error("Unable to load courses."));
+      .catch(() => {
+        if (isMounted) {
+          setCourses([]);
+          setCoursesError("Unable to load courses right now.");
+          toast.error("Unable to load courses.");
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setCoursesLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -183,12 +217,22 @@ const Signup = () => {
                             <option disabled value="">
                               Select course
                             </option>
-                            {courses.map((c) => (
-                              <option key={c._id || c.id} value={c._id || c.id}>
-                                {c.course}
+                            {normalizedCourses.map((course) => (
+                              <option key={course.value} value={course.value}>
+                                {course.label}
                               </option>
                             ))}
+                            {!coursesLoading && normalizedCourses.length === 0 && (
+                              <option value="" disabled>
+                                No courses available
+                              </option>
+                            )}
                           </select>
+                          {coursesError && (
+                            <small className="text-danger d-block mt-1">
+                              {coursesError}
+                            </small>
+                          )}
                         </div>
                         <div className="form-group">
                           <label htmlFor="gender" className="control-label">
@@ -246,12 +290,22 @@ const Signup = () => {
                             <option disabled value="">
                               Select course
                             </option>
-                            {courses.map((c) => (
-                              <option key={c._id || c.id} value={c._id || c.id}>
-                                {c.course}
+                            {normalizedCourses.map((course) => (
+                              <option key={course.value} value={course.value}>
+                                {course.label}
                               </option>
                             ))}
+                            {!coursesLoading && normalizedCourses.length === 0 && (
+                              <option value="" disabled>
+                                No courses available
+                              </option>
+                            )}
                           </select>
+                          {coursesError && (
+                            <small className="text-danger d-block mt-1">
+                              {coursesError}
+                            </small>
+                          )}
                         </div>
                         <div className="form-group">
                           <label htmlFor="gender" className="control-label">
