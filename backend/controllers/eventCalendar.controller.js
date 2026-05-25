@@ -6,6 +6,7 @@ async function createEvent(req, res, next) {
   try {
     const {
       title,
+      category,
       description,
       eventType,
       startDate,
@@ -39,6 +40,7 @@ async function createEvent(req, res, next) {
 
     const newEvent = new EventCalendar({
       title,
+      category,
       description,
       eventType,
       startDate,
@@ -77,12 +79,14 @@ async function createEvent(req, res, next) {
 async function getAllEvents(req, res, next) {
   try {
     const { eventType, eventMode, tags, month, year, status } = req.query;
+    const { category } = req.query;
     
     const filter = { status: 'published' };
 
     if (eventType) filter.eventType = eventType;
     if (eventMode) filter.eventMode = eventMode;
     if (status) filter.status = status;
+    if (category) filter.category = category;
     
     if (tags) {
       filter.eventTags = { $in: tags.split(',') };
@@ -349,6 +353,7 @@ async function updateEvent(req, res, next) {
     const { eventId } = req.params;
     const {
       title,
+      category,
       description,
       startDate,
       endDate,
@@ -374,6 +379,7 @@ async function updateEvent(req, res, next) {
 
     // Update fields
     if (title) event.title = title;
+    if (category !== undefined) event.category = category;
     if (description) event.description = description;
     if (startDate) event.startDate = startDate;
     if (endDate) event.endDate = endDate;
@@ -395,6 +401,97 @@ async function updateEvent(req, res, next) {
       message: 'Event updated successfully',
       event
     });
+  } catch (err) {
+    next(err);
+  }
+}
+
+const normalizeKeywords = (values = []) => {
+  const tokens = new Set();
+
+  for (const value of values) {
+    if (!value) continue;
+    const text = String(value).toLowerCase();
+
+    text.split(/[^a-z0-9]+/g).forEach((token) => {
+      const trimmed = token.trim();
+      if (trimmed.length >= 3) {
+        tokens.add(trimmed);
+      }
+    });
+
+    if (text.trim().length >= 3) {
+      tokens.add(text.trim());
+    }
+  }
+
+  return Array.from(tokens);
+};
+
+const buildEventKeywords = (event = {}) => {
+  return normalizeKeywords([
+    event.category,
+    event.eventType,
+    event.title,
+    ...(Array.isArray(event.eventTags) ? event.eventTags : []),
+  ]);
+};
+
+async function getRecommendedJobs(req, res, next) {
+  try {
+    const { eventId } = req.params;
+    const event = await EventCalendar.findById(eventId).select('title category eventType eventTags');
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    const userEventKeywords = new Set(buildEventKeywords(event));
+
+    if (req.user?._id) {
+      const attendedEvents = await EventCalendar.find({
+        'rsvps.alumni': req.user._id,
+        'rsvps.status': 'confirmed',
+        status: 'published',
+      }).select('title category eventType eventTags');
+
+      attendedEvents.forEach((attendedEvent) => {
+        buildEventKeywords(attendedEvent).forEach((keyword) => userEventKeywords.add(keyword));
+      });
+    }
+
+    const keywords = Array.from(userEventKeywords);
+    if (keywords.length === 0) {
+      return res.json([]);
+    }
+
+    const matchingJobs = await require('../models/Index').Career.find({
+      status: 'open',
+      $or: [
+        { job_title: { $regex: keywords.join('|'), $options: 'i' } },
+        { company: { $regex: keywords.join('|'), $options: 'i' } },
+        { skills: { $in: keywords } },
+      ],
+    })
+      .populate('user', 'name')
+      .sort({ createdAt: -1 })
+      .limit(6);
+
+    const scoredJobs = matchingJobs.map((job) => {
+      const jobText = [job.company, job.job_title, job.description, ...(job.skills || [])]
+        .join(' ')
+        .toLowerCase();
+      const matchedKeywords = keywords.filter((keyword) => jobText.includes(keyword));
+
+      return {
+        ...job.toObject(),
+        matchedKeywords,
+      };
+    });
+
+    scoredJobs.sort((a, b) => b.matchedKeywords.length - a.matchedKeywords.length);
+
+    res.json(scoredJobs);
   } catch (err) {
     next(err);
   }
@@ -435,5 +532,6 @@ module.exports = {
   getMyRsvps,
   getEventAttendees,
   updateEvent,
-  deleteEvent
+  deleteEvent,
+  getRecommendedJobs
 };

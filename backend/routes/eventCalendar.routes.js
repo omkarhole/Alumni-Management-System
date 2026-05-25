@@ -12,7 +12,8 @@ const {
   getMyRsvps,
   getEventAttendees,
   updateEvent,
-  deleteEvent
+  deleteEvent,
+  getRecommendedJobs
 } = require('../controllers/eventCalendar.controller');
 
 const { authenticate, isAdmin } = require('../middlewares/auth.middleware');
@@ -22,6 +23,7 @@ router.get('/', getAllEvents);
 router.get('/calendar-view', getCalendarView);
 router.get('/upcoming', getUpcomingEvents);
 router.get('/details/:id', getEventDetails);
+router.get('/:eventId/recommended-jobs', authenticate, getRecommendedJobs);
 
 // Authenticated routes
 router.post('/', authenticate, isAdmin, createEvent);
