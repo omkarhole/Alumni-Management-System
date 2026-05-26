@@ -10,7 +10,8 @@ const {
   sendReferralMessage,
   getMyReferrals,
   getReferralById,
-  getReferralTimeline
+  getReferralTimeline,
+  computeReferralBonus
 } = require('../controllers/referral.controller');
 const { authenticate, isStudent } = require('../middlewares/auth.middleware');
 
