@@ -27,6 +27,11 @@ const eventCalendarSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  category: {
+    type: String,
+    default: '',
+    trim: true
+  },
   description: {
     type: String,
     required: true
@@ -122,8 +127,9 @@ const eventCalendarSchema = new mongoose.Schema({
 
 // Indexes for performance
 eventCalendarSchema.index({ startDate: 1 });
+eventCalendarSchema.index({ category: 1 });
 eventCalendarSchema.index({ eventType: 1 });
-eventCalendarSchema.index({ tags: 1 });
+eventCalendarSchema.index({ eventTags: 1 });
 eventCalendarSchema.index({ organizer: 1 });
 eventCalendarSchema.index({ 'rsvps.alumni': 1 });
 eventCalendarSchema.index({ rsvpDeadline: 1 });

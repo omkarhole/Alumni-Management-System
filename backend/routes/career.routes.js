@@ -19,6 +19,7 @@ const {
     getJobReferrals,
     updateReferralStatus,
     deleteReferral,
+    getCareerRelatedEvents,
     // trackJobInteraction,
     // getSimilarAlumniCareerPaths,
     // getSkillGapAnalysis,
@@ -43,6 +44,7 @@ router.post('/:id/apply', authenticate, isStudent, applyToJob);
 router.get('/:id/applicants', authenticate, canPostJobs, getJobApplications);
 router.patch('/:jobId/applicants/:userId', authenticate, canPostJobs, updateApplicationStatus);
 router.get('/my-applications', authenticate, isStudent, getMyApplications);
+router.get('/:id/events', authenticate, getCareerRelatedEvents);
 
 // job recommendation routes
 router.get('/recommendations', authenticate, getJobRecommendations);

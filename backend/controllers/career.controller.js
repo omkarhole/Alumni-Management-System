@@ -1,4 +1,4 @@
-const {Career, User, JobSubscription, JobPreference, JobReferral}=require('../models/Index');
+const {Career, User, JobSubscription, JobPreference, JobReferral, EventCalendar}=require('../models/Index');
 const sendEmail = require('../utils/mailer');
 const { calculateSkillsMatchPercentage } = require('../utils/skillMatcher');
 const logger = require('../utils/logger');
@@ -87,6 +87,69 @@ function calculateJobMatchScore(preferences, job) {
   };
 }
 
+function normalizeKeywords(values = []) {
+    const tokens = new Set();
+
+    for (const value of values) {
+        if (!value) continue;
+
+        const text = String(value).toLowerCase().trim();
+        if (!text) continue;
+
+        text.split(/[^a-z0-9]+/g).forEach((token) => {
+            const normalized = token.trim();
+            if (normalized.length >= 3) {
+                tokens.add(normalized);
+            }
+        });
+
+        if (text.length >= 3) {
+            tokens.add(text);
+        }
+    }
+
+    return Array.from(tokens);
+}
+
+function buildCareerKeywords(career = {}) {
+    return normalizeKeywords([
+        career.company,
+        career.job_title,
+        career.job_type,
+        career.experience_level,
+        ...(Array.isArray(career.skills) ? career.skills : []),
+    ]);
+}
+
+async function getRelatedEventsForCareer(career, limit = 3) {
+    const keywords = buildCareerKeywords(career);
+
+    if (keywords.length === 0) {
+        return [];
+    }
+
+    const matchedEvents = await EventCalendar.find({
+        status: 'published',
+        eventMode: { $in: ['virtual', 'hybrid'] },
+        $or: [
+            { category: { $in: keywords } },
+            { eventTags: { $in: keywords } },
+            { title: { $regex: keywords.join('|'), $options: 'i' } },
+            { description: { $regex: keywords.join('|'), $options: 'i' } },
+        ],
+    })
+        .populate('organizer', 'name avatar')
+        .populate('streamSessionId', 'platform meetingUrl meetingPassword status')
+        .sort({ startDate: 1 })
+        .limit(limit);
+
+    return matchedEvents.map((event) => ({
+        ...event.toObject(),
+        streamUrl: event.streamSessionId?.meetingUrl || event.virtualLink || '',
+        hasLiveStream: Boolean(event.streamSessionId?.meetingUrl || event.virtualLink),
+    }));
+}
+
 // print all careers
 async function listCarrers(req,res,next){
     try{
@@ -101,7 +164,14 @@ async function listCarrers(req,res,next){
                 }
             })
             .sort({ createdAt: -1 });
-        res.json(careers);
+        const careersWithSessions = await Promise.all(
+            careers.map(async (career) => ({
+                ...career.toObject(),
+                relatedLiveSessions: await getRelatedEventsForCareer(career),
+            }))
+        );
+
+        res.json(careersWithSessions);
 
     }
     catch(err){
@@ -360,6 +430,27 @@ async function getJobRecommendations(req, res, next) {
         recommendations.sort((a, b) => b.matchPercentage - a.matchPercentage);
         
         res.json(recommendations);
+    } catch (err) {
+        next(err);
+    }
+}
+
+async function getCareerRelatedEvents(req, res, next) {
+    try {
+        const career = await Career.findById(req.params.id)
+            .populate('user', 'name')
+            .select('company location job_title description skills job_type experience_level status user');
+
+        if (!career) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        const relatedLiveSessions = await getRelatedEventsForCareer(career, 6);
+
+        res.json({
+            job: career,
+            relatedLiveSessions,
+        });
     } catch (err) {
         next(err);
     }
@@ -753,5 +844,6 @@ module.exports={
     getAllReferrals,
     getJobReferrals,
     updateReferralStatus,
-    deleteReferral
+    deleteReferral,
+    getCareerRelatedEvents
 };
