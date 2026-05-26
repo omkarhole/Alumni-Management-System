@@ -31,6 +31,10 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
         setIsMenuOpen(!isMenuOpen);
     };
 
+    useEffect(() => {
+    setIsMenuOpen(false);
+    }, [location.pathname]);
+
     const isActive = (path) => {
         return location.pathname === path ? 'headnavactive' : '';
     };
@@ -135,7 +139,7 @@ useEffect(() => {
             <nav className={`navbar navbar-expand-lg navbar-${theme} fixed-top`} id="mainNav">
                 <div className="container">
                     <Link className="navbar-brand js-scroll-trigger" to="/"><img src={logo} className='logoimg' /></Link>
-                    <button className="navbar-toggler navbar-light" type="button"  >
+                    <button className="navbar-toggler navbar-light" type="button" onClick={toggleMenu} >
                         <Hamburger  hideOutline={false} rounded color="#FFFFFF" toggled={isMenuOpen} toggle={setIsMenuOpen}  />
                     </button>
                     <div ref={navRef} className={`collapse navbar-collapse ${isMenuOpen ? 'show' : ''}`} id="navbarResponsive">
