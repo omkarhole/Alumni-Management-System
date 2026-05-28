@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [isStudent, setIsStudent] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [user, setUser] = useState(null);
 
   const applyRoleState = (userType) => {
     const type = (userType || '').toLowerCase();
@@ -28,13 +29,26 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('alumnus_id');
   };
 
-  const login = (userType) => {
-    const type = userType || localStorage.getItem('user_type');
+  const setAuthUser = (userId, userType, userName) => {
+    const type = (userType || '').toLowerCase();
+    const id = userId || '';
+    const name = userName || '';
+
+    setUser(id || type || name ? { id, type, name } : null);
     applyRoleState(type);
+  };
+
+  const login = (userType) => {
+    setAuthUser(
+      localStorage.getItem('user_id'),
+      userType || localStorage.getItem('user_type'),
+      localStorage.getItem('user_name')
+    );
   };
 
   const logout = () => {
     clearStoredUser();
+    setUser(null);
     applyRoleState('');
   };
 
@@ -77,7 +91,7 @@ export const AuthProvider = ({ children }) => {
         if (userName) {
           localStorage.setItem('user_name', userName);
         }
-        applyRoleState(userType);
+        setAuthUser(userId, userType, userName);
       })
       .catch(async (err) => {
         if (!active) return;
@@ -90,7 +104,11 @@ export const AuthProvider = ({ children }) => {
             if (!active) return;
 
             if (isSessionValid) {
-              applyRoleState(cachedType);
+              setAuthUser(
+                localStorage.getItem('user_id'),
+                cachedType,
+                localStorage.getItem('user_name')
+              );
               return;
             }
           } catch (_) {
@@ -110,6 +128,7 @@ export const AuthProvider = ({ children }) => {
     const handleAuthError = () => {
       if (active) {
         clearStoredUser();
+        setUser(null);
         applyRoleState('');
       }
     };
@@ -125,7 +144,7 @@ export const AuthProvider = ({ children }) => {
 
 
   return (
-    <AuthContext.Provider value={{ isAdmin, isAlumnus, isStudent, isLoggedIn, isAuthReady, login, logout }}>
+    <AuthContext.Provider value={{ isAdmin, isAlumnus, isStudent, isLoggedIn, isAuthReady, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
