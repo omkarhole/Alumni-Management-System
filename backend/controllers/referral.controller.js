@@ -325,13 +325,13 @@ async function acceptReferral(req, res, next) {
     });
 
     await referral.save();
-  await recomputeAndPersistReferralBonus(referral, { computedBy: req.user.id });
+    const { referral: recomputedReferral } = await recomputeAndPersistReferralBonus(referral, { computedBy: req.user.id });
 
-    await referral.populate('applicants.user', 'name email');
+    await recomputedReferral.populate('applicants.user', 'name email');
 
     res.json({
       message: 'Applicant accepted successfully',
-      referral
+      referral: recomputedReferral
     });
   } catch (err) {
     next(err);
