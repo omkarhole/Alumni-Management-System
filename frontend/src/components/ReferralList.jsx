@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 const ReferralList = () => {
   const { user } = useAuth();
   const [referrals, setReferrals] = useState([]);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 10 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
@@ -43,15 +44,16 @@ const ReferralList = () => {
     };
   }, [user]);
 
-  const fetchReferrals = async () => {
+  const fetchReferrals = async ({ nextPage = page, nextSearch = search } = {}) => {
     try {
       setLoading(true);
       setError('');
-      const params = { status: statusFilter, page, limit };
-      if (search) params.search = search;
-      
+      const params = { status: statusFilter, page: nextPage, limit };
+      if (nextSearch) params.search = nextSearch;
+
       const response = await apiClient.get('/api/referrals', { params });
       setReferrals(response.data.referrals || []);
+      setPagination(response.data.pagination || { total: 0, page: nextPage, limit });
     } catch (err) {
       setError('Failed to load referrals');
       toast.error('Failed to load referrals');
@@ -63,7 +65,7 @@ const ReferralList = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchReferrals();
+    fetchReferrals({ nextPage: 1, nextSearch: search });
   };
 
   if (loading) {
@@ -73,11 +75,6 @@ const ReferralList = () => {
       </div>
     );
   }
-
-  const filteredReferrals = referrals.filter(ref => 
-    ref.jobTitle.toLowerCase().includes(search.toLowerCase()) ||
-    ref.company.toLowerCase().includes(search.toLowerCase())
-  );
 
   const savedMap = savedItems.reduce((accumulator, item) => {
     accumulator[`${item.entityType}:${item.entityId}`] = item;
@@ -169,7 +166,7 @@ const ReferralList = () => {
 
       {/* Referrals Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredReferrals.length === 0 ? (
+        {referrals.length === 0 ? (
           <div className="col-span-full text-center py-12">
             <div className="text-6xl text-gray-300 mb-4">📋</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No referrals found</h3>
@@ -177,7 +174,7 @@ const ReferralList = () => {
             <Link to="/" className="text-blue-600 hover:text-blue-700 font-medium">Browse other sections →</Link>
           </div>
         ) : (
-          filteredReferrals.map((referral) => (
+          referrals.map((referral) => (
             <div key={referral._id} className="bg-white shadow-lg rounded-2xl p-8 border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -214,7 +211,7 @@ const ReferralList = () => {
                   </div>
                 )}
               </div>
-              
+
               <p className="text-gray-600 mb-6 line-clamp-3">{referral.description}</p>
 
               <div className="flex flex-col sm:flex-row gap-3">
@@ -263,7 +260,7 @@ const ReferralList = () => {
       </div>
 
       {/* Pagination */}
-      {referrals.length > 0 && (
+      {pagination.total > 0 && (
         <div className="flex justify-center mt-12">
           <div className="flex gap-2">
             <button
@@ -276,7 +273,7 @@ const ReferralList = () => {
             <span className="px-4 py-2 font-medium">Page {page}</span>
             <button
               onClick={() => setPage(p => p + 1)}
-              disabled={referrals.length < limit}
+              disabled={page * limit >= pagination.total}
               className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
             >
               Next
