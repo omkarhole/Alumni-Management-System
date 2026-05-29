@@ -279,7 +279,7 @@ async function analyzeResume(req, res, next) {
       matchedSkills,
       missingSkills,
       skillExplanations,
-      recommendations: recommendations.map((r) => ({ text: r })).map((x) => x.text).map((t) => t),
+      recommendations,
       jobRequirements: requiredSkills,
       resumeSkills,
     });
