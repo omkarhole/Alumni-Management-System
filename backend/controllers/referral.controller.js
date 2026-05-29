@@ -303,12 +303,14 @@ async function acceptReferral(req, res, next) {
       return res.status(404).json({ message: 'Applicant not found' });
     }
 
+    if (referral.status !== 'open') {
+      return res.status(400).json({ message: 'Referral is no longer open' });
+    }
+
     const applicantUser = await User.findById(applicantId).select('_id name');
 
     referral.applicants[applicantIndex].status = 'accepted';
     referral.applicants[applicantIndex].acceptedAt = new Date();
-    referral.status = 'filled'; // Close after accept
-    referral.filledAt = new Date();
 
     appendTimelineEvent(referral, {
       action: 'accepted',
@@ -320,18 +322,6 @@ async function acceptReferral(req, res, next) {
       applicant: applicantUser?._id || applicantId,
       applicantName: applicantUser?.name,
       details: `${applicantUser?.name || 'Applicant'} was accepted`
-    });
-
-    appendTimelineEvent(referral, {
-      action: 'filled',
-      status: 'filled',
-      scope: 'referral',
-      actor: currentUser,
-      actorName: currentUser?.name,
-      actorType: currentUser?.type,
-      applicant: applicantUser?._id || applicantId,
-      applicantName: applicantUser?.name,
-      details: 'Referral marked as filled'
     });
 
     await referral.save();
