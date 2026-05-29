@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import io from 'socket.io-client';
 
 const SocketContext = createContext(null);
@@ -232,7 +232,7 @@ export const SocketProvider = ({ children }) => {
     socket.off(event, handler);
   }, [socket]);
 
-  const value = {
+  const value = useMemo(() => ({
     socket: socketRef.current,
     isConnected,
     currentUserId,
@@ -251,7 +251,25 @@ export const SocketProvider = ({ children }) => {
     editMessage,
     on,
     off
-  };
+  }), [
+    isConnected,
+    currentUserId,
+    activeConversation,
+    onlineUsers,
+    reactions,
+    typingUsers,
+    joinConversation,
+    leaveConversation,
+    markAsRead,
+    addReaction,
+    removeReaction,
+    sendVoiceMessage,
+    sendTypingIndicator,
+    deleteMessage,
+    editMessage,
+    on,
+    off
+  ]);
 
   return (
     <SocketContext.Provider value={value}>
