@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 const ReferralDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthReady } = useAuth();
+  const { isAuthReady, user: authUser } = useAuth();
   const [referral, setReferral] = useState(null);
   const [timeline, setTimeline] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -18,8 +18,18 @@ const ReferralDetail = () => {
   const [applying, setApplying] = useState(false);
   const [applicants, setApplicants] = useState([]);
 
-  const currentUserId = localStorage.getItem('user_id');
-  const currentUserType = (localStorage.getItem('user_type') || '').toLowerCase();
+  const authUserId = authUser?._id || authUser?.id || '';
+  const authUserType = (authUser?.type || '').toLowerCase();
+  const storedUserId = localStorage.getItem('user_id') || '';
+  const storedUserType = (localStorage.getItem('user_type') || '').toLowerCase();
+  const hasAuthIdentity = Boolean(authUserId || authUserType);
+  const hasStoredIdentity = Boolean(storedUserId || storedUserType);
+  const identitiesMatch = !isAuthReady || !hasAuthIdentity || !hasStoredIdentity || (
+    String(authUserId || '') === String(storedUserId) &&
+    String(authUserType || '') === String(storedUserType)
+  );
+  const currentUserId = identitiesMatch ? (authUserId || (isAuthReady ? storedUserId : '')) : '';
+  const currentUserType = identitiesMatch ? (authUserType || (isAuthReady ? storedUserType : '')) : '';
   const isAdmin = currentUserType === 'admin';
 
   const getDocId = (value) => value?._id || value?.id || value;
