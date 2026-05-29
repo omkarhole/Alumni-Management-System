@@ -8,13 +8,26 @@ const ResumeAnalyzer = () => {
   const { user } = useAuth();
   const [jobId, setJobId] = useState('');
   const [jobDescription, setJobDescription] = useState('');
+  const [jobSkillsInput, setJobSkillsInput] = useState('');
   const [resumeText, setResumeText] = useState('');
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState(null);
 
+  const jobSkills = useMemo(
+    () => jobSkillsInput
+      .split(/[\n,]/)
+      .map((skill) => skill.trim())
+      .filter(Boolean),
+    [jobSkillsInput]
+  );
+
   const canAnalyze = useMemo(() => {
-    return Boolean(resumeText.trim()) && (Boolean(jobId) || Boolean(jobDescription.trim()));
-  }, [resumeText, jobId, jobDescription]);
+    return Boolean(resumeText.trim()) && (
+      Boolean(jobId.trim()) ||
+      Boolean(jobDescription.trim()) ||
+      jobSkills.length > 0
+    );
+  }, [resumeText, jobId, jobDescription, jobSkills]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +38,7 @@ const ResumeAnalyzer = () => {
     }
 
     if (!canAnalyze) {
-      toast.error('Provide resume text and a jobId or job description');
+      toast.error('Provide resume text and a jobId, job description, or job skills');
       return;
     }
 
@@ -37,7 +50,7 @@ const ResumeAnalyzer = () => {
         resumeText,
         jobId: jobId ? jobId : null,
         jobDescription: jobDescription.trim() ? jobDescription.trim() : '',
-        // jobSkills: optional in v1
+        jobSkills,
       };
 
       const res = await apiClient.post('/resume-analyzer', payload);
@@ -81,6 +94,20 @@ const ResumeAnalyzer = () => {
               rows={5}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-800 mb-2">Job Skills (optional)</label>
+            <textarea
+              value={jobSkillsInput}
+              onChange={(e) => setJobSkillsInput(e.target.value)}
+              placeholder="Enter skills separated by commas or new lines, e.g. React, Node.js, SQL"
+              rows={4}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <p className="text-xs text-gray-500 mt-2">
+              This makes the analysis deterministic and avoids relying only on keyword extraction from the job description.
+            </p>
           </div>
 
           <div>
