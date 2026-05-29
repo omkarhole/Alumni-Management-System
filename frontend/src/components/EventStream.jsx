@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { useSocket } from '../SocketContext';
@@ -7,7 +7,8 @@ const EventStream = ({ eventId: propEventId, viewerCount: propViewerCount }) => 
   const { eventId: paramEventId } = useParams();
   const eventId = propEventId || paramEventId;
 
-  const socket = useSocket();
+  const { socket } = useSocket();
+  const attachedEventIdRef = useRef(null);
 
   const [streamUrl, setStreamUrl] = useState('');
   const [streamPassword, setStreamPassword] = useState('');
@@ -44,7 +45,13 @@ const EventStream = ({ eventId: propEventId, viewerCount: propViewerCount }) => 
   }, [eventId, apiBase]);
 
   useEffect(() => {
-    if (!socket?.socket || !eventId) return;
+    if (!socket || !eventId) return;
+
+    if (attachedEventIdRef.current === eventId.toString()) {
+      return;
+    }
+
+    attachedEventIdRef.current = eventId.toString();
 
     const handler = (payload) => {
       if (payload?.eventId?.toString() !== eventId.toString()) return;
@@ -54,11 +61,15 @@ const EventStream = ({ eventId: propEventId, viewerCount: propViewerCount }) => 
     socket.on('streamViewerCount', handler);
 
     // Join stream room to receive counts
-    socket.socket.emit('joinStream', { eventId });
+    socket.emit('joinStream', { eventId });
 
     return () => {
       socket.off('streamViewerCount', handler);
-      socket.socket.emit('leaveStream', { eventId });
+      socket.emit('leaveStream', { eventId });
+
+      if (attachedEventIdRef.current === eventId.toString()) {
+        attachedEventIdRef.current = null;
+      }
     };
   }, [socket, eventId]);
 
