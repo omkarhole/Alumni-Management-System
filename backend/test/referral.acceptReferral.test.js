@@ -27,11 +27,14 @@ test('acceptReferral keeps the referral open after accepting one applicant', asy
     _id: 'referral-1',
     status: 'open',
     filledAt: null,
+    referralBonus: 200,
     postedBy: {
       toString: () => 'owner-1'
     },
     bonusPolicy: {
-      payoutOn: 'accepted'
+      payoutOn: 'accepted',
+      companyMultiplier: 1.5,
+      companyFlatBonus: 50
     },
     timeline: [],
     applicants: [
@@ -88,15 +91,38 @@ test('acceptReferral keeps the referral open after accepting one applicant', asy
     await acceptReferral(req, res, () => {});
 
     assert.equal(res.statusCode, 200);
-    assert.deepStrictEqual(res.payload, {
-      message: 'Applicant accepted successfully',
-      referral
-    });
+    assert.equal(res.payload.message, 'Applicant accepted successfully');
+    assert.equal(res.payload.referral, referral);
     assert.equal(referral.status, 'open');
     assert.equal(referral.filledAt, null);
     assert.equal(referral.applicants[0].status, 'accepted');
     assert.ok(referral.applicants[0].acceptedAt instanceof Date);
     assert.equal(referral.applicants[1].status, 'pending');
+    assert.deepStrictEqual(res.payload.referral.bonusComputation, {
+      status: 'eligible',
+      amount: 350,
+      baseAmount: 200,
+      multiplier: 1.5,
+      flatBonus: 50,
+      deadlinePenaltyPercent: 0,
+      deadlinePenaltyAmount: 0,
+      payoutEvent: 'accepted',
+      eligibleApplicantId: 'applicant-1',
+      eligibleApplicantName: '',
+      computedAt: res.payload.referral.bonusComputation.computedAt,
+      computedBy: 'owner-1',
+      reason: 'Bonus eligible',
+      policySnapshot: {
+        payoutOn: 'accepted',
+        companyName: '',
+        companyMultiplier: 1.5,
+        companyFlatBonus: 50,
+        deadlineReductionPerDayPercent: 0,
+        deadlineReductionCapPercent: 100,
+        enabled: true,
+        notes: ''
+      }
+    });
     assert.deepStrictEqual(referral.timeline.map((event) => event.action), ['accepted']);
     assert.ok(referralFindByIdCalls >= 2);
   } finally {
