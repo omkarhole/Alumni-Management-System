@@ -10547,3 +10547,25 @@ header.masthead>div{
 position: relative;
 z-index: 2;
 } */
+
+/* Force section text visible in dark mode */
+body.dark-mode .home-section,
+body.dark-mode .home-section h1,
+body.dark-mode .home-section h2,
+body.dark-mode .home-section h3,
+body.dark-mode .home-section h4,
+body.dark-mode .home-section h5,
+body.dark-mode .home-section h6,
+body.dark-mode .home-section p,
+body.dark-mode .home-section span {
+  color: #ffffff !important;   /* force white text */
+}
+
+/* Optional: accent color for tags or highlights */
+body.dark-mode .home-section-tag {
+  color: #ffc107 !important;   /* yellow accent */
+}
+
+body.dark-mode .home-section-summary {
+  color: #e0e0e0 !important;   /* softer gray for readability */
+}
