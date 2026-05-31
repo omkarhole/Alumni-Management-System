@@ -79,7 +79,6 @@ const summarizeHtml = (html = '') =>
     html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
 const Home = () => {
-    const { theme } = useTheme();
     const { isLoggedIn, isAdmin } = useAuth();
     const [events, setEvents] = useState([]);
     const [activeBenefit, setActiveBenefit] = useState(0);
@@ -192,7 +191,7 @@ const Home = () => {
     };
 
     return (
-        <div className={`home-page ${theme === 'dark' ? 'home-theme-dark' : 'home-theme-light'}`}>
+        <div className="home-page home-theme-light">
 <section className="home-hero">
                 <img src={imgcs} alt="" className="home-hero-image" />
                 <div className="home-hero-mask" />
