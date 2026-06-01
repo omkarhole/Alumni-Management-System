@@ -10,7 +10,6 @@ import { Fade as Hamburger } from 'hamburger-react'
 import { authUrl, messagesUrl } from '../utils/globalurl';
 import apiClient from '../api/client';
 import { FaMessage } from "react-icons/fa6";
-import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
 
@@ -144,9 +143,7 @@ useEffect(() => {
                     </button>
                     <div ref={navRef} className={`collapse navbar-collapse ${isMenuOpen ? 'show' : ''}`} id="navbarResponsive">
                         <ul className="navbar-nav ml-auto my-2 my-lg-0">
-                            <li className="nav-item">
-                                <ThemeToggle />
-                            </li>
+                            
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/")}`} to="/">Home</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/alumni")}`} to="/alumni">Alumni</Link></li>
                             <li className="nav-item"><Link onClick={toggleMenu} className={`nav-link js-scroll-trigger ${isActive("/gallery")}`} to="/gallery">Gallery</Link></li>
