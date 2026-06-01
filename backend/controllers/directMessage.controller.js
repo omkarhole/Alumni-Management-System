@@ -13,6 +13,27 @@ const sendMessage = async (req, res) => {
       return res.status(400).json({ error: 'Receiver ID and content are required' });
     }
 
+    // Enforce a maximum message length to prevent oversized document storage
+    // and disproportionately large inbox payloads. The global express.json
+    // limit (100 KB) is too permissive for a single chat message.
+    const MAX_CONTENT_LENGTH = 2000;
+    if (typeof content !== 'string' || content.length > MAX_CONTENT_LENGTH) {
+      return res.status(400).json({
+        error: `Message content must not exceed ${MAX_CONTENT_LENGTH} characters`,
+      });
+    }
+
+    // Validate fileUrl when present: only allow http/https scheme to prevent
+    // javascript: URI injection that a frontend might render as a clickable link.
+    if (fileUrl && !/^https?:\/\//i.test(fileUrl)) {
+      return res.status(400).json({ error: 'fileUrl must be an http or https URL' });
+    }
+
+    // fileName may not contain path separators.
+    if (fileName && /[/\\]/.test(fileName)) {
+      return res.status(400).json({ error: 'Invalid fileName' });
+    }
+
     // Check if receiver exists
     const receiver = await User.findById(receiverId);
     if (!receiver) {
