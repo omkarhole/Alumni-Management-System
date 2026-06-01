@@ -23,23 +23,35 @@ async function addForum(req, res, next) {
     } catch (err) { next(err); }
 }
 
-// update forum topic
+// update forum topic - only the original author may edit (#264)
 async function updateForum(req, res, next) {
     try {
-        const updateData = { ...req.body };
-        delete updateData._id;
-        delete updateData.id;
-        if (req.body.user_id) {
-            updateData.user = req.body.user_id;
-            delete updateData.user_id;
+        const topic = await ForumTopic.findById(req.params.id);
+        if (!topic) {
+            return res.status(404).json({ message: 'Topic not found' });
         }
-        await ForumTopic.findByIdAndUpdate(req.params.id, updateData, { new: true });
+        const callerId = String(req.user.id || req.user._id);
+        if (String(topic.user) !== callerId) {
+            return res.status(403).json({ message: 'Not authorised to update this topic' });
+        }
+        // Only update content fields; never allow reassigning the author.
+        const { title, description } = req.body;
+        await ForumTopic.findByIdAndUpdate(req.params.id, { title, description }, { new: true });
         res.json({ message: 'Updated' });
     } catch (err) { next(err); }
 }
-// delete forum topic
+
+// delete forum topic - only the original author may delete (#264)
 async function deleteForum(req, res, next) {
     try {
+        const topic = await ForumTopic.findById(req.params.id);
+        if (!topic) {
+            return res.status(404).json({ message: 'Topic not found' });
+        }
+        const callerId = String(req.user.id || req.user._id);
+        if (String(topic.user) !== callerId) {
+            return res.status(403).json({ message: 'Not authorised to delete this topic' });
+        }
         await ForumTopic.findByIdAndDelete(req.params.id);
         res.json({ message: 'Deleted' });
     } catch (err) { next(err); }
