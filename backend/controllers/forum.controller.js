@@ -1,13 +1,32 @@
 const {ForumTopic,User}=require('../models/Index');
 
-// list all forum topics with user names
+// Maximum forum topics returned per page (#265)
+const FORUM_PAGE_SIZE = 20;
+
+// list forum topics with cursor-based pagination (#265)
 async function listForums(req, res, next) {
     try {
-        const forums = await ForumTopic.find()
-            .populate('user', 'name')
-            .populate('comments.user', 'name')
-            .sort({ createdAt: -1 });
-        res.json(forums);
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(FORUM_PAGE_SIZE, parseInt(req.query.limit) || FORUM_PAGE_SIZE);
+        const skip = (page - 1) * limit;
+
+        const [forums, total] = await Promise.all([
+            ForumTopic.find()
+                .populate('user', 'name')
+                .populate('comments.user', 'name')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            ForumTopic.countDocuments(),
+        ]);
+
+        res.json({
+            forums,
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        });
     } catch (err) { next(err); }
 }
 // add new forum topic - author is always the authenticated caller (#263)
