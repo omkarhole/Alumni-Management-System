@@ -10,13 +10,16 @@ async function listForums(req, res, next) {
         res.json(forums);
     } catch (err) { next(err); }
 }
-// add new forum topic
+// add new forum topic - author is always the authenticated caller (#263)
 async function addForum(req, res, next) {
     try {
         const topicData = {
             title: req.body.title,
             description: req.body.description,
-            user: req.body.user_id || req.body.user
+            // Always derive the author from the verified JWT payload.
+            // Trusting req.body.user_id or req.body.user allows any
+            // authenticated caller to impersonate another user.
+            user: req.user.id || req.user._id,
         };
         const topic = await ForumTopic.create(topicData);
         res.status(201).json(topic);
