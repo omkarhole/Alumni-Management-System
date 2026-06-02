@@ -18,8 +18,14 @@ const ReferralList = () => {
   const limit = 10;
 
   useEffect(() => {
-    fetchReferrals();
-  }, [statusFilter, page]);
+    // Fetch whenever filter/search/page changes.
+    // Pagination state is always synced from the server inside fetchReferrals().
+    fetchReferrals({ page, search });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, page, search]);
+
+
+
 
   useEffect(() => {
     if (!user) {
@@ -44,16 +50,33 @@ const ReferralList = () => {
     };
   }, [user]);
 
-  const fetchReferrals = async ({ nextPage = page, nextSearch = search } = {}) => {
+  const fetchReferrals = async ({ page: requestedPage, search: requestedSearch } = {}) => {
+
     try {
       setLoading(true);
       setError('');
-      const params = { status: statusFilter, page: nextPage, limit };
-      if (nextSearch) params.search = nextSearch;
+
+
+      const params = {
+        status: statusFilter,
+        page: requestedPage ?? 1,
+        limit
+      };
+
+
+      const effectiveSearch = requestedSearch ?? '';
+      if (effectiveSearch) params.search = effectiveSearch;
 
       const response = await apiClient.get('/api/referrals', { params });
-      setReferrals(response.data.referrals || []);
-      setPagination(response.data.pagination || { total: 0, page: nextPage, limit });
+
+      const serverPagination = response.data?.pagination;
+      const serverPage = serverPagination?.page;
+
+      setReferrals(response.data?.referrals || []);
+      setPagination(serverPagination || { total: 0, page: serverPage ?? requestedPage ?? 1, limit });
+      if (typeof serverPage === 'number') {
+        setPage(serverPage);
+      }
     } catch (err) {
       setError('Failed to load referrals');
       toast.error('Failed to load referrals');
@@ -65,8 +88,9 @@ const ReferralList = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchReferrals({ nextPage: 1, nextSearch: search });
+    fetchReferrals({ page: 1, search });
   };
+
 
   if (loading) {
     return (
@@ -264,23 +288,31 @@ const ReferralList = () => {
         <div className="flex justify-center mt-12">
           <div className="flex gap-2">
             <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
+              onClick={() => {
+                const targetPage = Math.max(1, page - 1);
+                setPage(targetPage);
+              }}
+              disabled={page === 1 || loading}
               className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
             >
               Previous
             </button>
             <span className="px-4 py-2 font-medium">Page {page}</span>
             <button
-              onClick={() => setPage(p => p + 1)}
-              disabled={page * limit >= pagination.total}
+              onClick={() => {
+                const targetPage = page + 1;
+                setPage(targetPage);
+              }}
+              disabled={page * limit >= pagination.total || loading}
               className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
             >
               Next
             </button>
+
           </div>
         </div>
       )}
+
     </div>
   );
 };
