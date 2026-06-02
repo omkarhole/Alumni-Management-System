@@ -394,19 +394,20 @@ async function rejectReferral(req, res, next) {
 // Get single referral by ID
 async function getReferralById(req, res, next) {
   try {
-    const referral = await JobReferral.findById(req.params.id)
-      .populate('postedBy', 'name email alumnus_bio type referralPostingSuspended referralPostingSuspendedReason')
-      .populate('applicants.user', 'name email alumnus_bio');
-    
+    const { referral, access } = await getReferralAccess(req.params.id, req.user.id);
+
     if (!referral) {
       return res.status(404).json({ message: 'Referral not found' });
     }
 
-    const currentUser = req.user?.id ? await getCurrentUserSummary(req.user.id) : null;
-    const isOwner = referral.postedBy?._id?.toString() === req.user?.id;
-    if (isReferralHidden(referral) && currentUser?.type !== 'admin' && !isOwner) {
+    if (!access) {
+      // Do not leak referral existence.
       return res.status(404).json({ message: 'Referral not found' });
     }
+
+    // Keep response structure consistent with prior implementation.
+    await referral.populate('postedBy', 'name email alumnus_bio type referralPostingSuspended referralPostingSuspendedReason');
+    await referral.populate('applicants.user', 'name email alumnus_bio');
 
     res.json(referral);
   } catch (err) {
@@ -416,14 +417,14 @@ async function getReferralById(req, res, next) {
 
 async function getReferralTimeline(req, res, next) {
   try {
-    const referral = await JobReferral.findById(req.params.id).select('timeline moderation postedBy');
+    const { referral, access } = await getReferralAccess(req.params.id, req.user.id);
+
     if (!referral) {
       return res.status(404).json({ message: 'Referral not found' });
     }
 
-    const currentUser = req.user?.id ? await getCurrentUserSummary(req.user.id) : null;
-    const isOwner = referral.postedBy?.toString() === req.user?.id;
-    if (isReferralHidden(referral) && currentUser?.type !== 'admin' && !isOwner) {
+    if (!access) {
+      // Do not leak referral existence.
       return res.status(404).json({ message: 'Referral not found' });
     }
 
@@ -437,7 +438,9 @@ async function getReferralTimeline(req, res, next) {
   }
 }
 
+
 async function closeReferral(req, res, next) {
+
   try {
     const { id } = req.params;
     const currentUser = await getCurrentUserSummary(req.user.id);
