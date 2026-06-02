@@ -234,7 +234,13 @@ const ReferralDetail = () => {
     return 'from-blue-500 to-cyan-500';
   };
 
-  const getMessageSide = (message) => getDocId(message.sender) === currentUserId ? 'self' : 'other';
+  const getMessageSide = (message) => {
+    // Harden against missing/failed populations (message.sender might be null/undefined).
+    const senderId = getDocId(message?.sender);
+    if (!currentUserId) return 'other';
+    if (!senderId) return 'other';
+    return String(senderId) === String(currentUserId) ? 'self' : 'other';
+  };
 
   const bonusComputation = referral?.bonusComputation || {};
   const bonusStatus = bonusComputation.status || 'pending';
@@ -436,7 +442,7 @@ const ReferralDetail = () => {
                             <div className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-sm ${side === 'self' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border border-gray-200'}`}>
                               <div className="flex items-center justify-between gap-4 mb-2 text-xs opacity-80">
                                 <span className="font-semibold">
-                                  {getDocId(message.sender) === currentUserId ? 'You' : message.sender?.name || 'Member'}
+                                  {String(getDocId(message?.sender)) === String(currentUserId) ? 'You' : message.sender?.name || 'Member'}
                                   {' '}→{' '}
                                   {message.recipient?.name || 'Recipient'}
                                 </span>
