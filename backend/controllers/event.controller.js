@@ -11,8 +11,11 @@ const {
 // all events details
 async function listEvents(req, res, next) {
     try {
-        const events = await listEventsService();
-        res.json(events);
+        const result = await listEventsService({
+            page: req.query.page,
+            limit: req.query.limit,
+        });
+        res.json(result);
     } catch (err) {
         next(err);
     }

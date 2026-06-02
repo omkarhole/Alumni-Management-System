@@ -36,8 +36,11 @@ const createCrudService = ({
     return result;
   };
 
-  const list = async ({ filter = {}, populate, sort } = {}) => {
-    return await applyQueryOptions(model.find(filter), { populate, sort });
+  const list = async ({ filter = {}, populate, sort, skip, limit } = {}) => {
+    let query = applyQueryOptions(model.find(filter), { populate, sort });
+    if (typeof skip === 'number') query = query.skip(skip);
+    if (typeof limit === 'number') query = query.limit(limit);
+    return await query;
   };
 
   const findById = async (id, { populate } = {}) => {
