@@ -65,14 +65,15 @@ const ReferralDetail = () => {
       return;
     }
 
-    if (isOwner && applicants.length > 0 && !selectedRecipientId) {
-      setSelectedRecipientId(getDocId(applicants[0].user));
+    if (isOwner) {
+      if (applicants.length > 0 && !selectedRecipientId) {
+        setSelectedRecipientId(getDocId(applicants[0].user));
+      }
+      return;
     }
 
-    if (!isOwner) {
-      setSelectedRecipientId(getDocId(referral.postedBy));
-    }
-  }, [referral, applicants, isOwner, selectedRecipientId]);
+    setSelectedRecipientId(getDocId(referral.postedBy));
+  }, [referral, applicants, isOwner]);
 
   const fetchReferral = async () => {
     try {
@@ -487,7 +488,7 @@ const ReferralDetail = () => {
 
                     <button
                       type="submit"
-                      disabled={sendingMessage}
+                      disabled={sendingMessage || (isOwner && !selectedRecipientId)}
                       className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white shadow-lg transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {sendingMessage ? 'Sending...' : 'Send Message'}
