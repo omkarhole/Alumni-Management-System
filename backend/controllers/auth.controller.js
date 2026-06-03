@@ -131,6 +131,7 @@ async function signup(req, res, next) {
                 student_bio: {
                     gender: req.body.gender || 'male',
                     enrollment_year: req.body.enrollment_year || new Date().getFullYear(),
+                    current_year: Number(req.body.current_year),
                     course: course_id,
                     roll_number: req.body.roll_number || null,
                     avatar: ''
