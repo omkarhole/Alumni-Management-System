@@ -18,11 +18,11 @@ async function login(req, res, next) {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (!user) {
-            return res.json({ loginStatus: false, Error: 'Invalid Credentials' });
+            return res.status(401).json({ loginStatus: false, Error: 'Invalid Credentials' });
         }
         const match = await bycrypt.compare(password, user.password);
         if (!match) {
-            return res.json({ loginStatus: false, Error: 'Invalid Credentials' });
+            return res.status(401).json({ loginStatus: false, Error: 'Invalid Credentials' });
         }
         const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1d' });
         res.cookie('token', token, cookieOptions);
