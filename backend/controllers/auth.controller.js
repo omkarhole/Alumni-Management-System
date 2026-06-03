@@ -87,7 +87,7 @@ async function signup(req, res, next) {
         //check for existing email
         const existing = await User.findOne({ email });
         if (existing) {
-            return res.json({ email: existing.email });
+            return res.status(409).json({ error: 'An account with this email already exists' });
         }
         const hashed = await bycrypt.hash(password, 10);
         let user;
