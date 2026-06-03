@@ -8,7 +8,18 @@ const eventCrud = createCrudService({
   defaultSort: { schedule: -1 },
 });
 
-const listEvents = async () => eventCrud.list();
+const listEvents = async ({ page = 1, limit = 20 } = {}) => {
+  const safeLimit = Math.min(Math.max(1, Number(limit)), 100);
+  const safePage  = Math.max(1, Number(page));
+  const skip      = (safePage - 1) * safeLimit;
+
+  const [events, total] = await Promise.all([
+    eventCrud.list({ skip, limit: safeLimit }),
+    eventCrud.model.countDocuments(),
+  ]);
+
+  return { events, total, page: safePage, limit: safeLimit, totalPages: Math.ceil(total / safeLimit) };
+};
 
 const addEvent = async (payload) => eventCrud.create(payload);
 
