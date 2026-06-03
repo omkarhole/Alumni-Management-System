@@ -19,6 +19,16 @@ const deleteEvent = async (id) => eventCrud.remove(id);
 const participateEvent = async ({ eventId, userId }) => {
   const event = await eventCrud.findById(eventId);
 
+  const alreadyParticipated = event.commits.some(
+    (commit) => commit.user.toString() === userId.toString()
+  );
+
+  if (alreadyParticipated) {
+    const error = new Error('User has already participated in this event');
+    error.statusCode = 409;
+    throw error;
+  }
+
   event.commits.push({ user: userId });
   await event.save();
 
