@@ -10,6 +10,7 @@ const ReferralList = () => {
   const [referrals, setReferrals] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 10 });
   const [loading, setLoading] = useState(true);
+  const [loadingNextPage, setLoadingNextPage] = useState(false);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('open');
@@ -17,12 +18,14 @@ const ReferralList = () => {
   const [savedItems, setSavedItems] = useState([]);
   const limit = 10;
 
+
   useEffect(() => {
     // Fetch whenever filter/search/page changes.
     // Pagination state is always synced from the server inside fetchReferrals().
     fetchReferrals({ page, search });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, page, search]);
+
 
 
 
@@ -51,18 +54,23 @@ const ReferralList = () => {
   }, [user]);
 
   const fetchReferrals = async ({ page: requestedPage, search: requestedSearch } = {}) => {
+    const requestedPageNum = Number(requestedPage ?? 1);
+    const isPageNavigation = requestedPageNum !== Number(pagination?.page);
 
     try {
-      setLoading(true);
-      setError('');
+      if (isPageNavigation) {
+        setLoadingNextPage(true);
+      } else {
+        setLoading(true);
+      }
 
+      setError('');
 
       const params = {
         status: statusFilter,
         page: requestedPage ?? 1,
         limit
       };
-
 
       const effectiveSearch = requestedSearch ?? '';
       if (effectiveSearch) params.search = effectiveSearch;
@@ -82,8 +90,10 @@ const ReferralList = () => {
       toast.error('Failed to load referrals');
     } finally {
       setLoading(false);
+      setLoadingNextPage(false);
     }
   };
+
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -99,6 +109,7 @@ const ReferralList = () => {
       </div>
     );
   }
+
 
   const savedMap = savedItems.reduce((accumulator, item) => {
     accumulator[`${item.entityType}:${item.entityId}`] = item;
@@ -286,24 +297,31 @@ const ReferralList = () => {
       {/* Pagination */}
       {pagination.total > 0 && (
         <div className="flex justify-center mt-12">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+
             <button
               onClick={() => {
                 const targetPage = Math.max(1, page - 1);
                 setPage(targetPage);
               }}
-              disabled={page === 1 || loading}
+              disabled={page === 1 || loadingNextPage || loading}
+
               className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
             >
               Previous
             </button>
-            <span className="px-4 py-2 font-medium">Page {page}</span>
+            <span className="px-4 py-2 font-medium flex items-center gap-2">
+              Page {page}
+              {loadingNextPage && <span className="text-sm text-gray-500">(Loading…)</span>}
+            </span>
+
             <button
               onClick={() => {
                 const targetPage = page + 1;
                 setPage(targetPage);
               }}
-              disabled={page * limit >= pagination.total || loading}
+              disabled={page * limit >= pagination.total || loadingNextPage || loading}
+
               className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
             >
               Next

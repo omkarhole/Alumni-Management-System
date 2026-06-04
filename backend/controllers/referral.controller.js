@@ -186,7 +186,11 @@ async function awardFirstReferralBadge(userId) {
 async function getReferrals(req, res, next) {
   try {
     const { status = 'open', search, page = 1, limit = 10 } = req.query;
-    const skip = (page - 1) * limit;
+
+    const pageNum = Math.max(1, Number(page));
+    const limitNum = Math.max(1, Number(limit));
+    const skip = (pageNum - 1) * limitNum;
+
     const currentUser = req.user?.id ? await getCurrentUserSummary(req.user.id) : null;
 
     const query = { status };
@@ -201,19 +205,20 @@ async function getReferrals(req, res, next) {
       .populate('postedBy', 'name email alumnus_bio type referralPostingSuspended referralPostingSuspendedReason')
       .populate('applicants.user', 'name email')
       .sort({ createdAt: -1 })
-      .skip(skip * 1)
-      .limit(limit * 1);
+      .skip(skip)
+      .limit(limitNum);
 
     const total = await JobReferral.countDocuments(query);
 
     res.json({
       referrals,
-      pagination: { total, page: parseInt(page), limit: parseInt(limit) }
+      pagination: { total, page: pageNum, limit: limitNum }
     });
   } catch (err) {
     next(err);
   }
 }
+
 
 // Apply for a referral
 async function applyForReferral(req, res, next) {
