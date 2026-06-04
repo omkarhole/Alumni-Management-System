@@ -44,7 +44,7 @@ connectDB();
 ========================= */
 
 const normalizeOrigin = (origin = '') =>
-    origin.trim().replace(/\/+$/, '');
+    String(origin).trim().replace(/\/+$/, '');
 
 const DEFAULT_ORIGINS = [
     'http://localhost:5173',
@@ -52,22 +52,30 @@ const DEFAULT_ORIGINS = [
     'https://alumni-management-system-xi.vercel.app'
 ];
 
-const ENV_ORIGINS = [
-    process.env.FRONTEND_URL,
-    ...(process.env.FRONTEND_URLS || '')
-        .split(',')
+const parseOriginsEnv = () => {
+    const single = process.env.FRONTEND_URL;
+    const multipleRaw = process.env.FRONTEND_URLS;
+
+    const multiple = typeof multipleRaw === 'string'
+        ? multipleRaw.split(',')
+        : [];
+
+    return [single, ...multiple]
         .map((origin) => normalizeOrigin(origin))
-        .filter(Boolean)
-];
+        .filter(Boolean);
+};
 
 const CLIENT_ORIGINS = [...new Set(
-    [...DEFAULT_ORIGINS, ...ENV_ORIGINS]
+    [...DEFAULT_ORIGINS, ...parseOriginsEnv()]
         .map((origin) => normalizeOrigin(origin))
         .filter(Boolean)
 )];
 
-console.log('Allowed CORS origins:', CLIENT_ORIGINS);
+if (process.env.NODE_ENV === 'development') {
+    console.log('Allowed CORS origins:', CLIENT_ORIGINS);
+}
 logger.logInfo('Server initialized with logging system enabled');
+
 
 const corsOptions = {
     origin: (origin, callback) => {
@@ -201,7 +209,18 @@ const server = http.createServer(app);
 // Initialize Socket.IO with CORS configuration
 const io = socketIO(server, {
   cors: {
-    origin: CLIENT_ORIGINS,
+    origin: (origin, callback) => {
+        // Socket.IO needs exact origin match; normalize to reduce intermittent failures
+        if (!origin) return callback(null, true);
+
+        const normalizedOrigin = normalizeOrigin(origin);
+
+        if (CLIENT_ORIGINS.includes(normalizedOrigin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error(`Socket CORS blocked for origin: ${origin}`));
+    },
     methods: ['GET', 'POST'],
     credentials: true
   },
