@@ -234,37 +234,114 @@ async function analyzeResume(req, res, next) {
     const missingSkills = skillExplanations.filter((entry) => entry.status === 'missing').map((entry) => entry.skill);
 
     // Course suggestions: match missing skills against course tags/title (best-effort)
-    // We still return generic recommendations even if no matching courses are found.
+    // Fix: avoid N+1 DB queries by doing a single batched query for all missing skills (up to 8).
     const missingTop = missingSkills.slice(0, 8);
 
     const courseSuggestions = [];
     if (missingTop.length > 0) {
-      for (const skill of missingTop) {
+      const escapeRegExp = (value) => String(value ?? '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      const skillRegexes = missingTop
+        .map((skill) => ({
+          skill: String(skill).trim(),
+          regex: new RegExp(escapeRegExp(String(skill)), 'i'),
+        }))
+        .filter((x) => x.skill.length > 0);
+
+      if (skillRegexes.length > 0) {
+        // Single query that returns candidates matched by ANY missing skill.
+        const orConditions = [
+          ...skillRegexes.map((sr) => ({ title: { $regex: sr.regex } })),
+          ...skillRegexes.map((sr) => ({
+            tags: { $elemMatch: { $regex: sr.regex } },
+          })),
+          ...skillRegexes.map((sr) => ({ description: { $regex: sr.regex } })),
+        ];
+
         const courses = await Course.find({
           isPublished: true,
-          $or: [
-            { title: { $regex: new RegExp(skill, 'i') } },
-            { tags: { $elemMatch: { $regex: new RegExp(skill, 'i') } } },
-            { description: { $regex: new RegExp(skill, 'i') } },
-          ],
+          $or: orConditions,
         })
-          .limit(3)
+          // Upper bound; we post-process to pick best matches.
+          .limit(60)
           .lean();
 
         if (courses && courses.length > 0) {
+          const getSkillScoreForCourse = (course, skillEntry) => {
+            // Important: RegExp#test is stateful for /g. We never use /g, but cloning keeps it safe.
+            const regex = new RegExp(skillEntry.regex.source, skillEntry.regex.flags);
+
+            const title = String(course?.title || '');
+            const description = String(course?.description || '');
+            const tags = Array.isArray(course?.tags) ? course.tags : [];
+
+            let score = 0;
+
+            if (regex.test(title)) score += 6;
+            if (regex.test(description)) score += 3;
+            if (tags.some((t) => regex.test(String(t)))) score += 5;
+
+            const skillLower = String(skillEntry.skill).toLowerCase().trim();
+            if (skillLower && title.toLowerCase().includes(skillLower)) score += 2;
+
+            return score;
+          };
+
+
+          for (const c of courses) {
+            let bestSkill = null;
+            let bestScore = 0;
+
+            for (const sr of skillRegexes) {
+              const s = getSkillScoreForCourse(c, sr);
+              if (s > bestScore) {
+                bestScore = s;
+                bestSkill = sr.skill;
+              }
+            }
+
+            if (bestSkill && bestScore > 0) {
+              courseSuggestions.push({
+                skill: bestSkill,
+                courseId: c._id,
+                title: c.title,
+                category: c.category,
+                _score: bestScore,
+              });
+            }
+          }
+
+          courseSuggestions.sort((a, b) => (b._score || 0) - (a._score || 0));
+
+          const seen = new Set();
+          const deduped = [];
+          for (const cs of courseSuggestions) {
+            const key = String(cs.courseId);
+            if (seen.has(key)) continue;
+            seen.add(key);
+            deduped.push(cs);
+          }
+
+          courseSuggestions.length = 0;
           courseSuggestions.push(
-            ...courses.map((c) => ({
-              skill,
-              courseId: c._id,
-              title: c.title,
-              category: c.category,
+            ...deduped.map((cs) => ({
+              skill: cs.skill,
+              courseId: cs.courseId,
+              title: cs.title,
+              category: cs.category,
             }))
           );
         }
       }
     }
 
+
+
+
+
+
     const recommendations = buildRecommendations({ missingSkills, score });
+
     if (courseSuggestions.length > 0) {
       recommendations.push('Suggested courses based on your skill gaps:');
       for (const cs of courseSuggestions.slice(0, 6)) {
