@@ -104,6 +104,30 @@ async function getReferralAccess(referralId, userId) {
   };
 }
 
+async function checkReferralAccessMiddleware(req, res, next) {
+  try {
+    const { id } = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid referral ID format' });
+    }
+
+    const accessInfo = await getReferralAccess(id, req.user.id);
+    if (!accessInfo.referral) {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    // Hide referrals that are hidden/removed from non-admins
+    if (isReferralHidden(accessInfo.referral) && accessInfo.currentUser?.type !== 'admin') {
+      return res.status(404).json({ message: 'Referral not found' });
+    }
+
+    req.referralAccess = accessInfo;
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
 // Create a new job referral opportunity
 async function createReferral(req, res, next) {
   try {
@@ -223,20 +247,10 @@ async function getReferrals(req, res, next) {
 // Apply for a referral
 async function applyForReferral(req, res, next) {
   try {
-    const { id } = req.params;
-    const currentUser = await getCurrentUserSummary(req.user.id);
+    const { referral, currentUser } = req.referralAccess;
 
     if (!currentUser || currentUser.type !== 'student') {
       return res.status(403).json({ message: 'Only students can apply for referrals' });
-    }
-
-    const referral = await JobReferral.findById(id);
-    if (!referral) {
-      return res.status(404).json({ message: 'Referral not found' });
-    }
-
-    if (isReferralHidden(referral) && currentUser?.type !== 'admin') {
-      return res.status(404).json({ message: 'Referral not found' });
     }
 
     if (referral.status !== 'open') {
@@ -287,16 +301,9 @@ async function applyForReferral(req, res, next) {
 // Accept a referral applicant
 async function acceptReferral(req, res, next) {
   try {
-    const { id, applicantId } = req.params;
-    const currentUser = await getCurrentUserSummary(req.user.id);
+    const { applicantId } = req.params;
+    const { referral, isOwner, isAdmin, currentUser } = req.referralAccess;
 
-    const referral = await JobReferral.findById(id);
-    if (!referral) {
-      return res.status(404).json({ message: 'Referral not found' });
-    }
-
-    const isOwner = referral.postedBy.toString() === req.user.id;
-    const isAdmin = currentUser?.type === 'admin';
     if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'Access denied' });
     }
@@ -346,16 +353,9 @@ async function acceptReferral(req, res, next) {
 // Reject a referral applicant
 async function rejectReferral(req, res, next) {
   try {
-    const { id, applicantId } = req.params;
-    const currentUser = await getCurrentUserSummary(req.user.id);
+    const { applicantId } = req.params;
+    const { referral, isOwner, isAdmin, currentUser } = req.referralAccess;
 
-    const referral = await JobReferral.findById(id);
-    if (!referral) {
-      return res.status(404).json({ message: 'Referral not found' });
-    }
-
-    const isOwner = referral.postedBy.toString() === req.user.id;
-    const isAdmin = currentUser?.type === 'admin';
     if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'Access denied' });
     }
@@ -399,15 +399,10 @@ async function rejectReferral(req, res, next) {
 // Get single referral by ID
 async function getReferralById(req, res, next) {
   try {
-    const { referral, access } = await getReferralAccess(req.params.id, req.user.id);
-
-    if (!referral) {
-      return res.status(404).json({ message: 'Referral not found' });
-    }
+    const { referral, access } = req.referralAccess;
 
     if (!access) {
-      // Do not leak referral existence.
-      return res.status(404).json({ message: 'Referral not found' });
+      return res.status(403).json({ message: 'Access denied' });
     }
 
     // Keep response structure consistent with prior implementation.
@@ -422,15 +417,10 @@ async function getReferralById(req, res, next) {
 
 async function getReferralTimeline(req, res, next) {
   try {
-    const { referral, access } = await getReferralAccess(req.params.id, req.user.id);
-
-    if (!referral) {
-      return res.status(404).json({ message: 'Referral not found' });
-    }
+    const { referral, access } = req.referralAccess;
 
     if (!access) {
-      // Do not leak referral existence.
-      return res.status(404).json({ message: 'Referral not found' });
+      return res.status(403).json({ message: 'Access denied' });
     }
 
     const timeline = [...(referral.timeline || [])].sort(
@@ -445,18 +435,9 @@ async function getReferralTimeline(req, res, next) {
 
 
 async function closeReferral(req, res, next) {
-
   try {
-    const { id } = req.params;
-    const currentUser = await getCurrentUserSummary(req.user.id);
+    const { referral, isOwner, isAdmin, currentUser } = req.referralAccess;
 
-    const referral = await JobReferral.findById(id);
-    if (!referral) {
-      return res.status(404).json({ message: 'Referral not found' });
-    }
-
-    const isOwner = referral.postedBy.toString() === req.user.id;
-    const isAdmin = currentUser?.type === 'admin';
     if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'Access denied' });
     }
@@ -724,11 +705,7 @@ async function suspendReferralPoster(req, res, next) {
 async function getReferralMessages(req, res, next) {
   try {
     const { id } = req.params;
-    const { referral, access } = await getReferralAccess(id, req.user.id);
-
-    if (!referral) {
-      return res.status(404).json({ message: 'Referral not found' });
-    }
+    const { referral, access } = req.referralAccess;
 
     if (!access) {
       return res.status(403).json({ message: 'Access denied' });
@@ -779,11 +756,7 @@ async function sendReferralMessage(req, res, next) {
       });
     }
 
-    const { referral, currentUser, access, isOwner, isApplicant } = await getReferralAccess(id, req.user.id);
-
-    if (!referral) {
-      return res.status(404).json({ message: 'Referral not found' });
-    }
+    const { referral, currentUser, access, isOwner, isApplicant } = req.referralAccess;
 
     if (!access) {
       return res.status(403).json({ message: 'Access denied' });
@@ -868,13 +841,7 @@ async function getMyReferrals(req, res, next) {
 
 async function computeReferralBonus(req, res, next) {
   try {
-    const referral = await JobReferral.findById(req.params.id)
-      .populate('postedBy', 'name email alumnus_bio')
-      .populate('applicants.user', 'name email alumnus_bio');
-
-    if (!referral) {
-      return res.status(404).json({ message: 'Referral not found' });
-    }
+    const { referral } = req.referralAccess;
 
     const { referral: persistedReferral, bonus } = await recomputeAndPersistReferralBonus(referral, {
       computedBy: req.user?.id || null
@@ -908,6 +875,6 @@ module.exports = {
   getMyReferrals,
   getReferralById,
   getReferralTimeline,
-  computeReferralBonus
+  computeReferralBonus,
+  checkReferralAccessMiddleware
 };
-

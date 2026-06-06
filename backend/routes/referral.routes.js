@@ -11,7 +11,8 @@ const {
   getMyReferrals,
   getReferralById,
   getReferralTimeline,
-  computeReferralBonus
+  computeReferralBonus,
+  checkReferralAccessMiddleware
 } = require('../controllers/referral.controller');
 const { authenticate, isStudent } = require('../middlewares/auth.middleware');
 
@@ -35,31 +36,34 @@ router.post('/', authenticate, createReferral);
 // Get all referrals
 router.get('/', authenticate, getReferrals);
 
-// Apply for referral
-router.post('/:id/apply', authenticate, isStudent, applyForReferral);
-
-// Referral Q&A / messaging
-router.post('/:id/messages', authenticate, sendReferralMessage);
-router.get('/:id/messages', authenticate, getReferralMessages);
-
-// Referral bonus computation
-router.post('/:id/compute-bonus', authenticate, allowBonusCompute, computeReferralBonus);
-
-// Manage applicants (only poster)
-router.put('/:id/applicants/:applicantId/accept', authenticate, acceptReferral);
-router.put('/:id/applicants/:applicantId/reject', authenticate, rejectReferral);
-
-// Close referral (poster/admin)
-router.patch('/:id/close', authenticate, closeReferral);
-
-// Get referral timeline
-router.get('/:id/timeline', authenticate, getReferralTimeline);
-
 // Get my referrals
 router.get('/my-referrals', authenticate, getMyReferrals);
 
+// Check access for all ID-based subroutes
+router.use('/:id', authenticate, checkReferralAccessMiddleware);
+
+// Apply for referral
+router.post('/:id/apply', isStudent, applyForReferral);
+
+// Referral Q&A / messaging
+router.post('/:id/messages', sendReferralMessage);
+router.get('/:id/messages', getReferralMessages);
+
+// Referral bonus computation
+router.post('/:id/compute-bonus', allowBonusCompute, computeReferralBonus);
+
+// Manage applicants (only poster)
+router.put('/:id/applicants/:applicantId/accept', acceptReferral);
+router.put('/:id/applicants/:applicantId/reject', rejectReferral);
+
+// Close referral (poster/admin)
+router.patch('/:id/close', closeReferral);
+
+// Get referral timeline
+router.get('/:id/timeline', getReferralTimeline);
+
 // Get single referral
-router.get('/:id', authenticate, getReferralById);
+router.get('/:id', getReferralById);
 
 module.exports = router;
 
