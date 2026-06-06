@@ -99,6 +99,29 @@ export const SocketProvider = ({ children }) => {
   }, [socket]);
 
   /**
+   * Join a referral room
+   */
+  const joinReferral = useCallback((referralId) => {
+    if (!socket || !isConnected) {
+      console.warn('Socket not connected');
+      return;
+    }
+
+    socket.emit('joinReferral', { referralId });
+    console.log(`Joined referral room: referral:${referralId}`);
+  }, [socket, isConnected]);
+
+  /**
+   * Leave a referral room
+   */
+  const leaveReferral = useCallback((referralId) => {
+    if (!socket) return;
+
+    socket.emit('leaveReferral', { referralId });
+    console.log(`Left referral room: referral:${referralId}`);
+  }, [socket]);
+
+  /**
    * Mark messages as read
    */
   const markAsRead = useCallback((conversationId, messageIds, userId) => {
@@ -242,6 +265,8 @@ export const SocketProvider = ({ children }) => {
     typingUsers,
     joinConversation,
     leaveConversation,
+    joinReferral,
+    leaveReferral,
     markAsRead,
     addReaction,
     removeReaction,
@@ -260,6 +285,8 @@ export const SocketProvider = ({ children }) => {
     typingUsers,
     joinConversation,
     leaveConversation,
+    joinReferral,
+    leaveReferral,
     markAsRead,
     addReaction,
     removeReaction,
@@ -287,6 +314,20 @@ export const useSocket = () => {
     throw new Error('useSocket must be used within SocketProvider');
   }
   return context;
+};
+
+/**
+ * Hook to listen to a socket event
+ */
+export const useSocketListener = (event, callback) => {
+  const { on } = useSocket();
+
+  useEffect(() => {
+    const cleanup = on(event, callback);
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [event, callback, on]);
 };
 
 export default SocketContext;

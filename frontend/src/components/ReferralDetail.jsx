@@ -3,12 +3,36 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../AuthContext';
 import { toast } from 'react-toastify';
+import { useSocket, useSocketListener } from '../SocketContext';
 
 const ReferralDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthReady, user: authUser } = useAuth();
   const [referral, setReferral] = useState(null);
+
+  const { joinReferral, leaveReferral } = useSocket();
+
+  useEffect(() => {
+    if (id) {
+      joinReferral(id);
+      return () => {
+        leaveReferral(id);
+      };
+    }
+  }, [id, joinReferral, leaveReferral]);
+
+  useSocketListener('referralMessageCreated', (payload) => {
+    if (payload && String(payload.referralId) === String(id)) {
+      setMessages((prevMessages) => {
+        const messageExists = prevMessages.some((msg) => msg._id === payload.message?._id);
+        if (messageExists) {
+          return prevMessages;
+        }
+        return [...prevMessages, payload.message];
+      });
+    }
+  });
   const [timeline, setTimeline] = useState([]);
   const [messages, setMessages] = useState([]);
   const [messageBody, setMessageBody] = useState('');
