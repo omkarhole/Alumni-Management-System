@@ -74,6 +74,7 @@ const SimpleBarChart = ({ matched, missing }) => {
 const SkillExplanationRow = ({ item }) => {
   const isMatched = item?.status === 'matched';
   const matchedTypeLabel = item?.matchedType || 'none';
+  const confidence = item?.confidence || (isMatched ? (matchedTypeLabel === 'exact' ? 'exact' : 'partial') : 'low');
   const toneClass = isMatched
     ? 'border-green-200 bg-green-50 text-green-800'
     : 'border-red-200 bg-red-50 text-red-800';
@@ -95,6 +96,13 @@ const SkillExplanationRow = ({ item }) => {
           </span>
           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/80 text-gray-700 border border-current/20">
             {matchedTypeLabel}
+          </span>
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            confidence === 'exact' ? 'bg-green-100 text-green-800 border border-green-200' :
+            confidence === 'partial' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+            'bg-red-100 text-red-800 border border-red-200'
+          }`}>
+            {confidence.charAt(0).toUpperCase() + confidence.slice(1)} Confidence
           </span>
         </div>
       </summary>
@@ -119,6 +127,7 @@ const SkillExplanationsPanel = ({ analysis }) => {
           skill,
           status: 'matched',
           matchedType: 'exact',
+          confidence: 'exact',
           matchedBecause: [`Analysis reported '${skill}' as matched.`],
           source: 'analysis',
         })),
@@ -126,6 +135,7 @@ const SkillExplanationsPanel = ({ analysis }) => {
           skill,
           status: 'missing',
           matchedType: 'none',
+          confidence: 'low',
           matchedBecause: [`Analysis reported '${skill}' as missing.`],
           source: 'analysis',
         })),
