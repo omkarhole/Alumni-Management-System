@@ -3,6 +3,9 @@ const { JobReferral, User, Badge, UserBadge, ReferralMessage, ReferralModeration
 const logger = require('../utils/logger');
 const { recomputeAndPersistReferralBonus } = require('../services/referralBonusService');
 
+const POSTED_BY_SELECT = 'name email alumnus_bio type referralPostingSuspended referralPostingSuspendedReason referralPostingSuspendedAt';
+const APPLICANT_SELECT = 'name email alumnus_bio';
+
 async function getCurrentUserSummary(userId) {
   return User.findById(userId).select('_id name type referralPostingSuspended referralPostingSuspendedAt referralPostingSuspendedReason referralPostingSuspendedBy');
 }
@@ -49,7 +52,7 @@ async function moderateReferral({ referralId, adminId, actionType, reason, refer
 
     await session.withTransaction(async () => {
       referral = await JobReferral.findById(referralId)
-        .populate('postedBy', 'name email type referralPostingSuspended referralPostingSuspendedAt referralPostingSuspendedReason');
+        .populate('postedBy', POSTED_BY_SELECT);
 
       if (!referral) {
         const notFoundError = new Error('Referral not found');
@@ -82,8 +85,8 @@ async function moderateReferral({ referralId, adminId, actionType, reason, refer
 
 async function getReferralAccess(referralId, userId) {
   const referral = await JobReferral.findById(referralId)
-    .populate('postedBy', 'name email alumnus_bio')
-    .populate('applicants.user', 'name email alumnus_bio');
+    .populate('postedBy', POSTED_BY_SELECT)
+    .populate('applicants.user', APPLICANT_SELECT);
 
   if (!referral) {
     return { referral: null, access: false, currentUser: null, isOwner: false, isApplicant: false };
@@ -156,7 +159,7 @@ async function createReferral(req, res, next) {
     const referral = await JobReferral.create(referralData);
 
     // Populate for response
-    await referral.populate('postedBy', 'name email alumnus_bio');
+    await referral.populate('postedBy', POSTED_BY_SELECT);
 
     // Check if this is user's first referral (award badge)
     const userReferralsCount = await JobReferral.countDocuments({ postedBy: req.user.id });
@@ -226,8 +229,8 @@ async function getReferrals(req, res, next) {
     }
 
     const referrals = await JobReferral.find(query)
-      .populate('postedBy', 'name email alumnus_bio type referralPostingSuspended referralPostingSuspendedReason')
-      .populate('applicants.user', 'name email')
+      .populate('postedBy', POSTED_BY_SELECT)
+      .populate('applicants.user', APPLICANT_SELECT)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limitNum);
@@ -287,7 +290,7 @@ async function applyForReferral(req, res, next) {
 
     await referral.save();
 
-    await referral.populate('applicants.user', 'name email alumnus_bio');
+    await referral.populate('applicants.user', APPLICANT_SELECT);
 
     res.status(201).json({
       message: 'Application submitted successfully',
@@ -339,7 +342,7 @@ async function acceptReferral(req, res, next) {
     await referral.save();
     const { referral: recomputedReferral } = await recomputeAndPersistReferralBonus(referral, { computedBy: req.user.id });
 
-    await recomputedReferral.populate('applicants.user', 'name email');
+    await recomputedReferral.populate('applicants.user', APPLICANT_SELECT);
 
     res.json({
       message: 'Applicant accepted successfully',
@@ -385,7 +388,7 @@ async function rejectReferral(req, res, next) {
 
     await referral.save();
 
-    await referral.populate('applicants.user', 'name email');
+    await referral.populate('applicants.user', APPLICANT_SELECT);
 
     res.json({
       message: 'Applicant rejected successfully',
@@ -406,8 +409,8 @@ async function getReferralById(req, res, next) {
     }
 
     // Keep response structure consistent with prior implementation.
-    await referral.populate('postedBy', 'name email alumnus_bio type referralPostingSuspended referralPostingSuspendedReason');
-    await referral.populate('applicants.user', 'name email alumnus_bio');
+    await referral.populate('postedBy', POSTED_BY_SELECT);
+    await referral.populate('applicants.user', APPLICANT_SELECT);
 
     res.json(referral);
   } catch (err) {
@@ -488,7 +491,7 @@ async function getAdminReferrals(req, res, next) {
     }
 
     const referrals = await JobReferral.find(query)
-      .populate('postedBy', 'name email alumnus_bio type referralPostingSuspended referralPostingSuspendedReason referralPostingSuspendedAt')
+      .populate('postedBy', POSTED_BY_SELECT)
       .populate('moderation.moderatedBy', 'name email type')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -716,8 +719,8 @@ async function getReferralMessages(req, res, next) {
     }
 
     const messages = await ReferralMessage.find({ referralId: id })
-      .populate('sender', 'name email alumnus_bio')
-      .populate('recipient', 'name email alumnus_bio')
+      .populate('sender', APPLICANT_SELECT)
+      .populate('recipient', APPLICANT_SELECT)
       .sort({ createdAt: 1 });
 
     res.json({ messages });
@@ -810,8 +813,8 @@ async function sendReferralMessage(req, res, next) {
     });
 
     const populatedMessage = await ReferralMessage.findById(message._id)
-      .populate('sender', 'name email alumnus_bio')
-      .populate('recipient', 'name email alumnus_bio');
+      .populate('sender', APPLICANT_SELECT)
+      .populate('recipient', APPLICANT_SELECT);
 
     const io = req.app.get('io');
     if (io) {
@@ -834,7 +837,7 @@ async function sendReferralMessage(req, res, next) {
 async function getMyReferrals(req, res, next) {
   try {
     const referrals = await JobReferral.find({ postedBy: req.user.id })
-      .populate('applicants.user', 'name email alumnus_bio')
+      .populate('applicants.user', APPLICANT_SELECT)
       .sort({ createdAt: -1 });
 
     res.json(referrals);
