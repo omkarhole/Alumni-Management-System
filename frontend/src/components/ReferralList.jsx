@@ -4,10 +4,29 @@ import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import apiClient from '../api/client';
 import { useAuth } from '../AuthContext';
 import { toast } from 'react-toastify';
+import { useSocketListener } from '../SocketContext';
 
 const ReferralList = () => {
   const { user } = useAuth();
   const [referrals, setReferrals] = useState([]);
+
+  useSocketListener('referralModerationUpdated', (payload) => {
+    if (payload) {
+      const { referralId, status } = payload;
+      if (status === 'hidden' || status === 'removed') {
+        setReferrals((prevReferrals) => prevReferrals.filter(r => r._id !== referralId));
+      } else {
+        setReferrals((prevReferrals) =>
+          prevReferrals.map((r) =>
+            r._id === referralId
+              ? { ...r, moderation: { ...r.moderation, status } }
+              : r
+          )
+        );
+      }
+    }
+  });
+
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 10 });
   const [loading, setLoading] = useState(true);
   const [loadingNextPage, setLoadingNextPage] = useState(false);

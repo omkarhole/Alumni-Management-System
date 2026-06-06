@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import apiClient from '../api/client';
+import { useSocketListener } from '../SocketContext';
 
 const statusColors = {
     pending: 'warning',
@@ -38,6 +39,27 @@ const AdminReferrals = () => {
     const [selectedModerationReferralId, setSelectedModerationReferralId] = useState('');
     const [moderationActions, setModerationActions] = useState([]);
     const [auditLoading, setAuditLoading] = useState(false);
+
+    useSocketListener('referralModerationUpdated', (payload) => {
+        if (payload) {
+            const { referralId, status, referral: updatedReferral } = payload;
+            setModerationReferrals((currentList) =>
+                currentList.map((item) => {
+                    if (item._id !== referralId) return item;
+                    
+                    const updatedPostedBy = updatedReferral?.postedBy 
+                        ? { ...item.postedBy, ...updatedReferral.postedBy }
+                        : item.postedBy;
+
+                    return { 
+                        ...item, 
+                        postedBy: updatedPostedBy,
+                        moderation: { ...item.moderation, status } 
+                    };
+                })
+            );
+        }
+    });
 
     useEffect(() => {
         fetchJobReferrals();
@@ -115,9 +137,45 @@ const AdminReferrals = () => {
             return;
         }
 
+        const trimmedReason = reason.trim() || defaultReason || '';
+
+        // Save current list state for fallback
+        const previousModerationReferrals = [...moderationReferrals];
+
+        // Optimistically update the UI
+        setModerationReferrals((currentList) =>
+            currentList.map((item) => {
+                if (item._id !== referralId) return item;
+
+                let newStatus = item.moderation?.status || 'visible';
+                let posterSuspended = item.postedBy?.referralPostingSuspended || false;
+
+                if (actionType === 'flag') {
+                    newStatus = 'flagged';
+                } else if (actionType === 'hide') {
+                    newStatus = 'hidden';
+                } else if (actionType === 'restore') {
+                    newStatus = 'visible';
+                } else if (actionType === 'suspend-poster') {
+                    newStatus = 'hidden';
+                    posterSuspended = true;
+                }
+
+                return {
+                    ...item,
+                    postedBy: item.postedBy ? { ...item.postedBy, referralPostingSuspended: posterSuspended } : null,
+                    moderation: {
+                        ...item.moderation,
+                        status: newStatus,
+                        reason: trimmedReason
+                    }
+                };
+            })
+        );
+
         try {
             await apiClient.post(`/admin/referrals/${referralId}/${actionType}`, {
-                reason: reason.trim() || defaultReason || ''
+                reason: trimmedReason
             });
 
             await Promise.all([
@@ -127,6 +185,8 @@ const AdminReferrals = () => {
 
             fetchModerationActions(referralId);
         } catch (err) {
+            // Roll back on error
+            setModerationReferrals(previousModerationReferrals);
             alert(err.response?.data?.message || 'Failed to update moderation state');
         }
     };
