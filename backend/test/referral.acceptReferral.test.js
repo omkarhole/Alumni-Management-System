@@ -84,7 +84,13 @@ test('acceptReferral keeps the referral open after accepting one applicant', asy
   try {
     const req = {
       params: { id: 'referral-1', applicantId: 'applicant-1' },
-      user: { id: 'owner-1' }
+      user: { id: 'owner-1' },
+      referralAccess: {
+        referral,
+        isOwner: true,
+        isAdmin: false,
+        currentUser: { _id: 'owner-1', name: 'Owner User', type: 'alumnus' }
+      }
     };
     const res = createResponse();
 
@@ -124,7 +130,7 @@ test('acceptReferral keeps the referral open after accepting one applicant', asy
       }
     });
     assert.deepStrictEqual(referral.timeline.map((event) => event.action), ['accepted']);
-    assert.ok(referralFindByIdCalls >= 2);
+    assert.ok(referralFindByIdCalls >= 1);
   } finally {
     JobReferral.findById = originalFindById;
     User.findById = originalUserFindById;
