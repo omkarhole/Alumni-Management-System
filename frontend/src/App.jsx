@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { ThemeProvider } from "./ThemeContext";
+import { SocketProvider } from "./SocketContext";
 import ScrollToTop from "./components/ScrollToTop";
 import SmoothWheelScroll from "./components/SmoothWheelScroll";
 import PrivateRoute from "./components/PrivateRoute";
@@ -77,9 +78,11 @@ function App() {
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <ScrollToTop />
-          <SmoothWheelScroll />
-          <AppRouter />
+          <SocketProvider>
+            <ScrollToTop />
+            <SmoothWheelScroll />
+            <AppRouter />
+          </SocketProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

@@ -316,6 +316,36 @@ const initializeSocket = (io) => {
       }
     });
 
+    // ===== REFERRAL: JOIN/LEAVE ROOMS =====
+    socket.on('joinReferral', (data) => {
+      try {
+        const { referralId } = data || {};
+        if (!referralId) {
+          socket.emit('error', { message: 'referralId is required' });
+          return;
+        }
+
+        const roomId = `referral:${referralId}`;
+        socket.join(roomId);
+        console.log(`Socket ${socket.id} joined referral room ${roomId}`);
+      } catch (error) {
+        console.error('Error in joinReferral:', error);
+      }
+    });
+
+    socket.on('leaveReferral', (data) => {
+      try {
+        const { referralId } = data || {};
+        if (!referralId) return;
+
+        const roomId = `referral:${referralId}`;
+        socket.leave(roomId);
+        console.log(`Socket ${socket.id} left referral room ${roomId}`);
+      } catch (error) {
+        console.error('Error in leaveReferral:', error);
+      }
+    });
+
     // ===== DISCONNECT HANDLER =====
     socket.on('disconnect', () => {
       try {
