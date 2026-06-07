@@ -104,11 +104,18 @@ function buildSkillExplanations({ resumeText = '', resumeSkills = [], requiredSk
       matchedBecause.push(`resume does not include '${skillLabel}'`);
     }
 
+    const confidence = matchedType === 'exact' ? 'exact' : (matchedType === 'partial' ? 'partial' : 'low');
+
+    if (matchedBecause.length === 0) {
+      matchedBecause.push(`no confirmation information available for '${skillLabel}'`);
+    }
+
     return {
       skill: skillLabel,
       status,
       matchedType,
       matchedBecause,
+      confidence,
       source,
     };
   });

@@ -60,6 +60,11 @@ const resumeAnalysisSchema = new mongoose.Schema(
             type: String,
             default: 'jobRequirements',
           },
+          confidence: {
+            type: String,
+            enum: ['exact', 'partial', 'low'],
+            default: 'low',
+          },
         },
       ],
       default: [],
