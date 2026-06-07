@@ -69,7 +69,7 @@ async function moderateReferral({ referralId, adminId, actionType, reason, refer
         adminId,
         referralId: referral._id,
         actionType,
-        reason: normalizeModerationReason(reason),
+        reason: reason,
         targetUserId: referral.postedBy?._id || referral.postedBy || null
       });
     });
@@ -526,16 +526,17 @@ async function flagReferralForSpam(req, res, next) {
   try {
     const { id } = req.params;
     const { reason } = req.body;
+    const normalizedReason = normalizeModerationReason(reason, 'Flagged for review');
 
     const { referral, moderationAction } = await moderateReferral({
       referralId: id,
       adminId: req.user.id,
       actionType: 'flag',
-      reason: normalizeModerationReason(reason, 'Flagged for review'),
+      reason: normalizedReason,
       referralMutator: async (referralDoc) => {
         referralDoc.moderation = {
           status: 'flagged',
-          reason: normalizeModerationReason(reason, 'Flagged for review'),
+          reason: normalizedReason,
           moderatedBy: req.user.id,
           moderatedAt: new Date()
         };
@@ -568,16 +569,17 @@ async function hideReferral(req, res, next) {
   try {
     const { id } = req.params;
     const { reason } = req.body;
+    const normalizedReason = normalizeModerationReason(reason, 'Hidden by administrator');
 
     const { referral, moderationAction } = await moderateReferral({
       referralId: id,
       adminId: req.user.id,
       actionType: 'hide',
-      reason: normalizeModerationReason(reason, 'Hidden by administrator'),
+      reason: normalizedReason,
       referralMutator: async (referralDoc) => {
         referralDoc.moderation = {
           status: 'hidden',
-          reason: normalizeModerationReason(reason, 'Hidden by administrator'),
+          reason: normalizedReason,
           moderatedBy: req.user.id,
           moderatedAt: new Date()
         };
@@ -610,16 +612,17 @@ async function restoreReferral(req, res, next) {
   try {
     const { id } = req.params;
     const { reason } = req.body;
+    const normalizedReason = normalizeModerationReason(reason, 'Restored by administrator');
 
     const { referral, moderationAction } = await moderateReferral({
       referralId: id,
       adminId: req.user.id,
       actionType: 'restore',
-      reason: normalizeModerationReason(reason, 'Restored by administrator'),
+      reason: normalizedReason,
       referralMutator: async (referralDoc) => {
         referralDoc.moderation = {
           status: 'visible',
-          reason: normalizeModerationReason(reason, 'Restored by administrator'),
+          reason: normalizedReason,
           moderatedBy: req.user.id,
           moderatedAt: new Date()
         };
@@ -652,16 +655,17 @@ async function suspendReferralPoster(req, res, next) {
   try {
     const { id } = req.params;
     const { reason } = req.body;
+    const normalizedReason = normalizeModerationReason(reason, 'Poster suspended by administrator');
 
     const { referral, moderationAction } = await moderateReferral({
       referralId: id,
       adminId: req.user.id,
       actionType: 'suspend_poster',
-      reason: normalizeModerationReason(reason, 'Poster suspended by administrator'),
+      reason: normalizedReason,
       referralMutator: async (referralDoc) => {
         referralDoc.moderation = {
           status: 'hidden',
-          reason: normalizeModerationReason(reason, 'Poster suspended by administrator'),
+          reason: normalizedReason,
           moderatedBy: req.user.id,
           moderatedAt: new Date()
         };
@@ -674,7 +678,7 @@ async function suspendReferralPoster(req, res, next) {
         await User.findByIdAndUpdate(posterId, {
           referralPostingSuspended: true,
           referralPostingSuspendedAt: new Date(),
-          referralPostingSuspendedReason: normalizeModerationReason(reason, 'Poster suspended by administrator'),
+          referralPostingSuspendedReason: normalizedReason,
           referralPostingSuspendedBy: req.user.id
         }, { session });
       }
