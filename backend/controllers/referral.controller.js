@@ -749,6 +749,36 @@ async function sendReferralMessage(req, res, next) {
   try {
     const { id } = req.params;
     const { body, recipientId } = req.body;
+
+    const validationErrors = {};
+
+    // Validate referral ID (id)
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      validationErrors.id = 'Invalid referral ID format';
+    }
+
+    // Validate recipientId if provided
+    if (recipientId !== undefined && recipientId !== null && String(recipientId).trim() !== '') {
+      if (!mongoose.Types.ObjectId.isValid(recipientId)) {
+        validationErrors.recipientId = 'Recipient ID must be a valid ObjectId';
+      }
+    }
+
+    // Validate body
+    const trimmedBody = String(body || '').trim();
+    if (!trimmedBody) {
+      validationErrors.body = 'Message body is required';
+    } else if (trimmedBody.length > 2000) {
+      validationErrors.body = 'Message body cannot exceed 2000 characters';
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: validationErrors
+      });
+    }
+
     const { referral, currentUser, access, isOwner, isApplicant } = await getReferralAccess(id, req.user.id);
 
     if (!referral) {
@@ -757,11 +787,6 @@ async function sendReferralMessage(req, res, next) {
 
     if (!access) {
       return res.status(403).json({ message: 'Access denied' });
-    }
-
-    const trimmedBody = String(body || '').trim();
-    if (!trimmedBody) {
-      return res.status(400).json({ message: 'Message body is required' });
     }
 
     let recipientUser = null;
