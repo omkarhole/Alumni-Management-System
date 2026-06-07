@@ -561,6 +561,15 @@ async function flagReferralForSpam(req, res, next) {
       }
     });
 
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('referralModerationUpdated', {
+        referralId: id,
+        status: referral.moderation?.status || 'visible',
+        referral
+      });
+    }
+
     res.json({
       message: 'Referral flagged successfully',
       referral,
@@ -594,6 +603,15 @@ async function hideReferral(req, res, next) {
       }
     });
 
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('referralModerationUpdated', {
+        referralId: id,
+        status: referral.moderation?.status || 'visible',
+        referral
+      });
+    }
+
     res.json({
       message: 'Referral hidden successfully',
       referral,
@@ -626,6 +644,15 @@ async function restoreReferral(req, res, next) {
         };
       }
     });
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('referralModerationUpdated', {
+        referralId: id,
+        status: referral.moderation?.status || 'visible',
+        referral
+      });
+    }
 
     res.json({
       message: 'Referral restored successfully',
@@ -671,6 +698,15 @@ async function suspendReferralPoster(req, res, next) {
         }, { session });
       }
     });
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('referralModerationUpdated', {
+        referralId: id,
+        status: referral.moderation?.status || 'visible',
+        referral
+      });
+    }
 
     res.json({
       message: 'Referral poster suspended successfully',
